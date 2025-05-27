@@ -1,6 +1,8 @@
 package com.pickcar.drivehistory.application;
 
 import com.pickcar.drivehistory.domain.DriveHistory;
+import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
+import com.pickcar.drivehistory.exception.DriveHistoryException;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryCreateRequest;
 import java.time.LocalDateTime;
@@ -46,7 +48,7 @@ public class DriveHistoryService {
         }
 
         if (request.drivingEndedAt().isBefore(request.drivingStartedAt())) {
-            throw new IllegalArgumentException("[ERROR] 운행 종료 일시는 운행 시작 일시보다 빠를 수 없습니다.");
+            throw new DriveHistoryException(DriveHistoryErrorCode.START_TIME_CANNOT_BE_AFTER_END_TIME);
         }
     }
 }
