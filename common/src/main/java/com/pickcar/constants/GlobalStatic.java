@@ -2,6 +2,8 @@ package com.pickcar.constants;
 
 public class GlobalStatic {
 
+    public static final String ERROR_PREFIX = "[ERROR]";
+
     public enum HttpStatus {
         //2XX Success
         OK(200, "요청이 정상적으로 처리되었습니다."),
@@ -36,8 +38,4 @@ public class GlobalStatic {
             return description;
         }
     }
-
-    public static final String ERROR_PREFIX = "[ERROR]";
-
-
 }
