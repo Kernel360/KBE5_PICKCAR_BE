@@ -3,3 +3,5 @@ spring:
     cache: false
     prefix: 'classpath:/templates/'
     suffix: '.html'
+  profiles:
+    active: local
