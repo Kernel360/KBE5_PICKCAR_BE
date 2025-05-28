@@ -2,7 +2,7 @@ package com.pickcar.constants;
 
 public class GlobalStatic {
 
-    public static final String ERROR_PREFIX = "[ERROR]";
+    public static final String ERROR_PREFIX = "[ERROR] ";
 
     public enum HttpStatus {
         //2XX Success

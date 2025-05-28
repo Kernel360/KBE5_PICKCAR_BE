@@ -1,5 +1,6 @@
 package com.pickcar.drivehistory.exception;
 
+import com.pickcar.constants.GlobalStatic;
 import com.pickcar.constants.GlobalStatic.HttpStatus;
 import com.pickcar.exception.BaseErrorCode;
 import com.pickcar.exception.ErrorReason;
@@ -11,7 +12,9 @@ import java.util.Objects;
 public enum DriveHistoryErrorCode implements BaseErrorCode {
 
     //400(BAD_REQUEST)
-    START_TIME_CANNOT_BE_AFTER_END_TIME(HttpStatus.BAD_REQUEST, "DH_400_1", "운행 종료 일시는 운행 시작 일시보다 빠를 수 없습니다"),
+    END_TIME_BEFORE_START_TIME(HttpStatus.BAD_REQUEST, "DH_400_1", "운행 종료 일시는 운행 시작 일시보다 빠를 수 없습니다."),
+    END_TIME_BEFORE_NOW(HttpStatus.BAD_REQUEST, "DH_400_2", "운행 종료 일시는 현재 시각보다 빠를 수 없습니다."),
+    START_TIME_BEFORE_NOW(HttpStatus.BAD_REQUEST, "DH_400_3", "운행 시작 일시는 현재 시각보다 빠를 수 없습니다."),
 
     //403(FORBIDDEN)
     TEST_403_ERROR(HttpStatus.FORBIDDEN, "DH_403_1", "테스트용 403 에러");
@@ -23,7 +26,7 @@ public enum DriveHistoryErrorCode implements BaseErrorCode {
     DriveHistoryErrorCode(HttpStatus httpStatus, String errorCode, String reason) {
         this.httpStatus = httpStatus;
         this.errorCode = errorCode;
-        this.reason = reason;
+        this.reason = GlobalStatic.ERROR_PREFIX + reason;       //FIXME: prefix를 여기서 붙여도 될까?
     }
     public HttpStatus getStatus() {
         return httpStatus;

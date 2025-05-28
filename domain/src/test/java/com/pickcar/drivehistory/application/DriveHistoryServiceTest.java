@@ -55,9 +55,9 @@ class DriveHistoryServiceTest {
         LocalDateTime future = now.plusMinutes(1);
         DriveHistoryCreateRequest testRequest1 = new DriveHistoryCreateRequest(1L, future, now, now, 1.23D);
 
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
+        Assertions.assertThatExceptionOfType(DriveHistoryException.class).isThrownBy(() -> {
             driveHistoryService.create(testRequest1);
-        }).withMessageContaining("[ERROR] 운행 시작 일시는 현재 시각보다 빠를 수 없습니다.");
+        }).withMessageContaining(DriveHistoryErrorCode.START_TIME_BEFORE_NOW.getReason());
     }
 
     @Test
@@ -67,9 +67,9 @@ class DriveHistoryServiceTest {
         LocalDateTime future = now.plusMinutes(1);
         DriveHistoryCreateRequest testRequest1 = new DriveHistoryCreateRequest(1L, now, future, now, 1.23D);
 
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
+        Assertions.assertThatExceptionOfType(DriveHistoryException.class).isThrownBy(() -> {
             driveHistoryService.create(testRequest1);
-        }).withMessageContaining("[ERROR] 운행 종료 일시는 현재 시각보다 빠를 수 없습니다.");
+        }).withMessageContaining(DriveHistoryErrorCode.END_TIME_BEFORE_NOW.getReason());
     }
 
     @Test
@@ -81,6 +81,6 @@ class DriveHistoryServiceTest {
 
         Assertions.assertThatExceptionOfType(DriveHistoryException.class).isThrownBy(() -> {
             driveHistoryService.create(testRequest1);
-        }).withMessageContaining(DriveHistoryErrorCode.START_TIME_CANNOT_BE_AFTER_END_TIME.getMsg());
+        }).withMessageContaining(DriveHistoryErrorCode.END_TIME_BEFORE_START_TIME.getReason());
     }
 }

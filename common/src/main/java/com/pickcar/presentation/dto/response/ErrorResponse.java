@@ -10,7 +10,7 @@ public record ErrorResponse(
         this(ResponseInfo.error(statusCode), new ErrorReason(errorCode, reason));
     }
 
-    public ErrorResponse(Integer httpStatusCode, ErrorReason errorReason) {
-        this(ResponseInfo.error(httpStatusCode), errorReason);
+    public ErrorResponse(Integer statusCode, ErrorReason errorReason) {
+        this(ResponseInfo.error(statusCode), errorReason);
     }
 }

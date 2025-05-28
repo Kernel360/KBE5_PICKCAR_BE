@@ -40,15 +40,15 @@ public class DriveHistoryService {
     //FIXME: 메서드 분리 및 네이밍 수정 필요, 구성 순서도 중요
     public void checkCondition(DriveHistoryCreateRequest request) {
         if (request.drivingStartedAt().isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException("[ERROR] 운행 시작 일시는 현재 시각보다 빠를 수 없습니다.");
+            throw new DriveHistoryException(DriveHistoryErrorCode.START_TIME_BEFORE_NOW);
         }
 
         if (request.drivingEndedAt().isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException("[ERROR] 운행 종료 일시는 현재 시각보다 빠를 수 없습니다.");
+            throw new DriveHistoryException(DriveHistoryErrorCode.END_TIME_BEFORE_NOW);
         }
 
         if (request.drivingEndedAt().isBefore(request.drivingStartedAt())) {
-            throw new DriveHistoryException(DriveHistoryErrorCode.START_TIME_CANNOT_BE_AFTER_END_TIME);
+            throw new DriveHistoryException(DriveHistoryErrorCode.END_TIME_BEFORE_START_TIME);
         }
     }
 }
