@@ -191,6 +191,5 @@ application-prod.yml
 
 # 임시
 docker-compose.yml
-loki-config.yml
 loki-data
 logs/.promtail-positions.yml
