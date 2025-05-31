@@ -188,3 +188,9 @@ application-secret.yml
 application-dev.yml
 application-local.yml
 application-prod.yml
+
+# 임시
+docker-compose.yml
+loki-config.yml
+prometheus.yml
+promtail-config.yml
