@@ -1,35 +1,63 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
+    <!-- 콘솔 로그 패턴 설정 -->
+    <property name="CONSOLE_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %highlight([%-3level]) %logger{5} - %msg %n" />
 
-    <springProfile name="!prod">
-        <!-- 개발, 테스트용은 간단한 콘솔 출력 -->
-        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            </encoder>
-        </appender>
-    </springProfile>
+    <!-- TODO: 배포시 로그 출력 위치 별도 설정 필요-->
+    <property name="FILE_NAME" value="logs/application.log" />
+    <property name="LOG_NAME_PATTERN" value="logs/application-%d{yyyy-MM-dd-HH-mm}.%i.log" />
+    <property name="MAX_FILE_SIZE" value="30MB" />      <!-- 로그 파일 하나당 크기 -->
+    <property name="TOTAL_SIZE" value="500MB" />        <!-- 전체 로그 파일의 최대 크기 -->
+    <property name="MAX_HISTORY" value="360" />         <!-- 최대 360개의 파일 관리 -->
 
-    <springProfile name="prod">
-        <!-- 프로덕션용: JSON 포맷 콘솔 출력 -->
-        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-                <providers>
-                    <timestamp>
-                        <timeZone>UTC</timeZone>
-                    </timestamp>
-                    <loggerName/>
-                    <threadName/>
-                    <logLevel/>
-                    <message/>
-                    <mdc/>
-                    <stackTrace/>
-                </providers>
-            </encoder>
-        </appender>
-    </springProfile>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${CONSOLE_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLLING_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+        <file>${FILE_NAME}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_NAME_PATTERN}</fileNamePattern>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="jdbc" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLLING_LOG_FILE"/>
+    </logger>
+    <logger name="jdbc.sqlonly" level="DEBUG" additivity="false" >
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLLING_LOG_FILE"/>
+    </logger>
+    <logger name="jdbc.sqltiming" level="OFF" additivity="false" >
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLLING_LOG_FILE"/>
+    </logger>
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLLING_LOG_FILE"/>
+    </logger>
+
+    <!-- 컨트롤러 레이어 -->
+    <logger name="com.pickcar.drivehistory.presentation" level="INFO" additivity="false" >
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLLING_LOG_FILE"/>
+    </logger>
+
+    <!-- 서비스 레이어 -->
+    <logger name="com.pickcar.drivehistory.infrastructure" level="DEBUG" additivity="false" >
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLLING_LOG_FILE"/>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLLING_LOG_FILE"/>
     </root>
 </configuration>
