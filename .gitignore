@@ -190,6 +190,5 @@ application-local.yml
 application-prod.yml
 
 # 임시
-docker-compose.yml
 loki-data
 logs/.promtail-positions.yml
