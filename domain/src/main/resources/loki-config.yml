@@ -3,21 +3,19 @@ auth_enabled: false
 
 server:
   http_listen_port: 3100
-  grpc_listen_port: 9095
+  grpc_listen_port: 9096
 
 distributor:      # 수신한 로그를 ingester로 분배
   ring:
     kvstore:
-      store: memberlist
+      store: inmemory
 
 ingester:
   lifecycler:
-    join_after: 0s
     ring:
       kvstore:
-        store: memberlist
-      replication_factor: 3     # 복제본 (안정성 향상)
-    final_sleep: 0s
+        store: inmemory
+      replication_factor: 1
   chunk_idle_period: 5m     # 청크가 5분뒤 디스크로 flush 됨
   chunk_retain_period: 30s  # 청크 재로딩시 30초 유지
   max_chunk_age: 1h         # 청크당 최대 수명 (1시간)
@@ -25,35 +23,25 @@ ingester:
 
 schema_config:
   configs:
-    - from: 2020-10-24
-      store: boltdb-shipper            # 인덱스를 boltdb-shipper 방식으로 관리
-#      object_store: s3                 # 청크(chunk)와 인덱스를 AWS S3에 저장
-      schema: v11                      # Loki가 제공하는 최신 스키마 버전
+    - from: 2024-01-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
       index:
-        prefix: index_                 # 인덱스 파일명 접두사 (예: index_20220101)
-        period: 24h                    # 24시간 단위로 새로운 인덱스 파일 생성
+        prefix: index_
+        period: 24h
 
 storage_config:
   boltdb_shipper:
     active_index_directory: /loki/index   # 로컬에서 인덱스를 생성하는 디렉토리 경로 (컨테이너 내 경로)
     cache_location: /loki/boltdb-cache    # 인덱스 조회 성능 향상을 위해 로컬에 캐시 저장 (컨테이너 내 경로)
-#      shared_store: s3
-  filesystem: # 로컬용
+    shared_store: filesystem
+  filesystem:
     directory: /loki/chunks
-#  aws:
-#    s3:
-#      bucketnames: my-loki-bucket
-#      endpoint: s3.amazonaws.com
-#      region: us-east-1
-#      access_key_id: <AWS_ACCESS_KEY_ID>
-#      secret_access_key: <AWS_SECRET_ACCESS_KEY>
-#    s3forcepathstyle: false
 
 compactor:    # 인덱스 압축 및 정리 작업
   working_directory: /loki/compactor
   compaction_interval: 10m    # 10분마다 오래된 인덱스 압축 (디스크 사용량 절감)
-#  shared_store: s3
-
 
 limits_config:
   enforce_metric_name: false
