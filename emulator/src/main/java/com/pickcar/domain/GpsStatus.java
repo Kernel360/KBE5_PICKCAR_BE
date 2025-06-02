@@ -1,0 +1,5 @@
+package com.pickcar.domain;
+
+public enum GpsStatus {
+    NORMAL, ABNORMAL, NOT_INSTALLED, ON_ABNORMAL
+}

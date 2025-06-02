@@ -188,3 +188,7 @@ application-secret.yml
 application-dev.yml
 application-local.yml
 application-prod.yml
+
+# 임시
+loki-data
+logs/.promtail-positions.yml
