@@ -11,9 +11,3 @@ spring:
     password: # database password
   jpa:
     open-in-view: false
-
-logging:
-  level:
-    root: INFO      # FIXME: 로그 전략 수립 필요(현재는 전부 다 허용) => 패키지별로 하던지 등 ...
-  charset:
-    console: UTF-8
