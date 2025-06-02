@@ -2,8 +2,8 @@ import http from 'k6/http';
 import { sleep } from 'k6';
 
 export let options = {
-  vus: 100, // 동시 사용자 수
-  duration: '10s', // 테스트 시간
+  vus: 9000, // 동시 사용자 수
+  duration: '2s', // 테스트 시간
 };
 
 export default function () {
@@ -24,6 +24,6 @@ export default function () {
   };
 
   http.post(url, payload, params);
-  sleep(1);
+  // sleep(1);
 }
 
