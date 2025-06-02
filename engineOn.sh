@@ -3,7 +3,7 @@
 # PATH 설정
 export PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin
 
-URL="http://localhost:8080/api/v1/engine/on"
+URL="http://localhost:8080/api/v1/engine"
 TYPE="Content-Type: application/json"
 
 for i in {1..100}; do

@@ -1,4 +1,4 @@
-package com.pickcar.presentation.dto;
+package com.pickcar.presentation.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
