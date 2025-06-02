@@ -1,10 +1,7 @@
 package com.pickcar.application;
 
 import com.pickcar.domain.EventInfo;
-import com.pickcar.domain.Terminal;
-import com.pickcar.infrastructure.EmulatorRepository;
 import com.pickcar.infrastructure.EventInfoRepository;
-import com.pickcar.presentation.dto.request.EmulatorRequest;
 import com.pickcar.presentation.dto.request.EventInfoRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +27,7 @@ public class EventInfoService {
                 .speed(request.getSpeed())
                 .total_distance(request.getTotal_distance())
                 .build();
-        EventInfo save = eventInfoRepository.save(eventInfo);
-        log.info("Save Event Info: {}", save);
+        eventInfoRepository.save(eventInfo);
     }
 
     public void off(EventInfoRequest request) {

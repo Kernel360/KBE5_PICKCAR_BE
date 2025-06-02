@@ -8,14 +8,14 @@ export let options = {
 };
 
 export default function () {
-  const url = 'http://localhost:8080/api/v1/engine/off';
+  const url = 'http://localhost:8080/api/v1/event/engine/off';
   const payload = JSON.stringify({
         carId: 1,
         mdn: "01234567890",
         status: false,
         engineOnTime: "20240601123000",
         engineOffTime: "20240601134500",
-        gpsStatus: "A",
+        gpsStatus: "NORMAL",
         latitude: 37.4418038,
         longitude: 127.244003,
         angle: 270,
@@ -30,6 +30,6 @@ export default function () {
   };
 
   http.post(url, payload, params);
-  sleep(1);
+  // sleep(1);
 }
 

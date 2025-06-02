@@ -26,7 +26,6 @@ public class CycleInfo {
 
     private Long carId;
 
-
     private LocalDateTime occurredAt;
 
     private Integer cycleCnt;

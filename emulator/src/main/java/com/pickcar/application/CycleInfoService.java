@@ -21,7 +21,6 @@ public class CycleInfoService {
                 .cycleCnt(request.getCycleCnt())
                 .cycleInfos(request.getCycleInfos())
                 .build();
-        CycleInfo save = cycleInfoRepository.save(cycleInfo);
-        log.info("Save CycleInfo: {}", save);
+        cycleInfoRepository.save(cycleInfo);
     }
 }

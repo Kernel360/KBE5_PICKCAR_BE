@@ -1,5 +1,5 @@
 package com.pickcar.domain;
 
 public enum GpsStatus {
-    A, V, O, P
+    NORMAL, ABNORMAL, NOT_INSTALLED, ON_ABNORMAL
 }

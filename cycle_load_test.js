@@ -8,7 +8,7 @@ export let options = {
 };
 
 export default function () {
-  const url = 'http://localhost:8080/api/v1/engine/cycle';
+  const url = 'http://localhost:8080/api/v1/cycle';
   const payload = JSON.stringify({
       carId: 1,
       cycleCnt: 1,
@@ -16,7 +16,7 @@ export default function () {
       cycleInfos: {
           "0": {
               second: "20240601123001",
-              gps_status: "A",
+              gps_status: "NORMAL",
               latitude: 374418038,
               longitude: 127244003,
               angle: 90,
@@ -34,6 +34,6 @@ export default function () {
   };
 
   http.post(url, payload, params);
-  sleep(1);
+  // sleep(1);
 }
 
