@@ -19,7 +19,7 @@ public class Terminal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long carId;
+    private Long vehicleId;
 
     private String mdn;
 

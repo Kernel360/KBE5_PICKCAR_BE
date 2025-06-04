@@ -15,7 +15,7 @@ public class EmulatorService {
     public void terminal(EmulatorRequest request) {
         Terminal terminal = Terminal.builder()
                 .mdn(request.getMdn())
-                .carId(request.getCarId())
+                .vehicleId(request.getCarId())
                 .terminalId(request.getTerminalId())
                 .manufactureId(request.getManufactureId())
                 .packetVersion(request.getPacketVersion())

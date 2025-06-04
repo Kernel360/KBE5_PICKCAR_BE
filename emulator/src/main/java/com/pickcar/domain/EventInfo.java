@@ -8,9 +8,11 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class EventInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long carId;
+    private Long vehicleId;
 
     private Boolean status;
 

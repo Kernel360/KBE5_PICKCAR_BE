@@ -16,7 +16,7 @@ public class EventInfoService {
 
     public void on(EventInfoRequest request) {
         EventInfo eventInfo = EventInfo.builder()
-                .carId(request.getCarId())
+                .vehicleId(request.getCarId())
                 .status(request.getStatus())
                 .engineOnTime(request.getEngineOnTime())
                 .engineOffTime(request.getEngineOffTime())
@@ -32,7 +32,7 @@ public class EventInfoService {
 
     public void off(EventInfoRequest request) {
         EventInfo eventInfo = EventInfo.builder()
-                .carId(request.getCarId())
+                .vehicleId(request.getCarId())
                 .status(request.getStatus())
                 .engineOnTime(request.getEngineOnTime())
                 .engineOffTime(request.getEngineOffTime())
@@ -44,5 +44,19 @@ public class EventInfoService {
                 .total_distance(request.getTotal_distance())
                 .build();
         eventInfoRepository.save(eventInfo);
+    }
+
+//    //가장 최근의 on 내용이 내가 고르려는 그 내용인지에 대한 보장
+//    public void getLatestOnEventInfoByVehicleId(Long vehicleId) {
+//
+//        eventInfoRepository.findByVehicleIdAndStatus(vehicleId, )
+//
+//    }
+
+    //가장 최근의 off 내용이 내가 고르려는 그 내용인지에 대한 보장
+    public EventInfo getLatestOffEventInfoByVehicleId(Long vehicleId) {
+        return eventInfoRepository.findTopByVehicleIdOrderByEngineOffTimeDesc(vehicleId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("[ERROR] EventInfo Not Found By Vehicle Id : " + vehicleId));
     }
 }
