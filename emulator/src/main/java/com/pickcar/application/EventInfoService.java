@@ -25,7 +25,7 @@ public class EventInfoService {
                 .longitude(request.getLongitude())
                 .angle(request.getAngle())
                 .speed(request.getSpeed())
-                .total_distance(request.getTotal_distance())
+                .total_distance(request.getTotalDistance())
                 .build();
         eventInfoRepository.save(eventInfo);
     }
@@ -41,7 +41,7 @@ public class EventInfoService {
                 .longitude(request.getLongitude())
                 .angle(request.getAngle())
                 .speed(request.getSpeed())
-                .total_distance(request.getTotal_distance())
+                .total_distance(request.getTotalDistance())
                 .build();
         eventInfoRepository.save(eventInfo);
     }

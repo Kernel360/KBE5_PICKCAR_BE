@@ -1,6 +1,7 @@
 package com.pickcar.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pickcar.domain.GpsStatus;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -14,16 +15,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EventInfoRequest {
 
+    @JsonProperty("car_id")
     private Long carId;
 
     private Boolean status;
 
     @JsonFormat(pattern = "yyyyMMddHHmmss")
+    @JsonProperty("engine_on_time")
     private LocalDateTime engineOnTime;
 
     @JsonFormat(pattern = "yyyyMMddHHmmss")
+    @JsonProperty("engine_off_time")
     private LocalDateTime engineOffTime;
 
+    @JsonProperty("gps_status")
     private GpsStatus gpsStatus;
 
     private Double latitude;
@@ -34,5 +39,6 @@ public class EventInfoRequest {
 
     private Integer speed;
 
-    private Integer total_distance;
+    @JsonProperty("total_distance")
+    private Integer totalDistance;
 }
