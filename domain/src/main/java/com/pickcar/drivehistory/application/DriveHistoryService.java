@@ -13,8 +13,8 @@ import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -43,31 +43,7 @@ public class DriveHistoryService {
         Double totalDistance = 0D;
 
         EventInfo offEventInfo = eventInfoService.getLatestOffEventInfoByVehicleId(vehicle.getId());
-
-        List<CycleInfo> cycleInfoList = cycleInfoService.getCycleInfosByOffEventInfo(offEventInfo);
-
-        for (CycleInfo c : cycleInfoList) {
-            Map<String, Object> cycleInfoMap = c.getCycleInfos();
-
-            log.info("cycleInfoMap : {}", cycleInfoMap.toString());
-
-            for (int i = 0; i < c.getCycleCnt(); i++) {
-                Map<String, Object> o = (Map<String, Object>) cycleInfoMap.get(String.valueOf(i));
-                Object rawDistance = o.get("total_distance");
-
-                Double currentDistance = null;
-
-                if (rawDistance instanceof Number) {
-                    currentDistance = ((Number) rawDistance).doubleValue();
-                } else {
-                    log.warn("total_distance is not a number: {}", rawDistance);
-                    continue; // 또는 예외 처리
-                }
-
-                log.info("currentDistance : {}", currentDistance);
-                totalDistance += currentDistance;
-            }
-        }
+        List<CycleInfo> cycleInfos = cycleInfoService.getCycleInfosByOffEventInfo(offEventInfo);
 
         DriveHistory history = DriveHistory.builder()
                 .drivingStartedAt(offEventInfo.getEngineOnTime())
