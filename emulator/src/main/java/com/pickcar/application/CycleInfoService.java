@@ -27,6 +27,7 @@ public class CycleInfoService {
     }
 
     public List<CycleInfo> getCycleInfosByOffEventInfo(EventInfo offEventInfo) {
-        return cycleInfoRepository.findByOccurredAtBetween(offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
+        return cycleInfoRepository.findByVehicleIdAndOccurredAtBetween(offEventInfo.getVehicleId(),
+                offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
     }
 }

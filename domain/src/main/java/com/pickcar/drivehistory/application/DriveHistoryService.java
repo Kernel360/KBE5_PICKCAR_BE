@@ -52,16 +52,19 @@ public class DriveHistoryService {
             log.info("cycleInfoMap : {}", cycleInfoMap.toString());
 
             for (int i = 0; i < c.getCycleCnt(); i++) {
+                Map<String, Object> o = (Map<String, Object>) cycleInfoMap.get(String.valueOf(i));
+                Object rawDistance = o.get("total_distance");
 
-                String data = cycleInfoMap.get(i).toString();
+                Double currentDistance = null;
 
-                String[] split = data.split("totalDistance: ");
-                String[] split2 = split[1].split("battery");
+                if (rawDistance instanceof Number) {
+                    currentDistance = ((Number) rawDistance).doubleValue();
+                } else {
+                    log.warn("total_distance is not a number: {}", rawDistance);
+                    continue; // 또는 예외 처리
+                }
 
-                log.info("detected distance : {}", split2[0]);
-
-                double currentDistance = Double.parseDouble(split2[0]);
-
+                log.info("currentDistance : {}", currentDistance);
                 totalDistance += currentDistance;
             }
         }
@@ -74,6 +77,7 @@ public class DriveHistoryService {
                 .totalDistance(totalDistance)
                 .build();
 
+        log.info("history : {}", history.toString());
 
         driveHistoryRepository.save(history);
     }
