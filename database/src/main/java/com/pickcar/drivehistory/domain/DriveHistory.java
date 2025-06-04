@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,5 @@ public class DriveHistory extends BaseEntity {
 
     private Double totalDistance;
 
-    private LocalDateTime totalDrivingTime;
+    private LocalTime totalDrivingTime;
 }
