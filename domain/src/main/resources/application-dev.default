@@ -3,9 +3,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://{IP address or Domain URI}/pickcar_dev    # TODO: Timezone 등 옵션 추가 필요
-    username: {Prod Mysql DB Username}
-    password: {Prod Mysql DB Password}
+    url: jdbc:mysql://mysql:3306/${DB_NAME_DEV}?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true    # TODO: Timezone 등 옵션 추가 필요
+    username: ${DB_USERNAME_DEV}
+    password: ${DB_PASSWORD_DEV}
   jpa:
     hibernate:
       ddl-auto: create    # 현재는 배포에서도 create로 하지만, 나중에 update => 그 뒤 validate or none(최종)
