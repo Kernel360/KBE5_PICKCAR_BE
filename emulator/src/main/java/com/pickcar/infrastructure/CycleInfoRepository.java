@@ -6,5 +6,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CycleInfoRepository extends JpaRepository<CycleInfo, Long> {
-    List<CycleInfo> findByOccurredAtBetween(LocalDateTime occurredAtStart, LocalDateTime occurredAtEnd);
+    List<CycleInfo> findByVehicleIdAndOccurredAtBetween(Long vehicleId, LocalDateTime occurredAtStart, LocalDateTime occurredAtEnd);
 }
