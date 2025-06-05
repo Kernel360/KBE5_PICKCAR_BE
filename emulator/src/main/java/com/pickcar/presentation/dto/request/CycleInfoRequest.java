@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CycleInfoRequest {
 
-    private Long carId;
+    private Long vehicleId;
 
     @JsonFormat(pattern = "yyyyMMddHHmmss")
     private LocalDateTime occurredAt;
