@@ -12,13 +12,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateTimeConverter;
 
 @Entity
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CycleInfo {
+public class Cycle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +30,6 @@ public class CycleInfo {
     private Integer cycleCnt;
 
     @Convert(converter = JsonMapConverter.class)
-    @Column(columnDefinition = "json")
+    @Column(columnDefinition = "text")
     private Map<String, Object> cycleInfos;
 }
