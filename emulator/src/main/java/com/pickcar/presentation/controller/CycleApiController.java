@@ -1,7 +1,9 @@
 package com.pickcar.presentation.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pickcar.application.CycleInfoService;
 import com.pickcar.presentation.dto.request.CycleInfoRequest;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +20,7 @@ public class CycleApiController {
     private final CycleInfoService cycleInfoService;
 
     @PostMapping
-    public void emulatorCycle(@RequestBody CycleInfoRequest request) {
+    public void emulatorCycle(@RequestBody CycleInfoRequest request) throws IOException {
         log.info("POST /api/v1/engine/cycle - CycleInfoRequest: {}", request);
         cycleInfoService.cycle(request);
     }
