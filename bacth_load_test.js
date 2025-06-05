@@ -31,6 +31,7 @@ export default function () {
                 car_id: 1,
                 cycle_cnt: 60,
                 occurred_at: "20240601123000",
+                distance: 10590,
                 cycle_infos: {
                     "0": {
                         "car_id": 1,
@@ -40,8 +41,7 @@ export default function () {
                         "longitude": 12.7244003,
                         "angle": 0,
                         "speed": 30,
-                        "battery": 128,
-                        "total_distance": 10000
+                        "battery": 128
                     },
                     "1": {
                         "car_id": 1,
@@ -51,8 +51,7 @@ export default function () {
                         "longitude": 12.7244004,
                         "angle": 6,
                         "speed": 31,
-                        "battery": 128,
-                        "total_distance": 10010
+                        "battery": 128
                     },
                     "2": {
                         "car_id": 1,
@@ -62,8 +61,7 @@ export default function () {
                         "longitude": 12.7244005,
                         "angle": 12,
                         "speed": 32,
-                        "battery": 128,
-                        "total_distance": 10020
+                        "battery": 128
                     },
                     "3": {
                         "car_id": 1,
@@ -73,8 +71,7 @@ export default function () {
                         "longitude": 12.7244006,
                         "angle": 18,
                         "speed": 33,
-                        "battery": 128,
-                        "total_distance": 10030
+                        "battery": 128
                     },
                     "4": {
                         "car_id": 1,
@@ -84,8 +81,7 @@ export default function () {
                         "longitude": 12.7244007,
                         "angle": 24,
                         "speed": 34,
-                        "battery": 128,
-                        "total_distance": 10040
+                        "battery": 128
                     },
                     "5": {
                         "car_id": 1,
@@ -95,8 +91,7 @@ export default function () {
                         "longitude": 12.7244008,
                         "angle": 30,
                         "speed": 35,
-                        "battery": 128,
-                        "total_distance": 10050
+                        "battery": 128
                     },
                     "6": {
                         "car_id": 1,
@@ -106,8 +101,7 @@ export default function () {
                         "longitude": 12.7244009,
                         "angle": 36,
                         "speed": 36,
-                        "battery": 128,
-                        "total_distance": 10060
+                        "battery": 128
                     },
                     "7": {
                         "car_id": 1,
@@ -117,8 +111,7 @@ export default function () {
                         "longitude": 12.7244010,
                         "angle": 42,
                         "speed": 37,
-                        "battery": 128,
-                        "total_distance": 10070
+                        "battery": 128
                     },
                     "8": {
                         "car_id": 1,
@@ -128,8 +121,7 @@ export default function () {
                         "longitude": 12.7244011,
                         "angle": 48,
                         "speed": 38,
-                        "battery": 128,
-                        "total_distance": 10080
+                        "battery": 128
                     },
                     "9": {
                         "car_id": 1,
@@ -139,8 +131,7 @@ export default function () {
                         "longitude": 12.7244012,
                         "angle": 54,
                         "speed": 39,
-                        "battery": 128,
-                        "total_distance": 10090
+                        "battery": 128
                     },
                     "10": {
                         "car_id": 1,
@@ -150,8 +141,7 @@ export default function () {
                         "longitude": 12.7244013,
                         "angle": 60,
                         "speed": 40,
-                        "battery": 128,
-                        "total_distance": 10100
+                        "battery": 128
                     },
                     "11": {
                         "car_id": 1,
@@ -161,8 +151,7 @@ export default function () {
                         "longitude": 12.7244014,
                         "angle": 66,
                         "speed": 41,
-                        "battery": 128,
-                        "total_distance": 10110
+                        "battery": 128
                     },
                     "12": {
                         "car_id": 1,
@@ -172,8 +161,7 @@ export default function () {
                         "longitude": 12.7244015,
                         "angle": 72,
                         "speed": 42,
-                        "battery": 128,
-                        "total_distance": 10120
+                        "battery": 128
                     },
                     "13": {
                         "car_id": 1,
@@ -183,8 +171,7 @@ export default function () {
                         "longitude": 12.7244016,
                         "angle": 78,
                         "speed": 43,
-                        "battery": 128,
-                        "total_distance": 10130
+                        "battery": 128
                     },
                     "14": {
                         "car_id": 1,
@@ -194,8 +181,7 @@ export default function () {
                         "longitude": 12.7244017,
                         "angle": 84,
                         "speed": 44,
-                        "battery": 128,
-                        "total_distance": 10140
+                        "battery": 128
                     },
                     "15": {
                         "car_id": 1,
@@ -205,8 +191,7 @@ export default function () {
                         "longitude": 12.7244018,
                         "angle": 90,
                         "speed": 45,
-                        "battery": 128,
-                        "total_distance": 10150
+                        "battery": 128
                     },
                     "16": {
                         "car_id": 1,
@@ -216,8 +201,7 @@ export default function () {
                         "longitude": 12.7244019,
                         "angle": 96,
                         "speed": 46,
-                        "battery": 128,
-                        "total_distance": 10160
+                        "battery": 128
                     },
                     "17": {
                         "car_id": 1,
@@ -227,8 +211,7 @@ export default function () {
                         "longitude": 12.7244020,
                         "angle": 102,
                         "speed": 47,
-                        "battery": 128,
-                        "total_distance": 10170
+                        "battery": 128
                     },
                     "18": {
                         "car_id": 1,
@@ -238,8 +221,7 @@ export default function () {
                         "longitude": 12.7244021,
                         "angle": 108,
                         "speed": 48,
-                        "battery": 128,
-                        "total_distance": 10180
+                        "battery": 128
                     },
                     "19": {
                         "car_id": 1,
@@ -249,8 +231,7 @@ export default function () {
                         "longitude": 12.7244022,
                         "angle": 114,
                         "speed": 49,
-                        "battery": 128,
-                        "total_distance": 10190
+                        "battery": 128
                     },
                     "20": {
                         "car_id": 1,
@@ -260,8 +241,7 @@ export default function () {
                         "longitude": 12.7244023,
                         "angle": 120,
                         "speed": 50,
-                        "battery": 128,
-                        "total_distance": 10200
+                        "battery": 128
                     },
                     "21": {
                         "car_id": 1,
@@ -271,8 +251,7 @@ export default function () {
                         "longitude": 12.7244024,
                         "angle": 126,
                         "speed": 51,
-                        "battery": 128,
-                        "total_distance": 10210
+                        "battery": 128
                     },
                     "22": {
                         "car_id": 1,
@@ -282,8 +261,7 @@ export default function () {
                         "longitude": 12.7244025,
                         "angle": 132,
                         "speed": 52,
-                        "battery": 128,
-                        "total_distance": 10220
+                        "battery": 128
                     },
                     "23": {
                         "car_id": 1,
@@ -293,8 +271,7 @@ export default function () {
                         "longitude": 12.7244026,
                         "angle": 138,
                         "speed": 53,
-                        "battery": 128,
-                        "total_distance": 10230
+                        "battery": 128
                     },
                     "24": {
                         "car_id": 1,
@@ -304,8 +281,7 @@ export default function () {
                         "longitude": 12.7244027,
                         "angle": 144,
                         "speed": 54,
-                        "battery": 128,
-                        "total_distance": 10240
+                        "battery": 128
                     },
                     "25": {
                         "car_id": 1,
@@ -315,8 +291,7 @@ export default function () {
                         "longitude": 12.7244028,
                         "angle": 150,
                         "speed": 55,
-                        "battery": 128,
-                        "total_distance": 10250
+                        "battery": 128
                     },
                     "26": {
                         "car_id": 1,
@@ -326,8 +301,7 @@ export default function () {
                         "longitude": 12.7244029,
                         "angle": 156,
                         "speed": 56,
-                        "battery": 128,
-                        "total_distance": 10260
+                        "battery": 128
                     },
                     "27": {
                         "car_id": 1,
@@ -337,8 +311,7 @@ export default function () {
                         "longitude": 12.7244030,
                         "angle": 162,
                         "speed": 57,
-                        "battery": 128,
-                        "total_distance": 10270
+                        "battery": 128
                     },
                     "28": {
                         "car_id": 1,
@@ -348,8 +321,7 @@ export default function () {
                         "longitude": 12.7244031,
                         "angle": 168,
                         "speed": 58,
-                        "battery": 128,
-                        "total_distance": 10280
+                        "battery": 128
                     },
                     "29": {
                         "car_id": 1,
@@ -359,8 +331,7 @@ export default function () {
                         "longitude": 12.7244032,
                         "angle": 174,
                         "speed": 59,
-                        "battery": 128,
-                        "total_distance": 10290
+                        "battery": 128
                     },
                     "30": {
                         "car_id": 1,
@@ -370,8 +341,7 @@ export default function () {
                         "longitude": 12.7244033,
                         "angle": 180,
                         "speed": 60,
-                        "battery": 128,
-                        "total_distance": 10300
+                        "battery": 128
                     },
                     "31": {
                         "car_id": 1,
@@ -381,8 +351,7 @@ export default function () {
                         "longitude": 12.7244034,
                         "angle": 186,
                         "speed": 61,
-                        "battery": 128,
-                        "total_distance": 10310
+                        "battery": 128
                     },
                     "32": {
                         "car_id": 1,
@@ -392,8 +361,7 @@ export default function () {
                         "longitude": 12.7244035,
                         "angle": 192,
                         "speed": 62,
-                        "battery": 128,
-                        "total_distance": 10320
+                        "battery": 128
                     },
                     "33": {
                         "car_id": 1,
@@ -403,8 +371,7 @@ export default function () {
                         "longitude": 12.7244036,
                         "angle": 198,
                         "speed": 63,
-                        "battery": 128,
-                        "total_distance": 10330
+                        "battery": 128
                     },
                     "34": {
                         "car_id": 1,
@@ -414,8 +381,7 @@ export default function () {
                         "longitude": 12.7244037,
                         "angle": 204,
                         "speed": 64,
-                        "battery": 128,
-                        "total_distance": 10340
+                        "battery": 128
                     },
                     "35": {
                         "car_id": 1,
@@ -425,8 +391,7 @@ export default function () {
                         "longitude": 12.7244038,
                         "angle": 210,
                         "speed": 65,
-                        "battery": 128,
-                        "total_distance": 10350
+                        "battery": 128
                     },
                     "36": {
                         "car_id": 1,
@@ -436,8 +401,7 @@ export default function () {
                         "longitude": 12.7244039,
                         "angle": 216,
                         "speed": 66,
-                        "battery": 128,
-                        "total_distance": 10360
+                        "battery": 128
                     },
                     "37": {
                         "car_id": 1,
@@ -447,8 +411,7 @@ export default function () {
                         "longitude": 12.7244040,
                         "angle": 222,
                         "speed": 67,
-                        "battery": 128,
-                        "total_distance": 10370
+                        "battery": 128
                     },
                     "38": {
                         "car_id": 1,
@@ -458,8 +421,7 @@ export default function () {
                         "longitude": 12.7244041,
                         "angle": 228,
                         "speed": 68,
-                        "battery": 128,
-                        "total_distance": 10380
+                        "battery": 128
                     },
                     "39": {
                         "car_id": 1,
@@ -469,8 +431,7 @@ export default function () {
                         "longitude": 12.7244042,
                         "angle": 234,
                         "speed": 69,
-                        "battery": 128,
-                        "total_distance": 10390
+                        "battery": 128
                     },
                     "40": {
                         "car_id": 1,
@@ -480,8 +441,7 @@ export default function () {
                         "longitude": 12.7244043,
                         "angle": 240,
                         "speed": 70,
-                        "battery": 128,
-                        "total_distance": 10400
+                        "battery": 128
                     },
                     "41": {
                         "car_id": 1,
@@ -491,8 +451,7 @@ export default function () {
                         "longitude": 12.7244044,
                         "angle": 246,
                         "speed": 71,
-                        "battery": 128,
-                        "total_distance": 10410
+                        "battery": 128
                     },
                     "42": {
                         "car_id": 1,
@@ -502,8 +461,7 @@ export default function () {
                         "longitude": 12.7244045,
                         "angle": 252,
                         "speed": 72,
-                        "battery": 128,
-                        "total_distance": 10420
+                        "battery": 128
                     },
                     "43": {
                         "car_id": 1,
@@ -513,8 +471,7 @@ export default function () {
                         "longitude": 12.7244046,
                         "angle": 258,
                         "speed": 73,
-                        "battery": 128,
-                        "total_distance": 10430
+                        "battery": 128
                     },
                     "44": {
                         "car_id": 1,
@@ -524,8 +481,7 @@ export default function () {
                         "longitude": 12.7244047,
                         "angle": 264,
                         "speed": 74,
-                        "battery": 128,
-                        "total_distance": 10440
+                        "battery": 128
                     },
                     "45": {
                         "car_id": 1,
@@ -535,8 +491,7 @@ export default function () {
                         "longitude": 12.7244048,
                         "angle": 270,
                         "speed": 75,
-                        "battery": 128,
-                        "total_distance": 10450
+                        "battery": 128
                     },
                     "46": {
                         "car_id": 1,
@@ -546,8 +501,7 @@ export default function () {
                         "longitude": 12.7244049,
                         "angle": 276,
                         "speed": 76,
-                        "battery": 128,
-                        "total_distance": 10460
+                        "battery": 128
                     },
                     "47": {
                         "car_id": 1,
@@ -557,8 +511,7 @@ export default function () {
                         "longitude": 12.7244050,
                         "angle": 282,
                         "speed": 77,
-                        "battery": 128,
-                        "total_distance": 10470
+                        "battery": 128
                     },
                     "48": {
                         "car_id": 1,
@@ -568,8 +521,7 @@ export default function () {
                         "longitude": 12.7244051,
                         "angle": 288,
                         "speed": 78,
-                        "battery": 128,
-                        "total_distance": 10480
+                        "battery": 128
                     },
                     "49": {
                         "car_id": 1,
@@ -579,8 +531,7 @@ export default function () {
                         "longitude": 12.7244052,
                         "angle": 294,
                         "speed": 79,
-                        "battery": 128,
-                        "total_distance": 10490
+                        "battery": 128
                     },
                     "50": {
                         "car_id": 1,
@@ -590,8 +541,7 @@ export default function () {
                         "longitude": 12.7244053,
                         "angle": 300,
                         "speed": 0,
-                        "battery": 128,
-                        "total_distance": 10500
+                        "battery": 128
                     },
                     "51": {
                         "car_id": 1,
@@ -601,8 +551,7 @@ export default function () {
                         "longitude": 12.7244054,
                         "angle": 306,
                         "speed": 1,
-                        "battery": 128,
-                        "total_distance": 10510
+                        "battery": 128
                     },
                     "52": {
                         "car_id": 1,
@@ -612,8 +561,7 @@ export default function () {
                         "longitude": 12.7244055,
                         "angle": 312,
                         "speed": 2,
-                        "battery": 128,
-                        "total_distance": 10520
+                        "battery": 128
                     },
                     "53": {
                         "car_id": 1,
@@ -623,8 +571,7 @@ export default function () {
                         "longitude": 12.7244056,
                         "angle": 318,
                         "speed": 3,
-                        "battery": 128,
-                        "total_distance": 10530
+                        "battery": 128
                     },
                     "54": {
                         "car_id": 1,
@@ -634,8 +581,7 @@ export default function () {
                         "longitude": 12.7244057,
                         "angle": 324,
                         "speed": 4,
-                        "battery": 128,
-                        "total_distance": 10540
+                        "battery": 128
                     },
                     "55": {
                         "car_id": 1,
@@ -645,8 +591,7 @@ export default function () {
                         "longitude": 12.7244058,
                         "angle": 330,
                         "speed": 5,
-                        "battery": 128,
-                        "total_distance": 10550
+                        "battery": 128
                     },
                     "56": {
                         "car_id": 1,
@@ -656,8 +601,7 @@ export default function () {
                         "longitude": 12.7244059,
                         "angle": 336,
                         "speed": 6,
-                        "battery": 128,
-                        "total_distance": 10560
+                        "battery": 128
                     },
                     "57": {
                         "car_id": 1,
@@ -667,8 +611,7 @@ export default function () {
                         "longitude": 12.7244060,
                         "angle": 342,
                         "speed": 7,
-                        "battery": 128,
-                        "total_distance": 10570
+                        "battery": 128
                     },
                     "58": {
                         "car_id": 1,
@@ -678,8 +621,7 @@ export default function () {
                         "longitude": 12.7244061,
                         "angle": 348,
                         "speed": 8,
-                        "battery": 128,
-                        "total_distance": 10580
+                        "battery": 128
                     },
                     "59": {
                         "car_id": 1,
@@ -689,8 +631,7 @@ export default function () {
                         "longitude": 12.7244062,
                         "angle": 354,
                         "speed": 9,
-                        "battery": 128,
-                        "total_distance": 10590
+                        "battery": 128
                     }
                 }
             })
@@ -702,13 +643,13 @@ export default function () {
                 mdn: "01234567890",
                 status: false,
                 engine_on_time: "20240601123000",
-                engine_off_time: "20240601134500",
+                engine_off_time: "20240601123100",
                 gps_status: "NORMAL",
                 latitude: 37.4418097,
                 longitude: 12.7244062,
                 angle: 270,
                 speed: 0,
-                total_distance: 10500
+                total_distance: 10590
             })
         }
     ];

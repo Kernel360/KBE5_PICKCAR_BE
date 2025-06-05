@@ -29,6 +29,8 @@ public class Cycle {
 
     private Integer cycleCnt;
 
+    private Double distance;
+
     @Convert(converter = JsonMapConverter.class)
     @Column(columnDefinition = "text")
     private Map<String, Object> cycleInfos;

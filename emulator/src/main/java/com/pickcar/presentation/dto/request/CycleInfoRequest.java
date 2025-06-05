@@ -25,6 +25,9 @@ public class CycleInfoRequest {
     @JsonProperty("cycle_cnt")
     private Integer cycleCnt;
 
+    @JsonProperty("distance")
+    private Double distance;
+
     @JsonProperty("cycle_infos")
     private Map<String, Object> cycleInfos;
 }
