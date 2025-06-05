@@ -3,11 +3,9 @@ package com.pickcar.application;
 import com.pickcar.domain.Cycle;
 import com.pickcar.domain.CycleInfo;
 import com.pickcar.domain.EventInfo;
-import com.pickcar.infrastructure.CycleInfoConverter;
 import com.pickcar.infrastructure.CycleRepository;
 import com.pickcar.presentation.dto.request.CycleStoreRequest;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class CycleService {
 
     private final CycleRepository cycleRepository;
-    private final CycleInfoConverter cycleInfoConverter;
 
     public void store(CycleStoreRequest request) {
         Cycle cycle = Cycle.builder()
@@ -26,7 +23,7 @@ public class CycleService {
                 .occurredAt(request.getOccurredAt())
                 .cycleCnt(request.getCycleCnt())
                 .distance(calcDistance(request.getCycleCnt(), request.getCycleInfos()))
-                .cycleInfos(cycleInfoConverter.convertMapToString(request.getCycleInfos()))
+                .cycleInfos(request.getCycleInfos())
                 .build();
 
         cycleRepository.save(cycle);
@@ -37,11 +34,10 @@ public class CycleService {
                 offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
     }
 
-    private Double calcDistance(int cycleCnt, Map<String, Object> cycleInfos) {
+    private Double calcDistance(int cycleCnt, List<CycleInfo> cycleInfos) {
         double totalDistance = 0.0D;
 
-        for (int i = 0; i < cycleCnt; i++) {
-            CycleInfo cycleInfo = cycleInfoConverter.convertRawMapToCycleInfo(cycleInfos.get(String.valueOf(i)));
+        for(CycleInfo cycleInfo : cycleInfos) {
             totalDistance += (cycleInfo.getLongitude() + cycleInfo.getLatitude());
         }
 

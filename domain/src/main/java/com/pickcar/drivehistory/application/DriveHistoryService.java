@@ -41,7 +41,7 @@ public class DriveHistoryService {
         Double totalDistance = 0D;
 
         EventInfo offEventInfo = eventInfoService.getLatestOffEventInfoByVehicleId(vehicle.getId());
-        List<Cycle> cycles = cycleService.getCycleInfosByOffEventInfo(offEventInfo);
+        List<Cycle> cycles = cycleService.getCyclesByOffEventInfo(offEventInfo);
 
         DriveHistory history = DriveHistory.builder()
                 .drivingStartedAt(offEventInfo.getEngineOnTime())
