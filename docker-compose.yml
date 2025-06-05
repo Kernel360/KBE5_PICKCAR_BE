@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  pickcar:
+    image: openjdk:21-jdk
+    container_name: pickcar-java
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./emulator/build/libs/emulator-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    command: ["java", "-jar", "app.jar"]
+    networks:
+      - pickcar-net
+
+  mysql:
+    image: mysql:8.0
+    container_name: pickcar-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pickcar
+      MYSQL_DATABASE: pickcar
+      MYSQL_USER: pickcar
+      MYSQL_PASSWORD: pickcar
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - pickcar-net
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p$MYSQL_ROOT_PASSWORD" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql-data:
+
+networks:
+  pickcar-net:
