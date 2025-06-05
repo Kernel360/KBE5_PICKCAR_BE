@@ -1,8 +1,9 @@
 package com.pickcar.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pickcar.domain.CycleInfo;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,5 +22,5 @@ public class CycleStoreRequest {
 
     private Integer cycleCnt;
 
-    private Map<String, Object> cycleInfos;
+    private List<CycleInfo> cycleInfos;
 }
