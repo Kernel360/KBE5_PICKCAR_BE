@@ -6,6 +6,7 @@ import com.pickcar.domain.EventInfo;
 import com.pickcar.infrastructure.CycleInfoConverter;
 import com.pickcar.infrastructure.CycleRepository;
 import com.pickcar.presentation.dto.request.CycleStoreRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,10 @@ public class CycleService {
 
     public Cycle getById(Long id) {
         return cycleRepository.findById(id).orElse(null);       //FIXME: NULL 예외처리
+    }
+
+    public List<Cycle> getAllByVehicleIdAndOccurredAtBetween(Long vehicleId, LocalDateTime engineOnTime,
+                                                             LocalDateTime engineOffTime) {
+        return cycleRepository.findAllByVehicleIdAndOccurredAtBetween(vehicleId, engineOnTime, engineOffTime);
     }
 }

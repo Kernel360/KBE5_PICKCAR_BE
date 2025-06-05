@@ -2,8 +2,6 @@ package com.pickcar.drivehistory.application;
 
 import com.pickcar.application.CycleService;
 import com.pickcar.application.EventInfoService;
-import com.pickcar.auth.application.UserService;
-import com.pickcar.auth.domain.User;
 import com.pickcar.domain.Cycle;
 import com.pickcar.domain.EventInfo;
 import com.pickcar.drivehistory.domain.DriveHistory;
@@ -26,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DriveHistoryService {
 
-    private final UserService userService;
     private final VehicleService vehicleService;
     private final ReservationService reservationService;
     private final CycleService cycleService;
@@ -36,19 +33,18 @@ public class DriveHistoryService {
     @Transactional
     public void write(Long reservationId) {
         Reservation reservation = reservationService.getById(reservationId);
-        User user = userService.getById(reservation.getUserId());
         Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
-        Double totalDistance = 0D;
-
         EventInfo offEventInfo = eventInfoService.getLatestOffEventInfoByVehicleId(vehicle.getId());
-        List<Cycle> cycles = cycleService.getCycleInfosByOffEventInfo(offEventInfo);
+        List<Cycle> cycles = cycleService.getAllByVehicleIdAndOccurredAtBetween(vehicle.getId(),
+                offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
 
         DriveHistory history = DriveHistory.builder()
+                .reservationId(reservationId)
                 .drivingStartedAt(offEventInfo.getEngineOnTime())
                 .drivingEndedAt(offEventInfo.getEngineOffTime())
                 .totalDrivingTime(LocalTime.MIDNIGHT.plus(
                         Duration.between(offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime())))
-                .totalDistance(totalDistance)
+                .totalDistance(calcTotalDistance(cycles))
                 .build();
 
         log.info("history : {}", history.toString());
@@ -59,6 +55,12 @@ public class DriveHistoryService {
     public DriveHistory getById(Long id) {
         return driveHistoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] DriveHistory Not Found By Id " + id));
+    }
+
+    private Double calcTotalDistance(List<Cycle> cycles) {
+        return cycles.stream()
+                .mapToDouble(Cycle::getDistance)
+                .sum();
     }
 
 //    //FIXME: 메서드 분리 및 네이밍 수정 필요, 구성 순서도 중요
