@@ -1,6 +1,6 @@
 package com.pickcar.drivehistory.application;
 
-import com.pickcar.application.CycleInfoService;
+import com.pickcar.application.CycleService;
 import com.pickcar.application.EventInfoService;
 import com.pickcar.auth.application.UserService;
 import com.pickcar.auth.domain.User;
@@ -29,7 +29,7 @@ public class DriveHistoryService {
     private final UserService userService;
     private final VehicleService vehicleService;
     private final ReservationService reservationService;
-    private final CycleInfoService cycleInfoService;
+    private final CycleService cycleService;
     private final EventInfoService eventInfoService;
     private final DriveHistoryRepository driveHistoryRepository;
 
@@ -41,7 +41,7 @@ public class DriveHistoryService {
         Double totalDistance = 0D;
 
         EventInfo offEventInfo = eventInfoService.getLatestOffEventInfoByVehicleId(vehicle.getId());
-        List<Cycle> cycles = cycleInfoService.getCycleInfosByOffEventInfo(offEventInfo);
+        List<Cycle> cycles = cycleService.getCycleInfosByOffEventInfo(offEventInfo);
 
         DriveHistory history = DriveHistory.builder()
                 .drivingStartedAt(offEventInfo.getEngineOnTime())

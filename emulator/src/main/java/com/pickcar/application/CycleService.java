@@ -5,8 +5,7 @@ import com.pickcar.domain.CycleInfo;
 import com.pickcar.domain.EventInfo;
 import com.pickcar.infrastructure.CycleInfoConverter;
 import com.pickcar.infrastructure.CycleRepository;
-import com.pickcar.presentation.dto.request.CycleInfoRequest;
-import java.io.IOException;
+import com.pickcar.presentation.dto.request.CycleStoreRequest;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +15,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CycleInfoService {
+public class CycleService {
 
     private final CycleRepository cycleRepository;
     private final CycleInfoConverter cycleInfoConverter;
 
-    public void cycle(CycleInfoRequest request) throws IOException {
+    public void store(CycleStoreRequest request) {
         Cycle cycle = Cycle.builder()
                 .vehicleId(request.getVehicleId())
                 .occurredAt(request.getOccurredAt())
@@ -33,12 +32,12 @@ public class CycleInfoService {
         cycleRepository.save(cycle);
     }
 
-    public List<Cycle> getCycleInfosByOffEventInfo(EventInfo offEventInfo) {
-        return cycleRepository.findByVehicleIdAndOccurredAtBetween(offEventInfo.getVehicleId(),
+    public List<Cycle> getCyclesByOffEventInfo(EventInfo offEventInfo) {
+        return cycleRepository.findAllByVehicleIdAndOccurredAtBetween(offEventInfo.getVehicleId(),
                 offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
     }
 
-    private Double calcDistance(int cycleCnt, Map<String, Object> cycleInfos) throws IOException {
+    private Double calcDistance(int cycleCnt, Map<String, Object> cycleInfos) {
         double totalDistance = 0.0D;
 
         for (int i = 0; i < cycleCnt; i++) {

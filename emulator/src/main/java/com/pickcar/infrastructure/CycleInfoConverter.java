@@ -31,11 +31,11 @@ public class CycleInfoConverter {
             throw new IllegalArgumentException("변환할 수 없습니다", e);
         }
     }
-    
+
     public CycleInfo convertStringToCycleInfo(String cycleInfoStr) {
         try {
             log.info("convert string to cycleInfo, target : {}", cycleInfoStr);
-            
+
             //FIXME: 인덱스 한 번 빼는거 필요 <= 그럼 COUNT 필요
             return objectMapper.readValue(cycleInfoStr, CycleInfo.class);
         } catch (Exception e) {

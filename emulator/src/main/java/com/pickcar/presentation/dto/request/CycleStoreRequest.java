@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CycleInfoRequest {
+public class CycleStoreRequest {
 
     private Long vehicleId;
 

@@ -6,7 +6,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CycleRepository extends JpaRepository<Cycle, Long> {
-    List<Cycle> findByVehicleIdAndOccurredAtBetween(Long vehicleId, LocalDateTime occurredAtStart, LocalDateTime occurredAtEnd);
+    List<Cycle> findAllByVehicleIdAndOccurredAtBetween(Long vehicleId, LocalDateTime occurredAtStart,
+                                                       LocalDateTime occurredAtEnd);
 
 //    @Query(value = """
 //        SELECT
