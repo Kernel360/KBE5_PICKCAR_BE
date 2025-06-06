@@ -24,12 +24,14 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
 
     //관제사용 전체 리스트 조회
     //FIXME: api 경로를 search로 바꾸고, 관제사와 고객사는 같은 api 사용, 필터링을 통해 제공 내용 변경
+    @Override
     @GetMapping("/list")
-    public ResponseEntity<List<DriveHistoryAllListResponse>> allList() {
+    public ResponseEntity<List<DriveHistoryAllListResponse>> list() {
         List<DriveHistoryAllListResponse> responses = driveHistoryService.getAllList();
         return ResponseEntity.ok().body(responses);
     }
 
+    @Override
     @GetMapping("/{historyId}/detail")
     public ResponseEntity<DriveHistoryDetailResponse> detail(@PathVariable Long historyId) {
         log.info("Requesting detail for historyId: {}", historyId);
