@@ -10,9 +10,4 @@ import org.springframework.http.ResponseEntity;
 
 @Tag(name = "DriveHistory(운행 일지) 기능 API", description = "운행일지 관련 기능 API 문서입니다.")
 public interface DriveHistoryApiDocs {
-
-    @Operation(summary = "예시용 API", description = "예시용 API 입니다.")
-    @ApiResponse(responseCode = "200", description = "성공했음을 의미합니다")
-    @ApiErrorCodeExample(DriveHistoryErrorCode.class)
-    ResponseEntity<ExampleResponse> example();
 }

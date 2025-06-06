@@ -1,7 +1,8 @@
 package com.pickcar.drivehistory.presentation;
 
 import com.pickcar.drivehistory.application.DriveHistoryService;
-import com.pickcar.drivehistory.presentation.dto.response.ExampleResponse;
+import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryAllListResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/history")
-public class DriveHistoryController implements DriveHistoryApiDocs {
+public class DriveHistoryApiController implements DriveHistoryApiDocs {
 
     private final DriveHistoryService driveHistoryService;
 
-    @Override
-    @GetMapping("/example")
-    public ResponseEntity<ExampleResponse> example() {
-        return ResponseEntity.ok(new ExampleResponse("example"));       //Fixme: 실제로는 서비스에서 구성되어야 함
+    //관제사용 전체 리스트 조회
+    @GetMapping("/list")
+    public ResponseEntity<List<DriveHistoryAllListResponse>> allList() {
+        List<DriveHistoryAllListResponse> responses = driveHistoryService.getAllList();
+
+        return ResponseEntity.ok().body(responses);
     }
 }
