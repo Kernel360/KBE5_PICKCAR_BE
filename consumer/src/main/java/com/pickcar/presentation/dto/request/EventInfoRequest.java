@@ -1,7 +1,7 @@
 package com.pickcar.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pickcar.domain.GpsStatus;
+import com.pickcar.emulator.domain.GpsStatus;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EventInfoRequest {
 
-    private Long carId;
+    private Long vehicleId;
 
     private Boolean status;
 

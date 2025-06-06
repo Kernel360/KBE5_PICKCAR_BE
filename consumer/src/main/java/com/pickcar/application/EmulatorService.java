@@ -1,6 +1,6 @@
 package com.pickcar.application;
 
-import com.pickcar.domain.Terminal;
+import com.pickcar.emulator.domain.Terminal;
 import com.pickcar.infrastructure.EmulatorRepository;
 import com.pickcar.presentation.dto.request.EmulatorRequest;
 import lombok.RequiredArgsConstructor;

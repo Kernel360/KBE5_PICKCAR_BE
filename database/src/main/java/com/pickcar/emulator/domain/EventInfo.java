@@ -1,15 +1,10 @@
-package com.pickcar.domain;
+package com.pickcar.emulator.domain;
 
-import com.pickcar.infrastructure.CycleInfoConverter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,10 +14,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
-@AllArgsConstructor
-@Table(name = "cycles")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cycle {
+@AllArgsConstructor
+public class EventInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +24,21 @@ public class Cycle {
 
     private Long vehicleId;
 
-    private LocalDateTime occurredAt;
+    private Boolean status;
 
-    private Integer cycleCnt;
+    private LocalDateTime engineOnTime;
 
-    private Double distance;
+    private LocalDateTime engineOffTime;
 
-    @Convert(converter = CycleInfoConverter.class)
-    @Column(columnDefinition = "text")
-    private List<CycleInfo> cycleInfos;
+    private GpsStatus gpsStatus;
+
+    private Double latitude;
+
+    private Double longitude;
+
+    private Integer angle;
+
+    private Integer speed;
+
+    private Integer total_distance;
 }

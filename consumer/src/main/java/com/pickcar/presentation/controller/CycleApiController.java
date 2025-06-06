@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/cycle")
 @AllArgsConstructor
 public class CycleApiController {
+    //Sub (or Consumer) => MQ <-> DB(혹은 애뮬레이터 도메인) 간의 소통
 
     private final CycleService cycleService;
 

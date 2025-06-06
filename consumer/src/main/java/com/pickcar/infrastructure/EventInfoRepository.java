@@ -1,6 +1,6 @@
 package com.pickcar.infrastructure;
 
-import com.pickcar.domain.EventInfo;
+import com.pickcar.emulator.domain.EventInfo;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
