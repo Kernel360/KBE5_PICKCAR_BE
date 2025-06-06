@@ -6,11 +6,13 @@ import com.pickcar.drivehistory.application.command.dto.WriteDriveHistoryCommand
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryAllListResponse;
+import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.emulator.domain.Cycle;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
+import com.pickcar.vehicle.domain.VehicleInfo;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -96,6 +98,26 @@ public class DriveHistoryService {
         LocalDateTime today = LocalDateTime.now();
         LocalDateTime ago30Days = LocalDate.now().minusDays(30).atStartOfDay();
         return driveHistoryRepository.findAllByCreatedAtBetween(ago30Days, today);
+    }
+
+    public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {
+        //FIXME: 자꾸 거쳐 거쳐 조회하지 말고, 쿼리문을 쓰던지, 메서드를 만들던지 변경 필요
+        DriveHistory history = getById(historyId);
+        Reservation reservation = reservationService.getById(history.getReservationId());
+        Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
+        User driver = userService.getById(reservation.getUserId());
+        VehicleInfo vehicleInfo = vehicle.getInfo();
+
+        return DriveHistoryDetailResponse.builder()
+                .licensePlate(vehicleInfo.getLicensePlate())
+                .model(vehicleInfo.getModel())
+                .carAge(vehicleInfo.getCarAge())
+                .reservationStatus(reservation.getStatus())
+                .drivingStartedAt(history.getDrivingStartedAt())
+                .totalDrivingTime(history.getTotalDrivingTime())
+                .totalDistance(history.getTotalDistance())
+                .driverName(driver.getInfo().getName())
+                .build();
     }
 
 //    //FIXME: 메서드 분리 및 네이밍 수정 필요, 구성 순서도 중요

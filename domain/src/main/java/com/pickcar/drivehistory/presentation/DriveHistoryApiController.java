@@ -2,11 +2,13 @@ package com.pickcar.drivehistory.presentation;
 
 import com.pickcar.drivehistory.application.DriveHistoryService;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryAllListResponse;
+import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,10 +23,17 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
     private final DriveHistoryService driveHistoryService;
 
     //관제사용 전체 리스트 조회
+    //FIXME: api 경로를 search로 바꾸고, 관제사와 고객사는 같은 api 사용, 필터링을 통해 제공 내용 변경
     @GetMapping("/list")
     public ResponseEntity<List<DriveHistoryAllListResponse>> allList() {
         List<DriveHistoryAllListResponse> responses = driveHistoryService.getAllList();
-
         return ResponseEntity.ok().body(responses);
+    }
+
+    @GetMapping("/{historyId}/detail")
+    public ResponseEntity<DriveHistoryDetailResponse> detail(@PathVariable Long historyId) {
+        log.info("Requesting detail for historyId: {}", historyId);
+        DriveHistoryDetailResponse response = driveHistoryService.getDetailResponseById(historyId);
+        return ResponseEntity.ok().body(response);
     }
 }
