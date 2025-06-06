@@ -42,60 +42,69 @@ public class InitData implements CommandLineRunner {
     }
 
     private void initDummyCompanies() {
-        companyRepository.saveAll(
-                IntStream.iterate(1, i -> i + 1)
-                        .limit(5)
-                        .mapToObj(i -> new Company(
-                                "company" + i,
-                                "address" + i,
-                                "phoneNumber" + i,
-                                "company" + i + "@kernel.com",
-                                "더미 회사입니다",
-                                "0000000000" + i,
-                                ContractStatus.ACTIVE
-                        ))
-                        .toList()
-        );
+        //FIXME: 임시용 (중복 생성 X)
+        if(companyRepository.count() == 0) {
+            companyRepository.saveAll(
+                    IntStream.iterate(1, i -> i + 1)
+                            .limit(5)
+                            .mapToObj(i -> new Company(
+                                    "company" + i,
+                                    "address" + i,
+                                    "phoneNumber" + i,
+                                    "company" + i + "@kernel.com",
+                                    "더미 회사입니다",
+                                    "0000000000" + i,
+                                    ContractStatus.ACTIVE
+                            ))
+                            .toList()
+            );
+        }
     }
 
     private void initDummyUsers() {
-        userRepository.saveAll(
-                LongStream.iterate(1L, i -> i + 1)
-                        .limit(5L)
-                        .mapToObj(i -> new User(
-                                i,
-                                new UserInfo("user" + i + "@kernel.com", "1234" + i, "user" + i, "0101234567" + i),
-                                UserRole.EMPLOYEE,
-                                UserStatus.ACTIVE
-                        ))
-                        .toList());
+        if(userRepository.count() == 0) {
+            userRepository.saveAll(
+                    LongStream.iterate(1L, i -> i + 1)
+                            .limit(5L)
+                            .mapToObj(i -> new User(
+                                    i,
+                                    new UserInfo("user" + i + "@kernel.com", "1234" + i, "user" + i, "0101234567" + i),
+                                    UserRole.EMPLOYEE,
+                                    UserStatus.ACTIVE
+                            ))
+                            .toList());
+        }
     }
 
     private void initDummyVehicles() {
-        vehicleRepository.saveAll(
-                IntStream.iterate(1, i -> i + 1)
-                        .limit(10)
-                        .mapToObj(i -> new Vehicle(
-                                new VehicleInfo("model" + i, "color" + i, "가나다" + i,
-                                        "200", "Brand", FuelType.DIESEL),
-                                VehicleStatus.OPERABLE,
-                                true,
-                                false,
-                                true
-                        ))
-                        .toList());
+        if(vehicleRepository.count() == 0) {
+            vehicleRepository.saveAll(
+                    IntStream.iterate(1, i -> i + 1)
+                            .limit(10)
+                            .mapToObj(i -> new Vehicle(
+                                    new VehicleInfo("model" + i, "color" + i, "가나다" + i,
+                                            "200", "Brand", FuelType.DIESEL),
+                                    VehicleStatus.OPERABLE,
+                                    true,
+                                    false,
+                                    true
+                            ))
+                            .toList());
+        }
     }
 
     private void initDummyReservations() {
-        reservationRepository.saveAll(
-                LongStream.iterate(1L, i -> i + 1)
-                        .limit(5)
-                        .mapToObj(i -> new Reservation(
-                                i,
-                                i,
-                                LocalDateTime.now(),
-                                null,
-                                ReservationStatus.RESERVED
-                        )).toList());
+        if(reservationRepository.count() == 0) {
+            reservationRepository.saveAll(
+                    LongStream.iterate(1L, i -> i + 1)
+                            .limit(5)
+                            .mapToObj(i -> new Reservation(
+                                    i,
+                                    i,
+                                    LocalDateTime.now(),
+                                    null,
+                                    ReservationStatus.RESERVED
+                            )).toList());
+        }
     }
 }
