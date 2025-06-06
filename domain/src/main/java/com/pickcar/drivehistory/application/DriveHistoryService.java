@@ -1,15 +1,9 @@
 package com.pickcar.drivehistory.application;
 
-import com.pickcar.application.CycleService;
-import com.pickcar.application.EventInfoService;
-import com.pickcar.domain.Cycle;
-import com.pickcar.domain.EventInfo;
+import com.pickcar.drivehistory.application.command.dto.WriteDriveHistoryCommandDto;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
-import com.pickcar.reservation.application.ReservationService;
-import com.pickcar.reservation.domain.Reservation;
-import com.pickcar.vehicle.application.VehicleService;
-import com.pickcar.vehicle.domain.Vehicle;
+import com.pickcar.emulator.domain.Cycle;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
@@ -24,27 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DriveHistoryService {
 
-    private final VehicleService vehicleService;
-    private final ReservationService reservationService;
-    private final CycleService cycleService;
-    private final EventInfoService eventInfoService;
     private final DriveHistoryRepository driveHistoryRepository;
 
     @Transactional
-    public void write(Long reservationId) {
-        Reservation reservation = reservationService.getById(reservationId);
-        Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
-        EventInfo offEventInfo = eventInfoService.getLatestOffEventInfoByVehicleId(vehicle.getId());
-        List<Cycle> cycles = cycleService.getAllByVehicleIdAndOccurredAtBetween(vehicle.getId(),
-                offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
-
+    public void write(WriteDriveHistoryCommandDto dto) {
         DriveHistory history = DriveHistory.builder()
-                .reservationId(reservationId)
-                .drivingStartedAt(offEventInfo.getEngineOnTime())
-                .drivingEndedAt(offEventInfo.getEngineOffTime())
+                .reservationId(dto.reservationId())
+                .drivingStartedAt(dto.drivingStartedAt())
+                .drivingEndedAt(dto.drivingEndedAt())
                 .totalDrivingTime(LocalTime.MIDNIGHT.plus(
-                        Duration.between(offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime())))
-                .totalDistance(calcTotalDistance(cycles))
+                        Duration.between(dto.drivingStartedAt(), dto.drivingEndedAt())))
+                .totalDistance(calcTotalDistance(dto.cycles()))
                 .build();
 
         log.info("history : {}", history.toString());

@@ -4,6 +4,7 @@ import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
 import com.pickcar.reservation.presentation.dto.request.ReservationCreateRequest;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,5 +33,11 @@ public class ReservationService {
     public Reservation getById(Long id) {
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] Reservation Not Found By Id " + id));
+    }
+
+    //status가 할당중인것 중 자동차가 일치하는 것 =>status 변경이 누락된 경우에 대한 예외처리 필요
+    public Reservation getActiveReservationByVehicleId(Long vehicleId) {
+        return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).orElseThrow(
+                () -> new IllegalArgumentException("예약중인 차량 중 해당 차량을 찾을 수 없습니다."));
     }
 }
