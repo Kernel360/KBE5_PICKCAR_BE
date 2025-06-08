@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/vehicles")
-public class VehicleApiController {
+public class VehicleApiController implements VehicleApiDocs{
 
     private final VehicleService vehicleService;
 
+    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void register(@RequestBody VehicleRegisterRequest vehicleRegisterRequest) {
@@ -31,6 +32,7 @@ public class VehicleApiController {
         vehicleService.register(vehicleRegisterRequest);
     }
 
+    @Override
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<VehicleListResponse> allList() {
@@ -38,6 +40,7 @@ public class VehicleApiController {
         return vehicleService.getAllList();
     }
 
+    @Override
     @PatchMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeStatus(@RequestBody ChangeVehicleStatusRequest request) {
