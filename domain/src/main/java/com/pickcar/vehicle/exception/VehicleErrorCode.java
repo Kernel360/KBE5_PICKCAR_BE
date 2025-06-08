@@ -12,7 +12,8 @@ public enum VehicleErrorCode implements BaseErrorCode {
 
     //400(BAD_REQUEST)
     LICENSE_PLATE_DUPLICATED(HttpStatus.BAD_REQUEST, "VEHICLE_400_1", "동일한 번호판을 사용하는 자동차가 이미 존재합니다."),
-    NOT_FOUND_BY_ID(HttpStatus.BAD_REQUEST, "VEHICLE_400_2", "해당 ID를 가진 자동차를 찾을 수 없습니다.");
+    NOT_FOUND_BY_ID(HttpStatus.BAD_REQUEST, "VEHICLE_400_2", "해당 ID를 가진 자동차를 찾을 수 없습니다."),
+    ALREADY_SET_UP_STATUS(HttpStatus.BAD_REQUEST, "VEHICLE_400_3", "동일한 상태로는 변경할 수 없습니다");
 
     private HttpStatus httpStatus;
     private String errorCode;

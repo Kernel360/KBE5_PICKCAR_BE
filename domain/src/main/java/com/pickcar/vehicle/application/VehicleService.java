@@ -63,7 +63,7 @@ public class VehicleService {
         Vehicle vehicle = getById(request.vehicleId());
 
         if (vehicle.getStatus().equals(request.vehicleStatus())) {
-            throw new IllegalArgumentException("[ERROR] 동일한 상태로는 변경할 수 없습니다");
+            throw new VehicleException(VehicleErrorCode.ALREADY_SET_UP_STATUS);
         }
 
         vehicle.changeStatus(request.vehicleStatus());
