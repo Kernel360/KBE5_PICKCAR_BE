@@ -29,7 +29,8 @@ public class GpxWebSocketHandler extends TextWebSocketHandler {
         log.info("연결 종료 : {}", session.getId());
     }
 
-    public void broadcast(String message) {
+    //Todo : 다르게 처리할 방법이 있는지
+    public synchronized void broadcast(String message) {
         for (WebSocketSession session : sessions) {
             try {
                 session.sendMessage(new TextMessage(message));
