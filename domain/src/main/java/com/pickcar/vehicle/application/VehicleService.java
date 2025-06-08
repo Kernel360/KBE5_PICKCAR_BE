@@ -5,6 +5,12 @@ import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
 import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
+import com.pickcar.vehicle.presentation.dto.response.VehicleListResponse;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +24,6 @@ public class VehicleService {
 
     @Transactional
     public void register(VehicleRegisterRequest request) {
-
         //FIXME: 분리 필요, 케이스 추가
         if (hasLicensePlateAlready(request.vehicleInfo().getLicensePlate())) {
             throw new IllegalArgumentException("[ERROR] 동일한 번호판을 사용하는 자동차가 이미 존재합니다.");
@@ -35,5 +40,20 @@ public class VehicleService {
 
     private boolean hasLicensePlateAlready(String licensePlate) {
         return vehicleRepository.findByInfo_LicensePlate(licensePlate).isPresent();
+    }
+
+    public List<VehicleListResponse> getAllList() {
+        List<VehicleListResponse> responses = new ArrayList<>();
+
+        for (Vehicle v : vehicleRepository.findAll()) {
+            VehicleInfo info = v.getInfo();
+            VehicleListResponse response = new VehicleListResponse(v.getId(), info.getLicensePlate(), info.getModel(),
+                    info.getColor(), v.getStatus(), "빌린 회사명", LocalDate.now());
+            //FIXME: 빌린 회사 명, 빌린 시각 수정 필요, status도 rental관련 status 여야함
+            
+            responses.add(response);
+        }
+
+        return responses;
     }
 }
