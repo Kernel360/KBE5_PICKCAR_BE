@@ -1,6 +1,6 @@
 plugins {
     id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
 }
 
@@ -14,9 +14,17 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // JAXB API: XML 데이터를 Java 객체로 변환하기 위해 필요
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
+    implementation 'org.glassfish.jaxb:jaxb-runtime'
+
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    implementation 'mysql:mysql-connector-java:8.0.33'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
