@@ -4,6 +4,7 @@ import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
+import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,22 +17,14 @@ public class VehicleService {
     private final VehicleRepository vehicleRepository;
 
     @Transactional
-    public void create(VehicleInfo info) {
+    public void register(VehicleRegisterRequest request) {
 
-//        //FIXME: 책임 분리 필요
-        if (hasLicensePlateAlready(info.getLicensePlate())) {
+        //FIXME: 분리 필요, 케이스 추가
+        if (hasLicensePlateAlready(request.vehicleInfo().getLicensePlate())) {
             throw new IllegalArgumentException("[ERROR] 동일한 번호판을 사용하는 자동차가 이미 존재합니다.");
         }
 
-        //FIXME : 전체적으로 하드코딩 금지
-        Vehicle vehicle = Vehicle.builder()
-                .info(info)
-                .hasGps(true)
-                .isRented(false)
-                .isActive(true)
-                .status(VehicleStatus.OPERABLE)
-                .build();
-
+        Vehicle vehicle = new Vehicle(request.vehicleInfo(), request.hasGps());
         vehicleRepository.save(vehicle);
     }
 
