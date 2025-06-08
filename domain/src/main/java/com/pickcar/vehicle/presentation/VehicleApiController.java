@@ -1,6 +1,7 @@
 package com.pickcar.vehicle.presentation;
 
 import com.pickcar.vehicle.application.VehicleService;
+import com.pickcar.vehicle.presentation.dto.request.ChangeVehicleStatusRequest;
 import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
 import com.pickcar.vehicle.presentation.dto.response.VehicleListResponse;
 import java.util.List;
@@ -9,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,9 +34,16 @@ public class VehicleApiController {
     }
 
     @GetMapping
-    public ResponseEntity<List<VehicleListResponse>> allList() {
+    @ResponseStatus(HttpStatus.OK)
+    public List<VehicleListResponse> allList() {
         log.info("Retrieving all vehicles");
-        List<VehicleListResponse> responses = vehicleService.getAllList();
-        return ResponseEntity.ok().body(responses);
+        return vehicleService.getAllList();
+    }
+
+    @PatchMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changeStatus(@RequestBody ChangeVehicleStatusRequest request) {
+        log.info("Changing vehicle status");
+        vehicleService.changeStatus(request);
     }
 }

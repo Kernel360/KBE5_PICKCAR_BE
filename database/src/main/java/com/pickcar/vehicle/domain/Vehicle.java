@@ -44,5 +44,9 @@ public class Vehicle extends BaseEntity {
         this.isRented = false;
         this.isActive = true;
     }
+
+    public void changeStatus(VehicleStatus status) {
+        this.status = status;
+    }
 }
 

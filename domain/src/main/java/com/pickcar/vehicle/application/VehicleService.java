@@ -4,6 +4,7 @@ import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
+import com.pickcar.vehicle.presentation.dto.request.ChangeVehicleStatusRequest;
 import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
 import com.pickcar.vehicle.presentation.dto.response.VehicleListResponse;
 import java.time.LocalDate;
@@ -55,5 +56,17 @@ public class VehicleService {
         }
 
         return responses;
+    }
+
+    @Transactional
+    public void changeStatus(ChangeVehicleStatusRequest request) {
+        Vehicle vehicle = getById(request.vehicleId());
+
+        if(vehicle.getStatus().equals(request.vehicleStatus())) {
+            throw new IllegalArgumentException("[ERROR] 동일한 상태로는 변경할 수 없습니다");
+        }
+
+        vehicle.changeStatus(request.vehicleStatus());
+        //FIXME: 차량의 상태 <-> 예약의 상태 사용하는 구간 / 정의 / 예시 똑바로 설정
     }
 }
