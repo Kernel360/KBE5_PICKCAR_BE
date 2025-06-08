@@ -37,8 +37,9 @@ public class VehicleService {
     }
 
     private void hasLicensePlateAlready(String licensePlate) {
-        vehicleRepository.findByInfo_LicensePlate(licensePlate).orElseThrow(()
-                -> new VehicleException(VehicleErrorCode.LICENSE_PLATE_DUPLICATED));
+        if (vehicleRepository.findByInfo_LicensePlate(licensePlate).isPresent()) {
+            throw new VehicleException(VehicleErrorCode.LICENSE_PLATE_DUPLICATED);
+        }
     }
 
     public List<VehicleListResponse> getAllList() {
