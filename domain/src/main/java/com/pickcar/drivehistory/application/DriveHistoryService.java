@@ -1,20 +1,10 @@
 package com.pickcar.drivehistory.application;
 
-import com.pickcar.application.CycleService;
-import com.pickcar.application.EventInfoService;
 import com.pickcar.auth.application.UserService;
-import com.pickcar.auth.domain.User;
-import com.pickcar.emulator.domain.Cycle;
-import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.reservation.application.ReservationService;
-import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.vehicle.application.VehicleService;
-import com.pickcar.vehicle.domain.Vehicle;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,32 +19,14 @@ public class DriveHistoryService {
     private final UserService userService;
     private final VehicleService vehicleService;
     private final ReservationService reservationService;
-    private final CycleService cycleService;
-    private final EventInfoService eventInfoService;
     private final DriveHistoryRepository driveHistoryRepository;
 
-    @Transactional
-    public void write(Long reservationId) {
-        Reservation reservation = reservationService.getById(reservationId);
-        User user = userService.getById(reservation.getUserId());
-        Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
-        Double totalDistance = 0D;
-
-        EventInfo offEventInfo = eventInfoService.getLatestOffEventInfoByVehicleId(vehicle.getId());
-        List<Cycle> cycles = cycleService.getCyclesByOffEventInfo(offEventInfo);
-
-        DriveHistory history = DriveHistory.builder()
-                .drivingStartedAt(offEventInfo.getEngineOnTime())
-                .drivingEndedAt(offEventInfo.getEngineOffTime())
-                .totalDrivingTime(LocalTime.MIDNIGHT.plus(
-                        Duration.between(offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime())))
-                .totalDistance(totalDistance)
-                .build();
-
-        log.info("history : {}", history.toString());
-
-        driveHistoryRepository.save(history);
-    }
+//    @Transactional
+//    public void write(Long reservationId) {
+//
+//        //TODO: 주기정보 기반으로 시동 OFF시 운행일지 생성
+//
+//    }
 
     public DriveHistory getById(Long id) {
         return driveHistoryRepository.findById(id)
