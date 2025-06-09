@@ -21,10 +21,12 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Profile({"local", "test"})
 public class InitData implements CommandLineRunner {
 
     //FIXME: Service를 호출하는것이 바람직함
