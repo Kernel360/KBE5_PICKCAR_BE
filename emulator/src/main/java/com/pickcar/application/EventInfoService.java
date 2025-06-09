@@ -1,5 +1,6 @@
 package com.pickcar.application;
 
+import com.pickcar.application.command.WriteDriveHistoryCommand;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.infrastructure.EventInfoRepository;
 import com.pickcar.presentation.dto.request.EventInfoRequest;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EventInfoService {
 
+    private final WriteDriveHistoryCommand writeDriveHistoryCommand;
     private final EventInfoRepository eventInfoRepository;
 
     public void on(EventInfoRequest request) {
@@ -24,11 +26,12 @@ public class EventInfoService {
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
                 .build();
+
         eventInfoRepository.save(eventInfo);
     }
 
     public void off(EventInfoRequest request) {
-        EventInfo eventInfo = EventInfo.builder()
+        EventInfo offEventInfo = EventInfo.builder()
                 .vehicleId(request.getVehicleId())
                 .status(request.getStatus())
                 .engineOnTime(request.getEngineOnTime())
@@ -37,10 +40,12 @@ public class EventInfoService {
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
                 .build();
-        eventInfoRepository.save(eventInfo);
+
+        eventInfoRepository.save(offEventInfo);
+        writeDriveHistoryCommand.execute(offEventInfo);
     }
 
-    //가장 최근의 off 내용이 내가 고르려는 그 내용인지에 대한 보장
+    //FIXME: 가장 최근의 off 내용이 내가 고르려는 그 내용인지에 대한 보장
     public EventInfo getLatestOffEventInfoByVehicleId(Long vehicleId) {
         return eventInfoRepository.findTopByVehicleIdOrderByEngineOffTimeDesc(vehicleId)
                 .orElseThrow(
