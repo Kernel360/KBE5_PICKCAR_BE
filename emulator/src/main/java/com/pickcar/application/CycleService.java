@@ -2,7 +2,6 @@ package com.pickcar.application;
 
 
 import com.pickcar.emulator.domain.Cycle;
-import com.pickcar.emulator.domain.CycleInfo;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.infrastructure.CycleRepository;
 import com.pickcar.presentation.dto.request.CycleStoreRequest;
@@ -28,16 +27,6 @@ public class CycleService {
     public List<Cycle> getCyclesByOffEventInfo(EventInfo offEventInfo) {
         return cycleRepository.findAllByVehicleIdAndOccurredAtBetween(offEventInfo.getVehicleId(),
                 offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
-    }
-
-    private Double calcDistance(List<CycleInfo> cycleInfos) {
-        double totalDistance = 0.0D;
-
-        for(CycleInfo cycleInfo : cycleInfos) {
-            totalDistance += (cycleInfo.getLongitude() + cycleInfo.getLatitude());
-        }
-
-        return totalDistance;
     }
 
     public Cycle getById(Long id) {
