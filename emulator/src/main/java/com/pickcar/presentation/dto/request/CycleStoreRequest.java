@@ -2,7 +2,7 @@ package com.pickcar.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pickcar.domain.CycleInfo;
+import com.pickcar.emulator.domain.CycleInfo;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;

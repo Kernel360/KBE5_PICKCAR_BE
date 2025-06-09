@@ -1,6 +1,6 @@
 package com.pickcar.application;
 
-import com.pickcar.domain.EventInfo;
+import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.infrastructure.EventInfoRepository;
 import com.pickcar.presentation.dto.request.EventInfoRequest;
 import lombok.RequiredArgsConstructor;

@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @EntityScan(basePackages = {
-        "com.pickcar.domain",
+        "com.pickcar.emulator.domain",
 })
 @SpringBootApplication
 public class EmulatorApplication {
