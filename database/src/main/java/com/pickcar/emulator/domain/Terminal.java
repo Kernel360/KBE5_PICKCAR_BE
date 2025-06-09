@@ -1,41 +1,32 @@
-package com.pickcar.domain;
+package com.pickcar.emulator.domain;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-public class EventInfo {
-
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class Terminal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long vehicleId;
 
-    private Boolean status;
+    private String mdn;
 
-    private LocalDateTime engineOnTime;
+    private String terminalId;
 
-    private LocalDateTime engineOffTime;
+    private String manufactureId;
 
-    @Enumerated(EnumType.STRING)
-    private GpsStatus gpsStatus;
+    private String packetVersion;
 
-    private Double latitude;
-
-    private Double longitude;
+    private String deviceId;
 }
