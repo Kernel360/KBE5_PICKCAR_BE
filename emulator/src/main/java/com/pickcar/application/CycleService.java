@@ -19,13 +19,8 @@ public class CycleService {
     private final CycleRepository cycleRepository;
 
     public void store(CycleStoreRequest request) {
-        Cycle cycle = Cycle.builder()
-                .vehicleId(request.getVehicleId())
-                .occurredAt(request.getOccurredAt())
-                .cycleCnt(request.getCycleCnt())
-                .distance(calcDistance(request.getCycleInfos()))
-                .cycleInfos(request.getCycleInfos())
-                .build();
+        Cycle cycle = new Cycle(request.getVehicleId(), request.getOccurredAt(),
+                request.getCycleCnt(), request.getCycleInfos());
 
         cycleRepository.save(cycle);
     }
