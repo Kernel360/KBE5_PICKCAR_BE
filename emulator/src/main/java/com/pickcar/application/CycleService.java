@@ -22,7 +22,7 @@ public class CycleService {
                 .vehicleId(request.getVehicleId())
                 .occurredAt(request.getOccurredAt())
                 .cycleCnt(request.getCycleCnt())
-                .distance(calcDistance(request.getCycleCnt(), request.getCycleInfos()))
+                .distance(calcDistance(request.getCycleInfos()))
                 .cycleInfos(request.getCycleInfos())
                 .build();
 
@@ -34,7 +34,7 @@ public class CycleService {
                 offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
     }
 
-    private Double calcDistance(int cycleCnt, List<CycleInfo> cycleInfos) {
+    private Double calcDistance(List<CycleInfo> cycleInfos) {
         double totalDistance = 0.0D;
 
         for(CycleInfo cycleInfo : cycleInfos) {

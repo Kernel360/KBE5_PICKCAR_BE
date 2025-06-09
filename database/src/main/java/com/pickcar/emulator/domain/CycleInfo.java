@@ -1,4 +1,4 @@
-package com.pickcar.domain;
+package com.pickcar.emulator.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
