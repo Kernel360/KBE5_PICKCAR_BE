@@ -2,10 +2,8 @@ package com.pickcar.application;
 
 
 import com.pickcar.emulator.domain.Cycle;
-import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.infrastructure.CycleRepository;
 import com.pickcar.presentation.dto.request.CycleStoreRequest;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,14 +20,5 @@ public class CycleService {
                 request.getCycleCnt(), request.getCycleInfos());
 
         cycleRepository.save(cycle);
-    }
-
-    public List<Cycle> getCyclesByOffEventInfo(EventInfo offEventInfo) {
-        return cycleRepository.findAllByVehicleIdAndOccurredAtBetween(offEventInfo.getVehicleId(),
-                offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
-    }
-
-    public Cycle getById(Long id) {
-        return cycleRepository.findById(id).orElse(null);       //FIXME: NULL 예외처리
     }
 }
