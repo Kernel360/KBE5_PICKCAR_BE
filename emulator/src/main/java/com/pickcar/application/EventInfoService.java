@@ -40,13 +40,6 @@ public class EventInfoService {
         eventInfoRepository.save(eventInfo);
     }
 
-//    //가장 최근의 on 내용이 내가 고르려는 그 내용인지에 대한 보장
-//    public void getLatestOnEventInfoByVehicleId(Long vehicleId) {
-//
-//        eventInfoRepository.findByVehicleIdAndStatus(vehicleId, )
-//
-//    }
-
     //가장 최근의 off 내용이 내가 고르려는 그 내용인지에 대한 보장
     public EventInfo getLatestOffEventInfoByVehicleId(Long vehicleId) {
         return eventInfoRepository.findTopByVehicleIdOrderByEngineOffTimeDesc(vehicleId)
