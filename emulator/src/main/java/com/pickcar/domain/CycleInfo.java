@@ -1,36 +1,27 @@
 package com.pickcar.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
-import java.util.Map;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateTimeConverter;
+import lombok.Getter;
 
-@Entity
-@Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@Getter
 public class CycleInfo {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @JsonFormat(pattern = "yyyyMMddHHmmss")
+    private LocalDateTime second;
 
-    private Long carId;
+    @Enumerated(EnumType.STRING)
+    private GpsStatus gps_status;
 
-    private LocalDateTime occurredAt;
+    private Double latitude;
 
-    private Integer cycleCnt;
+    private Double longitude;
 
-    @Convert(converter = JsonMapConverter.class)
-    @Column(columnDefinition = "json")
-    private Map<String, Object> cycleInfos;
+    private Integer angle;
+
+    private Integer speed;
+
+    private Integer battery;
 }

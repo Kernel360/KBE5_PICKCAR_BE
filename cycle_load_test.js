@@ -10,10 +10,10 @@ export let options = {
 export default function () {
   const url = 'http://localhost:8080/api/v1/cycle';
   const payload = JSON.stringify({
-      carId: 1,
-      cycleCnt: 1,
-      occurredAt: "20240601123000",
-      cycleInfos: {
+      car_id: 1,
+      cycle_cnt: 1,
+      occurred_at: "20240601123000",
+      cycle_infos: {
           "0": {
               second: "20240601123001",
               gps_status: "NORMAL",
