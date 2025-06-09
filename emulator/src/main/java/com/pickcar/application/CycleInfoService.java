@@ -1,6 +1,6 @@
 package com.pickcar.application;
 
-import com.pickcar.domain.CycleInfo;
+import com.pickcar.domain.Cycle;
 import com.pickcar.infrastructure.CycleInfoRepository;
 import com.pickcar.presentation.dto.request.CycleInfoRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +15,11 @@ public class CycleInfoService {
     private final CycleInfoRepository cycleInfoRepository;
 
     public void cycle(CycleInfoRequest request) {
-        CycleInfo cycleInfo = CycleInfo.builder()
-                .carId(request.getCarId())
+        Cycle cycleInfo = Cycle.builder()
+                .vehicleId(request.getVehicleId())
                 .occurredAt(request.getOccurredAt())
                 .cycleCnt(request.getCycleCnt())
+                .distance(request.getDistance())
                 .cycleInfos(request.getCycleInfos())
                 .build();
         cycleInfoRepository.save(cycleInfo);

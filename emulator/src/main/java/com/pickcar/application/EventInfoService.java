@@ -16,32 +16,26 @@ public class EventInfoService {
 
     public void on(EventInfoRequest request) {
         EventInfo eventInfo = EventInfo.builder()
-                .carId(request.getCarId())
+                .vehicleId(request.getVehicleId())
                 .status(request.getStatus())
                 .engineOnTime(request.getEngineOnTime())
                 .engineOffTime(request.getEngineOffTime())
                 .gpsStatus(request.getGpsStatus())
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
-                .angle(request.getAngle())
-                .speed(request.getSpeed())
-                .total_distance(request.getTotal_distance())
                 .build();
         eventInfoRepository.save(eventInfo);
     }
 
     public void off(EventInfoRequest request) {
         EventInfo eventInfo = EventInfo.builder()
-                .carId(request.getCarId())
+                .vehicleId(request.getVehicleId())
                 .status(request.getStatus())
                 .engineOnTime(request.getEngineOnTime())
                 .engineOffTime(request.getEngineOffTime())
                 .gpsStatus(request.getGpsStatus())
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
-                .angle(request.getAngle())
-                .speed(request.getSpeed())
-                .total_distance(request.getTotal_distance())
                 .build();
         eventInfoRepository.save(eventInfo);
     }

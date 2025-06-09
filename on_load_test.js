@@ -10,12 +10,12 @@ export let options = {
 export default function () {
   const url = 'http://localhost:8080/api/v1/event/engine/on';
   const payload = JSON.stringify({
-        carId: 1,
+        car_id: 1,
         mdn: "01234567890",
         status: true,
-        engineOnTime: "20240601123000",
-        engineOffTime: "",
-        gpsStatus: "NORMAL",
+        engine_on_time: "20240601123000",
+        engine_off_time: "",
+        gps_status: "NORMAL",
         latitude: 37.4418038,
         longitude: 127.244003,
         angle: 90,
