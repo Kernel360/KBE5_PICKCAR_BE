@@ -3,6 +3,8 @@ package com.pickcar.drivehistory.application;
 import com.pickcar.auth.application.UserService;
 import com.pickcar.auth.domain.User;
 import com.pickcar.drivehistory.domain.DriveHistory;
+import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
+import com.pickcar.drivehistory.exception.DriveHistoryException;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryAllListResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
@@ -58,7 +60,7 @@ public class DriveHistoryService {
 
     public DriveHistory getById(Long id) {
         return driveHistoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("[ERROR] DriveHistory Not Found By Id " + id));
+                .orElseThrow(() -> new DriveHistoryException(DriveHistoryErrorCode.NOT_FOUND_BY_ID));
     }
 
 //    //FIXME: 메서드 분리 및 네이밍 수정 필요, 구성 순서도 중요
