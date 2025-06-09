@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
@@ -31,6 +30,7 @@ public class VehicleService {
         vehicleRepository.save(vehicle);
     }
 
+    @Transactional(readOnly = true)
     public Vehicle getById(Long id) {
         return vehicleRepository.findById(id)
                 .orElseThrow(() -> new VehicleException(VehicleErrorCode.NOT_FOUND_BY_ID));
@@ -42,6 +42,7 @@ public class VehicleService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<VehicleListResponse> getAllList() {
         List<VehicleListResponse> responses = new ArrayList<>();
 
