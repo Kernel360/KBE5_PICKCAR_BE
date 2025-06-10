@@ -1,12 +1,14 @@
 version: '3.8'
 
 services:
-  pickcar:
+  pickcar-pub:
     image: openjdk:21-jdk
-    container_name: pickcar-java
+    container_name: pickcar-pub
     ports:
       - "8080:8080"
     depends_on:
+      rabbitmq:
+        condition: service_healthy
       mysql:
         condition: service_healthy
     volumes:
@@ -15,6 +17,40 @@ services:
     command: ["java", "-jar", "app.jar"]
     networks:
       - pickcar-net
+
+  pickcar-sub:
+    image: openjdk:21-jdk
+    container_name: pickcar-sub
+    ports:
+      - "8081:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./consumer/build/libs/consumer-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    command: ["java", "-jar", "app.jar"]
+    networks:
+      - pickcar-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: pickcar-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - pickcar-net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mysql:
     image: mysql:8.0
@@ -39,6 +75,8 @@ services:
 
 volumes:
   mysql-data:
+    name: mysql-data
 
 networks:
   pickcar-net:
+    name: pickcar-net
