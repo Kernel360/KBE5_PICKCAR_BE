@@ -1,7 +1,8 @@
-//package com.pickcar.presentation.dto.request;
+//package com.pickcar.dto.request;
 //
 //import com.fasterxml.jackson.annotation.JsonFormat;
 //import com.fasterxml.jackson.annotation.JsonProperty;
+//import com.pickcar.domain.CycleInfo;
 //import java.time.LocalDateTime;
 //import java.util.List;
 //import lombok.AllArgsConstructor;
@@ -29,5 +30,5 @@
 //    private Integer distance;
 //
 //    @JsonProperty("cycle_infos")
-//    private List<CycleInfoPayload> cycleInfos;
+//    private List<CycleInfo> cycleInfos;
 //}

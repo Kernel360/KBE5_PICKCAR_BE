@@ -1,4 +1,4 @@
-//package com.pickcar.presentation.dto.request;
+//package com.pickcar.dto.request;
 //
 //import com.fasterxml.jackson.annotation.JsonFormat;
 //import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +14,6 @@
 //@NoArgsConstructor
 //@AllArgsConstructor
 //public class EventInfoRequest {
-//
 //    @JsonProperty("vehicle_id")
 //    private Long vehicleId;
 //
