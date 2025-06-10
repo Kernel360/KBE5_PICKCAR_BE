@@ -2,7 +2,7 @@ package com.pickcar.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pickcar.domain.GpsStatus;
+import com.pickcar.emulator.domain.GpsStatus;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

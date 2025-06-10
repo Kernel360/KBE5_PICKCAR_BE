@@ -1,6 +1,6 @@
 package com.pickcar.application;
 
-import com.pickcar.domain.Terminal;
+import com.pickcar.emulator.domain.Terminal;
 import com.pickcar.infrastructure.EmulatorRepository;
 import com.pickcar.presentation.dto.request.EmulatorRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ public class EmulatorService {
     public void terminal(EmulatorRequest request) {
         Terminal terminal = Terminal.builder()
                 .mdn(request.getMdn())
-                .carId(request.getCarId())
+                .vehicleId(request.getCarId())
                 .terminalId(request.getTerminalId())
                 .manufactureId(request.getManufactureId())
                 .packetVersion(request.getPacketVersion())

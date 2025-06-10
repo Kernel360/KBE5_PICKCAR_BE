@@ -1,4 +1,4 @@
-package com.pickcar.domain;
+package com.pickcar.emulator.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,9 +10,11 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

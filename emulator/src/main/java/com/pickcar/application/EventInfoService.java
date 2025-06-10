@@ -1,6 +1,6 @@
 package com.pickcar.application;
 
-import com.pickcar.domain.EventInfo;
+import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.infrastructure.EventInfoRepository;
 import com.pickcar.presentation.dto.request.EventInfoRequest;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +38,12 @@ public class EventInfoService {
                 .longitude(request.getLongitude())
                 .build();
         eventInfoRepository.save(eventInfo);
+    }
+
+    //가장 최근의 off 내용이 내가 고르려는 그 내용인지에 대한 보장
+    public EventInfo getLatestOffEventInfoByVehicleId(Long vehicleId) {
+        return eventInfoRepository.findTopByVehicleIdOrderByEngineOffTimeDesc(vehicleId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("[ERROR] EventInfo Not Found By Vehicle Id : " + vehicleId));
     }
 }

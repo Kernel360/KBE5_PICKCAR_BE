@@ -28,6 +28,7 @@ public enum DriveHistoryErrorCode implements BaseErrorCode {
         this.errorCode = errorCode;
         this.reason = GlobalStatic.ERROR_PREFIX + reason;       //FIXME: prefix를 여기서 붙여도 될까?
     }
+
     public HttpStatus getStatus() {
         return httpStatus;
     }
