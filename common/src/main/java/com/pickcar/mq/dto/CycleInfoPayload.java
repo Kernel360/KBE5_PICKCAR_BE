@@ -1,13 +1,12 @@
-package com.pickcar.domain;
+package com.pickcar.mq.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pickcar.mq.enumType.GpsStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
-import lombok.Getter;
 
-@Getter
-public class CycleInfo {
+public class CycleInfoPayload {
 
     @JsonFormat(pattern = "yyyyMMddHHmmss")
     private LocalDateTime second;
