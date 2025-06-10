@@ -29,6 +29,14 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
 }
 
+bootJar {
+    enabled = true
+}
+
+jar {
+    enabled = false
+}
+
 test {
     useJUnitPlatform()
 }

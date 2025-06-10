@@ -1,0 +1,73 @@
+#컨테이너로 띄울 서비스들 정의
+services:
+  mysql:
+    image: mysql:latest
+#    volumes:
+#      - mysql_data_dev:/var/lib/mysql
+    container_name: pickcar_mysql_dev
+    restart: no
+    env_file:
+      - ./.env.dev
+    environment: 
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD_DEV}
+      MYSQL_DATABASE: ${DB_NAME_DEV}
+      MYSQL_USER: ${DB_USERNAME_DEV}
+      MYSQL_PASSWORD: ${DB_PASSWORD_DEV}
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "3306:3306"
+    networks:
+      - backend_dev
+
+  domain:
+    build: 
+      context: .. 
+      dockerfile: domain/Dockerfile.dev 
+    container_name: pickcar_domain_dev
+    restart: no
+    env_file:
+      - ./.env.dev
+    environment:
+      SPRING_PROFILES_ACTIVE: dev 
+      DEV_DB_NAME: ${DB_NAME_DEV}
+      DEV_DB_USERNAME: ${DB_USERNAME_DEV}
+      DEV_DB_PASSWORD: ${DB_PASSWORD_DEV}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports: 
+      - "8080:8080" 
+    networks:
+      - backend_dev
+
+# ex)
+#  emulator:
+#    build:
+#      context: ..
+#      dockerfile: emulator/Dockerfile.dev #TODO: 운영은 .prod로 설정 필요
+#    container_name: pickcar_emulater_dev #TODO: 운영은 prod로 수정 필요
+#    restart: no #TODO: 운영은 always로 설정 필요
+#    environment: #필요한 환경변수
+#      SPRING_PROFILES_ACTIVE: dev #TODO: 운영은 prod로 설정 필요
+#      DEV_DB_NAME: ${DB_NAME_DEV}
+#      DEV_DB_USERNAME: ${DB_USERNAME_DEV}
+#      DEV_DB_PASSWORD: ${DB_PASSWORD_DEV}
+#    depends_on: #emulator 컨테이너보다 먼저 시작되어야할 것들 명시 
+#      - mysql
+#    ports:
+#      - "8081:8080" #TODO: 팀 회의를 통해 지정 필요
+#    networks:
+#      - backend_dev #TODO: 운영은 prod로 수정 필요
+
+#컨테이너 간 통신을 위한 네트워크 정의
+networks:
+  backend_dev:
+
+#TODO: 컨테이너가 아닌 볼륨에 저장 시 주석 해제 필요
+#volumes:
+#  mysql_data_dev:
