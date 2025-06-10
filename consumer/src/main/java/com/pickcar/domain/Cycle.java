@@ -1,6 +1,7 @@
 package com.pickcar.domain;
 
-import com.pickcar.infrastructure.CycleInfoConverter;
+import com.pickcar.mq.dto.CycleInfoConverter;
+import com.pickcar.mq.dto.CycleInfoPayload;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -34,5 +35,5 @@ public class Cycle {
 
     @Convert(converter = CycleInfoConverter.class)
     @Column(columnDefinition = "text")
-    private List<CycleInfo> cycleInfos;
+    private List<CycleInfoPayload> cycleInfos;
 }

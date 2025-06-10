@@ -2,7 +2,7 @@ package com.pickcar.application;
 
 import com.pickcar.domain.Cycle;
 import com.pickcar.infrastructure.CycleInfoRepository;
-import com.pickcar.presentation.dto.request.CycleInfoRequest;
+import com.pickcar.mq.dto.CyclePayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ public class CycleInfoService {
 
     private final CycleInfoRepository cycleInfoRepository;
 
-    public void cycle(CycleInfoRequest request) {
+    public void cycle(CyclePayload request) {
         Cycle cycleInfo = Cycle.builder()
                 .vehicleId(request.getVehicleId())
                 .occurredAt(request.getOccurredAt())

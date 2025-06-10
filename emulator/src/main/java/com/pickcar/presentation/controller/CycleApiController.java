@@ -1,7 +1,7 @@
 package com.pickcar.presentation.controller;
 
-import com.pickcar.application.CycleInfoService;
-import com.pickcar.presentation.dto.request.CycleInfoRequest;
+import com.pickcar.application.CycleMessagePublisher;
+import com.pickcar.mq.dto.CyclePayload;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class CycleApiController {
 
-    private final CycleInfoService cycleInfoService;
+    private CycleMessagePublisher cycleMessagePublisher;
 
     @PostMapping
-    public void emulatorCycle(@RequestBody CycleInfoRequest request) {
-        log.info("POST /api/v1/engine/cycle - CycleInfoRequest: {}", request);
-        cycleInfoService.cycle(request);
+    public void emulatorCycle(@RequestBody CyclePayload cyclePayload) {
+        log.info("POST /api/v1/cycle - CyclePayload: {}", cyclePayload);
+        cycleMessagePublisher.publish(cyclePayload);
     }
 }
