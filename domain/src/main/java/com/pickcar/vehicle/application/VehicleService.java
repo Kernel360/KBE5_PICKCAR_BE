@@ -28,7 +28,6 @@ public class VehicleService {
                 .info(info)
                 .hasGps(true)
                 .isRented(false)
-                .isActive(true)
                 .status(VehicleStatus.OPERABLE)
                 .build();
 

@@ -33,9 +33,4 @@ public class Vehicle extends BaseEntity {
 
     @Column(nullable = false)
     private Boolean isRented;
-
-    @Column(nullable = false)
-    private Boolean isActive;       //TODO: 자동차에 애뮬레이터 상태를 저장하는게 올바른지에 대한 고민 필요
-
 }
-
