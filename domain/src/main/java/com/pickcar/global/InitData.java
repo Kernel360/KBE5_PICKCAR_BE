@@ -82,8 +82,7 @@ public class InitData implements CommandLineRunner {
                                         "200", "Brand", FuelType.DIESEL),
                                 VehicleStatus.OPERABLE,
                                 true,
-                                false,
-                                true
+                                false
                         ))
                         .toList());
     }
