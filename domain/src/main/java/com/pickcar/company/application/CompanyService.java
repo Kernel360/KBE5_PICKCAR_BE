@@ -6,6 +6,7 @@ import com.pickcar.company.presentation.dto.request.CompanyJoinRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,11 @@ public class CompanyService {
                 .contractStatus(request.contractStatus())
                 .build();
 
-        return companyRepository.save(company);     //FIXME: 반환 금지 
+        return companyRepository.save(company);     //FIXME: 반환 금지
+    }
+
+    public List<Company> getAll(){
+        return companyRepository.findAll();
     }
 
     public Company getById(Long id) {
