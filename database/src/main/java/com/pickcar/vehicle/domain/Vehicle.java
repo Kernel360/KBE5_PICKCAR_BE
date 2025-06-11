@@ -33,4 +33,15 @@ public class Vehicle extends BaseEntity {
 
     @Column(nullable = false)
     private Boolean isRented;
+
+    public Vehicle(VehicleInfo info, Boolean hasGps) {
+        this.info = info;
+        this.hasGps = hasGps;
+        this.status = VehicleStatus.OPERABLE;
+        this.isRented = false;
+    }
+
+    public void changeStatus(VehicleStatus status) {
+        this.status = status;
+    }
 }

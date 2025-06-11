@@ -20,6 +20,14 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.33'
 }
 
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
 test {
     useJUnitPlatform()
 }

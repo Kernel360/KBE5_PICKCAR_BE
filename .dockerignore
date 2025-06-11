@@ -1,0 +1,42 @@
+#.idea
+#.git
+#.gitignore
+#.dockerignore
+#*.md
+*.sh
+*.yml
+scripts
+.env
+/docker/.env*
+
+# Node.js 프로젝트라면
+#node_modules
+#npm-debug.log
+#yarn-debug.log
+#yarn-error.log
+
+# Git 관련
+.git
+.gitignore
+
+# Docker 자체 파일
+domain/Dockerfile.dev
+Dockerfile.prod
+.dockerignore
+
+# 빌드 결과물 (예: React, Spring Boot)
+build/
+dist/
+target/
+
+# IDE 관련
+.idea
+*.iml
+.vscode
+
+# 테스트, 문서
+*.log
+coverage/
+docs/
+test/
+*.md
