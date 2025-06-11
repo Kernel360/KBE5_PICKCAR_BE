@@ -1,6 +1,3 @@
-server:
-  port: 8080    # TODO: 모듈별 포트번호 다르게 지정 필요
-
 spring:
   profiles:
     active: local   #기본은 local (test 작성시에는 어플리케이션에 test 명시, prod 경우 docker 컨테이너 띄울 때(jar 파일 명령) profile 작성
