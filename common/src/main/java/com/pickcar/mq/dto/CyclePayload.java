@@ -26,7 +26,7 @@ public class CyclePayload implements Serializable {
     private Integer cycleCnt;
 
     @JsonProperty("distance")
-    private Integer distance;
+    private Double distance;
 
     @JsonProperty("cycle_infos")
     private List<CycleInfoPayload> cycleInfos;
