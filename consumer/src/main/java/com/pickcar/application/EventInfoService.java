@@ -2,7 +2,7 @@ package com.pickcar.application;
 
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.infrastructure.EventInfoRepository;
-import com.pickcar.presentation.dto.request.EventInfoRequest;
+import com.pickcar.mq.dto.EventPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class EventInfoService {
 
     private final EventInfoRepository eventInfoRepository;
 
-    public void on(EventInfoRequest request) {
+    public void on(EventPayload request) {
         EventInfo eventInfo = EventInfo.builder()
                 .vehicleId(request.getVehicleId())
                 .status(request.getStatus())
@@ -29,7 +29,7 @@ public class EventInfoService {
         eventInfoRepository.save(eventInfo);
     }
 
-    public void off(EventInfoRequest request) {
+    public void off(EventPayload request) {
         EventInfo offEventInfo = EventInfo.builder()
                 .vehicleId(request.getVehicleId())
                 .status(request.getStatus())
