@@ -1,6 +1,7 @@
 package com.pickcar.emulator.domain;
 
-import com.pickcar.emulator.domain.converter.CycleInfoConverter;
+import com.pickcar.mq.dto.CycleInfoConverter;
+import com.pickcar.mq.dto.CycleInfoPayload;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -43,9 +44,9 @@ public class Cycle {
 
     @Convert(converter = CycleInfoConverter.class)
     @Column(columnDefinition = "text")
-    private List<CycleInfo> cycleInfos;
+    private List<CycleInfoPayload> cycleInfos;
 
-    public Cycle(Long vehicleId, LocalDateTime occurredAt, Integer cycleCnt, List<CycleInfo> cycleInfos) {
+    public Cycle(Long vehicleId, LocalDateTime occurredAt, Integer cycleCnt, List<CycleInfoPayload> cycleInfos) {
         this.vehicleId = vehicleId;
         this.occurredAt = occurredAt;
         this.cycleCnt = cycleCnt;
@@ -53,7 +54,7 @@ public class Cycle {
         this.cycleInfos = cycleInfos;
     }
 
-    private Double calcCycleDistance(List<CycleInfo> cycleInfos) {
+    private Double calcCycleDistance(List<CycleInfoPayload> cycleInfos) {
         if (cycleInfos.size() <= 1) {
             log.info("거리 계산이 필요하지 않은 정보입니다 : {}", cycleInfos);
             return 0.0D;
@@ -65,7 +66,7 @@ public class Cycle {
                 )).sum();
     }
 
-    private Double calculateDistanceBetween(CycleInfo origin, CycleInfo dest) {
+    private Double calculateDistanceBetween(CycleInfoPayload origin, CycleInfoPayload dest) {
         double haversineComponent = calcHaversineComponent(origin, dest);
         double centralAngle = calcCentralAngle(haversineComponent);
 
@@ -73,12 +74,12 @@ public class Cycle {
     }
 
     //삼각함수로 구성된 거리 비율(중심각을 구하기 위한 중간 계산값)
-    private Double calcHaversineComponent(CycleInfo origin, CycleInfo dest) {
+    private Double calcHaversineComponent(CycleInfoPayload origin, CycleInfoPayload dest) {
         double originLatitudeRad = Math.toRadians(origin.getLatitude());
         double destLatitudeRad = Math.toRadians(dest.getLatitude());
         double deltaLatitude = Math.toRadians(dest.getLatitude() - origin.getLatitude());
         double deltaLongitude = Math.toRadians(dest.getLongitude() - origin.getLongitude());
-        
+
         return Math.pow(Math.sin(deltaLatitude / 2), 2)
                 + Math.cos(originLatitudeRad) * Math.cos(destLatitudeRad) * Math.pow(Math.sin(deltaLongitude / 2),
                 2);
