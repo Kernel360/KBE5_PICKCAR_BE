@@ -1,6 +1,6 @@
 package com.pickcar.application;
 
-import com.pickcar.domain.Cycle;
+import com.pickcar.emulator.domain.Cycle;
 import com.pickcar.infrastructure.CycleInfoRepository;
 import com.pickcar.mq.dto.CyclePayload;
 import lombok.RequiredArgsConstructor;
