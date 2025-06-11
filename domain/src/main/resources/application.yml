@@ -8,3 +8,6 @@ spring:
     password: # database password
   jpa:
     open-in-view: false
+
+server:
+  port: 8080
