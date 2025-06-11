@@ -1,6 +1,6 @@
 package com.pickcar.drivehistory.presentation.dto.response;
 
-import com.pickcar.emulator.domain.CycleInfo;
+import com.pickcar.mq.dto.CycleInfoPayload;
 import com.pickcar.reservation.domain.ReservationStatus;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -21,8 +21,6 @@ public record DriveHistoryDetailResponse(
 //        Double speedAvg
 //        Double lastLongitude,
 //        Double lastLatitude
-        List<CycleInfo> path
-
-
+        List<CycleInfoPayload> path
 ) {
 }
