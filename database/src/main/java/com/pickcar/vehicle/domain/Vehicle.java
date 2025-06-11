@@ -45,3 +45,4 @@ public class Vehicle extends BaseEntity {
         this.status = status;
     }
 }
+

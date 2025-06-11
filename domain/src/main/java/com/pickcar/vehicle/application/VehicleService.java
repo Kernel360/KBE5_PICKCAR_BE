@@ -26,14 +26,6 @@ public class VehicleService {
         //FIXME: 분리 필요, 케이스 추가
         hasLicensePlateAlready(request.vehicleInfo().getLicensePlate());
 
-        //FIXME : 전체적으로 하드코딩 금지
-        Vehicle vehicle = Vehicle.builder()
-                .info(info)
-                .hasGps(true)
-                .isRented(false)
-                .status(VehicleStatus.OPERABLE)
-                .build();
-
         Vehicle vehicle = new Vehicle(request.vehicleInfo(), request.hasGps());
         vehicleRepository.save(vehicle);
     }
