@@ -12,16 +12,14 @@ repositories {
 }
 
 dependencies {
+    implementation project(":common")
+    implementation project(":database")
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
-bootJar {
-    enabled = false
-}
-
-jar {
-    enabled = true
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'mysql:mysql-connector-java:8.0.33'
 }
 
 test {

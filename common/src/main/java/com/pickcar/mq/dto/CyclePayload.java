@@ -1,8 +1,8 @@
-package com.pickcar.presentation.dto.request;
+package com.pickcar.mq.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pickcar.emulator.domain.CycleInfo;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CycleStoreRequest {
-
+public class CyclePayload implements Serializable {
     @JsonProperty("vehicle_id")
     private Long vehicleId;
 
@@ -26,6 +25,9 @@ public class CycleStoreRequest {
     @JsonProperty("cycle_cnt")
     private Integer cycleCnt;
 
+    @JsonProperty("distance")
+    private Double distance;
+
     @JsonProperty("cycle_infos")
-    private List<CycleInfo> cycleInfos;
+    private List<CycleInfoPayload> cycleInfos;
 }
