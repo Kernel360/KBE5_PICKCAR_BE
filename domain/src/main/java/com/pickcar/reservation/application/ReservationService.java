@@ -33,4 +33,11 @@ public class ReservationService {
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] Reservation Not Found By Id " + id));
     }
+
+    //status가 할당중인것 중 자동차가 일치하는 것 =>status 변경이 누락된 경우에 대한 예외처리 필요
+    //NOTE: 만약 즉시 예약상태가 종료되었다면?
+    public Reservation getActiveReservationByVehicleId(Long vehicleId) {
+        return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).orElseThrow(
+                () -> new IllegalArgumentException("예약중인 차량 중 해당 차량을 찾을 수 없습니다."));
+    }
 }
