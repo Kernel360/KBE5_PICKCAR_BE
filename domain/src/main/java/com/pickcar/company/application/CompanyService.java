@@ -3,9 +3,13 @@ package com.pickcar.company.application;
 import com.pickcar.company.domain.Company;
 import com.pickcar.company.infrastructure.CompanyRepository;
 import com.pickcar.company.presentation.dto.request.CompanyJoinRequest;
+import com.pickcar.company.presentation.dto.response.CompanyListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -56,5 +60,21 @@ public class CompanyService {
         if (companyRepository.findByName(name).isPresent()) {
             throw new IllegalArgumentException("[ERROR] 이미 사용중인 회사명 입니다. Company Name : " + name);
         }
+    }
+
+    public List<CompanyListResponse> findAll() {
+        List<Company> companies = companyRepository.findAll();
+
+        List<CompanyListResponse> responseList = new ArrayList<>();
+
+        for (Company company : companies) {
+            CompanyListResponse dto = CompanyListResponse.builder()
+                    .id(company.getId())
+                    .name(company.getName())
+                    .build();
+            responseList.add(dto);
+        }
+
+        return responseList;
     }
 }
