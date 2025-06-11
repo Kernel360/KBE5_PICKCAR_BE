@@ -10,6 +10,7 @@ import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryAllListRes
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.emulator.application.CycleQueryService;
 import com.pickcar.emulator.application.EventInfoQueryService;
+import com.pickcar.emulator.domain.Cycle;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.domain.Reservation;
@@ -120,6 +121,7 @@ public class DriveHistoryService {
         Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
         User driver = userService.getById(reservation.getUserId());
         VehicleInfo vehicleInfo = vehicle.getInfo();
+        Cycle cycle = cycleQueryService.getByVehicleId(vehicle.getId());
 
         return DriveHistoryDetailResponse.builder()
                 .licensePlate(vehicleInfo.getLicensePlate())
@@ -130,6 +132,8 @@ public class DriveHistoryService {
                 .totalDrivingTime(history.getTotalDrivingTime())
                 .totalDistance(history.getTotalDistance())
                 .driverName(driver.getInfo().getName())
+                .path(cycle.getCycleInfos())
                 .build();
+
     }
 }
