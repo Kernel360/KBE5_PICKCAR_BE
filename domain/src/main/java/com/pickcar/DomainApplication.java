@@ -11,7 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
         "com.pickcar.drivehistory.domain",
         "com.pickcar.rental.domain",
         "com.pickcar.reservation.domain",
-        "com.pickcar.vehicle.domain"
+        "com.pickcar.vehicle.domain",
+        "com.pickcar.emulator.domain"
 })
 @EnableJpaAuditing
 @SpringBootApplication

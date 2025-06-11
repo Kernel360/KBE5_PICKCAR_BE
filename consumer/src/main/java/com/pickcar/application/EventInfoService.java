@@ -6,6 +6,7 @@ import com.pickcar.mq.dto.EventPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
@@ -24,11 +25,12 @@ public class EventInfoService {
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
                 .build();
+
         eventInfoRepository.save(eventInfo);
     }
 
     public void off(EventPayload request) {
-        EventInfo eventInfo = EventInfo.builder()
+        EventInfo offEventInfo = EventInfo.builder()
                 .vehicleId(request.getVehicleId())
                 .status(request.getStatus())
                 .engineOnTime(request.getEngineOnTime())
@@ -37,13 +39,14 @@ public class EventInfoService {
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
                 .build();
-        eventInfoRepository.save(eventInfo);
+
+        eventInfoRepository.save(offEventInfo);
+        writeDriveHistoryRequestAfterOff(offEventInfo);
     }
 
-    //가장 최근의 off 내용이 내가 고르려는 그 내용인지에 대한 보장
-    public EventInfo getLatestOffEventInfoByVehicleId(Long vehicleId) {
-        return eventInfoRepository.findTopByVehicleIdOrderByEngineOffTimeDesc(vehicleId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("[ERROR] EventInfo Not Found By Vehicle Id : " + vehicleId));
+    private void writeDriveHistoryRequestAfterOff(EventInfo offEventInfo) {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.postForEntity("http://localhost:8080/api/v1/history/%d".formatted(offEventInfo.getId()),
+                null, Void.class);
     }
 }
