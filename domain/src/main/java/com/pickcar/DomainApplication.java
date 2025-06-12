@@ -16,7 +16,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "com.pickcar.emulator.domain"
 })
 @EnableJpaAuditing
-@EnableMethodSecurity
+//@EnableMethodSecurity
 @SpringBootApplication
 public class DomainApplication {
     public static void main(String[] args) {
