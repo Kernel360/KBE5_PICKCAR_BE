@@ -22,7 +22,5 @@ public record DriveHistoryDetailResponse(
 //        Double lastLongitude,
 //        Double lastLatitude
         List<CycleInfoPayload> path
-
-
 ) {
 }
