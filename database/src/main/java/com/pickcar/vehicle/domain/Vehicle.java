@@ -41,6 +41,14 @@ public class Vehicle extends BaseEntity {
         this.isRented = false;
     }
 
+    public Vehicle(VehicleInfo brand, VehicleStatus vehicleStatus, boolean b, boolean b1, boolean b2) {
+        this.info = brand;
+        this.status = vehicleStatus;
+        this.hasGps = b;
+        this.isRented = b1;
+        this.isRented = b2;
+    }
+
     public void changeStatus(VehicleStatus status) {
         this.status = status;
     }
