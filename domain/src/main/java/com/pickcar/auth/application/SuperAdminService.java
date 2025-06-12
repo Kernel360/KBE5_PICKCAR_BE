@@ -1,10 +1,10 @@
 package com.pickcar.auth.application;
 
-import com.pickcar.auth.domain.SuperAdmin;
-import com.pickcar.auth.domain.UserInfo;
-import com.pickcar.auth.domain.UserStatus;
+import com.pickcar.auth.domain.*;
 import com.pickcar.auth.infrastructure.SuperAdminRepository;
+import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,10 +12,18 @@ import org.springframework.stereotype.Service;
 public class SuperAdminService {
 
     private final SuperAdminRepository superAdminRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public void create() {
+    public void create(UserInfoRequest request) {
+        String encodedPassword = passwordEncoder.encode(request.password());
+
         SuperAdmin superAdmin = SuperAdmin.builder()
-                .info(new UserInfo("email", "password", "name", "phoneNumber")) //FIXME
+                .info(new UserInfo(
+                        request.email(),
+                        encodedPassword,
+                        request.name(),
+                        request.phoneNumber()
+                ))
                 .status(UserStatus.ACTIVE)
                 .build();
 
@@ -26,5 +34,4 @@ public class SuperAdminService {
         return superAdminRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] Super Admin Not Found By Id :" + id));
     }
-
 }

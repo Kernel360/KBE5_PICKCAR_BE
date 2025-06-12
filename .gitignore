@@ -189,6 +189,9 @@ application-dev.yml
 application-local.yml
 application-prod.yml
 
+domain/Dockerfile.local
+docker/docker-compose.local.yml
+
 # 임시
 loki-data
 logs/.promtail-positions.yml
