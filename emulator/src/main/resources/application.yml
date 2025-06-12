@@ -5,6 +5,3 @@ spring:
     suffix: '.html'
   profiles:
     active: local
-
-server:
-  port: 8081

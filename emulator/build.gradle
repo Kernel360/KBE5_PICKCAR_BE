@@ -14,7 +14,6 @@ repositories {
 dependencies {
     implementation project(":common")
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // JAXB API: XML 데이터를 Java 객체로 변환하기 위해 필요
