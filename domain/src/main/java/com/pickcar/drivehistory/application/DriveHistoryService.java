@@ -46,14 +46,7 @@ public class DriveHistoryService {
         Reservation reservation = reservationService.getActiveReservationByVehicleId(offEventInfo.getVehicleId());
         Double totalDistance = cycleQueryService.getTotalDistanceForHistory(offEventInfo);
 
-        DriveHistory driveHistory = DriveHistory.builder()
-                .reservationId(reservation.getId())
-                .drivingStartedAt(offEventInfo.getEngineOnTime())
-                .drivingEndedAt(offEventInfo.getEngineOffTime())
-                .totalDistance(totalDistance)
-                .totalDrivingTime(LocalTime.MIDNIGHT.plus(Duration.between(offEventInfo.getEngineOnTime(),
-                        offEventInfo.getEngineOffTime())))
-                .build();
+        DriveHistory driveHistory = new DriveHistory(reservation.getId(), offEventInfo, totalDistance);
 
         driveHistoryRepository.save(driveHistory);
     }
@@ -83,8 +76,7 @@ public class DriveHistoryService {
         List<DriveHistory> histories = getAll30DaysList();
 
         for (DriveHistory history : histories) {
-            /* FIXME: N+1 여지 있음 -> histories 기반 List 조회 필요 가능성 있음
-                reservation(예약)이 없다면 예외 발생 가능성 있음 */
+            // FIXME: N+1 여지 있음 -> histories 기반 List 조회 필요 가능성 있음
             ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
             DriveHistoryAllListResponse response = DriveHistoryAllListResponse.of(history, context);
             responses.add(response);
