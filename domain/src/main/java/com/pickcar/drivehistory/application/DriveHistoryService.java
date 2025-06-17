@@ -83,18 +83,10 @@ public class DriveHistoryService {
         List<DriveHistory> histories = getAll30DaysList();
 
         for (DriveHistory history : histories) {
+            /* FIXME: N+1 여지 있음 -> histories 기반 List 조회 필요 가능성 있음
+                reservation(예약)이 없다면 예외 발생 가능성 있음 */
             ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
-
-            DriveHistoryAllListResponse response = DriveHistoryAllListResponse.builder()
-                    .historyId(history.getId())
-                    .licensePlate(context.reservedVehicleInfo().getLicensePlate())
-                    .driverName(context.reservedUserInfo().getName())
-                    .drivingStartedAt(history.getDrivingStartedAt())
-                    .drivingEndedAt(history.getDrivingEndedAt())
-                    .totalDrivingTime(history.getTotalDrivingTime())
-                    .totalDistance(history.getTotalDistance())
-                    .build();
-
+            DriveHistoryAllListResponse response = DriveHistoryAllListResponse.of(history, context);
             responses.add(response);
         }
         return responses;
@@ -111,18 +103,9 @@ public class DriveHistoryService {
         //FIXME: 자꾸 거쳐 거쳐 조회하지 말고, 쿼리문을 쓰던지, 메서드를 만들던지 변경 필요
         DriveHistory history = getById(historyId);
         ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
-//        Cycle cycle = cycleQueryService.getByVehicleId(context.reservedVehicleInfo().getId());      //FIXME: path를 가져올 수 있는 다른 방법 필요
+        //FIXME: path를 가져올 수 있는 다른 방법 필요
+        //Cycle cycle = cycleQueryService.getByVehicleId(context.reservedVehicleInfo().getId());
 
-        return DriveHistoryDetailResponse.builder()
-                .licensePlate(context.reservedVehicleInfo().getLicensePlate())
-                .model(context.reservedVehicleInfo().getModel())
-                .carAge(context.reservedVehicleInfo().getCarAge())
-                .reservationStatus(context.reservation().getStatus())
-                .drivingStartedAt(history.getDrivingStartedAt())
-                .totalDrivingTime(history.getTotalDrivingTime())
-                .totalDistance(history.getTotalDistance())
-                .driverName(context.reservedUserInfo().getName())
-//                .path(cycle.getCycleInfos())
-                .build();
+        return DriveHistoryDetailResponse.of(history, context);
     }
 }
