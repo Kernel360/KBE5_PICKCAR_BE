@@ -1,9 +1,14 @@
 package com.pickcar.reservation.application;
 
+import com.pickcar.auth.application.UserService;
+import com.pickcar.auth.domain.User;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
+import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import com.pickcar.reservation.presentation.dto.request.ReservationCreateRequest;
+import com.pickcar.vehicle.application.VehicleService;
+import com.pickcar.vehicle.domain.Vehicle;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReservationService {
 
+    private final UserService userService;
+    private final VehicleService vehicleService;
     private final ReservationRepository reservationRepository;
 
     @Transactional
@@ -39,5 +46,13 @@ public class ReservationService {
     public Reservation getActiveReservationByVehicleId(Long vehicleId) {
         return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).orElseThrow(
                 () -> new IllegalArgumentException("예약중인 차량 중 해당 차량을 찾을 수 없습니다."));
+    }
+
+    public ReservationContext getReservationContextById(Long reservationId) {
+        Reservation reservation = getById(reservationId);
+        User user = userService.getById(reservation.getUserId());
+        Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
+
+        return new ReservationContext(reservation, user.getInfo(), vehicle.getInfo());
     }
 }

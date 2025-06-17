@@ -14,6 +14,7 @@ import com.pickcar.emulator.domain.Cycle;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.domain.Reservation;
+import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
@@ -34,8 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DriveHistoryService {
 
-    private final UserService userService;
-    private final VehicleService vehicleService;
     private final CycleQueryService cycleQueryService;
     private final EventInfoQueryService eventInfoQueryService;
     private final ReservationService reservationService;
@@ -80,22 +79,16 @@ public class DriveHistoryService {
 //    }
 
     public List<DriveHistoryAllListResponse> getAllList() {
+        List<DriveHistoryAllListResponse> responses = new ArrayList<>();
         List<DriveHistory> histories = getAll30DaysList();
 
-        log.info("histories : {}", histories.toString());
-
-        List<DriveHistoryAllListResponse> responses = new ArrayList<>();
-
         for (DriveHistory history : histories) {
-            //FIXME: reservation -> (user, vehicle)을 한번에 처리할 방법은?
-            Reservation reservation = reservationService.getById(history.getReservationId());
-            Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
-            User driver = userService.getById(reservation.getUserId());
+            ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
 
             DriveHistoryAllListResponse response = DriveHistoryAllListResponse.builder()
                     .historyId(history.getId())
-                    .licensePlate(vehicle.getInfo().getLicensePlate())
-                    .driverName(driver.getInfo().getName())
+                    .licensePlate(context.reservedVehicleInfo().getLicensePlate())
+                    .driverName(context.reservedUserInfo().getName())
                     .drivingStartedAt(history.getDrivingStartedAt())
                     .drivingEndedAt(history.getDrivingEndedAt())
                     .totalDrivingTime(history.getTotalDrivingTime())
@@ -117,23 +110,19 @@ public class DriveHistoryService {
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {
         //FIXME: 자꾸 거쳐 거쳐 조회하지 말고, 쿼리문을 쓰던지, 메서드를 만들던지 변경 필요
         DriveHistory history = getById(historyId);
-        Reservation reservation = reservationService.getById(history.getReservationId());
-        Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
-        User driver = userService.getById(reservation.getUserId());
-        VehicleInfo vehicleInfo = vehicle.getInfo();
-        Cycle cycle = cycleQueryService.getByVehicleId(vehicle.getId());
+        ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
+//        Cycle cycle = cycleQueryService.getByVehicleId(context.reservedVehicleInfo().getId());      //FIXME: path를 가져올 수 있는 다른 방법 필요
 
         return DriveHistoryDetailResponse.builder()
-                .licensePlate(vehicleInfo.getLicensePlate())
-                .model(vehicleInfo.getModel())
-                .carAge(vehicleInfo.getCarAge())
-                .reservationStatus(reservation.getStatus())
+                .licensePlate(context.reservedVehicleInfo().getLicensePlate())
+                .model(context.reservedVehicleInfo().getModel())
+                .carAge(context.reservedVehicleInfo().getCarAge())
+                .reservationStatus(context.reservation().getStatus())
                 .drivingStartedAt(history.getDrivingStartedAt())
                 .totalDrivingTime(history.getTotalDrivingTime())
                 .totalDistance(history.getTotalDistance())
-                .driverName(driver.getInfo().getName())
-                .path(cycle.getCycleInfos())
+                .driverName(context.reservedUserInfo().getName())
+//                .path(cycle.getCycleInfos())
                 .build();
-
     }
 }
