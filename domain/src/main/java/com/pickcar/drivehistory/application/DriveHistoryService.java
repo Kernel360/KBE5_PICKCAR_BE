@@ -66,15 +66,12 @@ public class DriveHistoryService {
 
     private List<DriveHistory> getFilteredList(DriveHistoryFilterRequest filterRequest) {
         LocalDateTime from = filterRequest.from();
-        LocalDateTime end = filterRequest.end();
+        LocalDateTime to = filterRequest.to();
 
-        return driveHistoryRepository.findAllFilteredListByDriverNameAndDuration(filterRequest.driverName(), from, end);
-
-//        return driveHistoryRepository.findAllByCreatedAtBetween(from, end);
+        return driveHistoryRepository.findAllFilteredListByDriverNameAndDuration(filterRequest.driverName(), from, to);
     }
 
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {
-        //FIXME: 자꾸 거쳐 거쳐 조회하지 말고, 쿼리문을 쓰던지, 메서드를 만들던지 변경 필요
         DriveHistory history = getById(historyId);
         ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
         //FIXME: path를 가져올 수 있는 다른 방법 필요

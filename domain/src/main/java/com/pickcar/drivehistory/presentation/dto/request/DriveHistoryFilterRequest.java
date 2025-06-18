@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record DriveHistoryFilterRequest(
         LocalDateTime from,
-        LocalDateTime end,
+        LocalDateTime to,
         String driverName
 ) {
 }
