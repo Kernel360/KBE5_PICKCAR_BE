@@ -12,6 +12,6 @@ public interface CycleQueryRepository extends JpaRepository<Cycle, Long> {
     List<Cycle> findAllByVehicleIdAndOccurredAtBetween(Long vehicleId, LocalDateTime occurredAtStart,
                                                        LocalDateTime occurredAtEnd);
 
-    @Query(value = "SELECT * FROM `pickcar-emul`.cycles c WHERE c.vehicle_id = :vehicleId LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM cycles c WHERE c.vehicle_id = :vehicleId LIMIT 1", nativeQuery = true)
     Optional<Cycle> findByVehicleId(Long vehicleId);
 }
