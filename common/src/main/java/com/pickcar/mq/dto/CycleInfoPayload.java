@@ -1,7 +1,6 @@
 package com.pickcar.mq.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pickcar.mq.enumType.GpsStatus;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.EnumType;
