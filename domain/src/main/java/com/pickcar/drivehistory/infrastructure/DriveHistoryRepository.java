@@ -15,5 +15,6 @@ public interface DriveHistoryRepository extends JpaRepository<DriveHistory, Long
             WHERE (:driverName IS NULL OR :driverName = '' OR u.info.name = :driverName)
                         AND dh.drivingStartedAt between :from AND :to
             """)
-    List<DriveHistory> findAllFilteredListByDriverNameAndDuration(String driverName, LocalDateTime from, LocalDateTime to);
+    List<DriveHistory> findAllFilteredListByDriverNameAndDuration(String driverName, LocalDateTime from,
+                                                                  LocalDateTime to);
 }

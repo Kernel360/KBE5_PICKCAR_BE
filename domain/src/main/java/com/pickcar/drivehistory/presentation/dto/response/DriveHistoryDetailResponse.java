@@ -1,13 +1,10 @@
 package com.pickcar.drivehistory.presentation.dto.response;
 
 import com.pickcar.drivehistory.domain.DriveHistory;
-import com.pickcar.mq.dto.CycleInfoPayload;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-
 import lombok.Builder;
 
 @Builder

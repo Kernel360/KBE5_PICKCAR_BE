@@ -1,8 +1,8 @@
 package com.pickcar.drivehistory.presentation;
 
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
-import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
+import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

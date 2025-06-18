@@ -2,8 +2,8 @@ package com.pickcar.drivehistory.presentation;
 
 import com.pickcar.drivehistory.application.DriveHistoryService;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
-import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
+import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
     @PostMapping("/{offEventInfoId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void write(@PathVariable Long offEventInfoId) {
-        log.info("POST /api/v1/history/{offEventId} : {} ",offEventInfoId);
+        log.info("POST /api/v1/history/{offEventId} : {} ", offEventInfoId);
         driveHistoryService.write(offEventInfoId);
     }
 
