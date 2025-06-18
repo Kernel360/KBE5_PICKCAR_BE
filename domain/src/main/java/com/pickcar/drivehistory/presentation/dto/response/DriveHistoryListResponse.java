@@ -7,7 +7,7 @@ import java.time.LocalTime;
 import lombok.Builder;
 
 @Builder
-public record DriveHistoryAllListResponse(
+public record DriveHistoryListResponse(
         Long historyId,
         String licensePlate,
         String driverName,
@@ -19,8 +19,8 @@ public record DriveHistoryAllListResponse(
         //String currentLocation
 ) {
 
-    public static DriveHistoryAllListResponse of(DriveHistory history, ReservationContext context) {
-        return DriveHistoryAllListResponse.builder()
+    public static DriveHistoryListResponse of(DriveHistory history, ReservationContext context) {
+        return DriveHistoryListResponse.builder()
                 .historyId(history.getId())
                 .licensePlate(context.reservedVehicleInfo().getLicensePlate())
                 .driverName(context.reservedUserInfo().getName())
