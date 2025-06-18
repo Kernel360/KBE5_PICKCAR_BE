@@ -5,8 +5,10 @@ import com.pickcar.emulator.exception.EventInfoQueryErrorCode;
 import com.pickcar.emulator.exception.EventInfoQueryException;
 import com.pickcar.emulator.infrastructure.EventInfoQueryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EventInfoQueryService {

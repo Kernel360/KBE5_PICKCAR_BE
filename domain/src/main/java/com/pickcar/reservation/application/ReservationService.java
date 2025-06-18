@@ -72,7 +72,6 @@ public class ReservationService {
             return maybeReservation.get();
         }
 
-        log.error("활성화된 예약을 찾지 못했습니다. {} 분 기준으로 최근 예약을 탐색합니다.", coolDownMinutes);
         throw new ReservationException(ReservationErrorCode.NOT_FOUND_ACTIVE_RESERVATION_BY_VEHICLE_ID);
     }
 
@@ -89,7 +88,6 @@ public class ReservationService {
             return maybeReservation.get();
         }
 
-        log.error("{} 분 기준으로도 예약 내역을 찾지 못했습니다.", coolDownMinutes);
         throw new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION);
     }
 
