@@ -13,7 +13,6 @@ import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -64,10 +63,8 @@ public class DriveHistoryService {
     }
 
     private List<DriveHistory> getFilteredList(DriveHistoryFilterRequest filterRequest) {
-        LocalDateTime from = filterRequest.from();
-        LocalDateTime to = filterRequest.to();
-
-        return driveHistoryRepository.findAllFilteredListByDriverNameAndDuration(filterRequest.driverName(), from, to);
+        return driveHistoryRepository.findAllFilteredListByDriverNameAndDuration(
+                filterRequest.driverName(), filterRequest.from(), filterRequest.to());
     }
 
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {

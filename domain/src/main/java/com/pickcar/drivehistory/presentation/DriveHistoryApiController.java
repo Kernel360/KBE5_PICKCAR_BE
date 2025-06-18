@@ -45,9 +45,9 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
 
     @Override
     @GetMapping("/{historyId}/detail")
-    public ResponseEntity<DriveHistoryDetailResponse> detail(@PathVariable Long historyId) {
+    @ResponseStatus(HttpStatus.OK)
+    public DriveHistoryDetailResponse detail(@PathVariable Long historyId) {
         log.info("GET /api/v1/history/{historyId}/detail : {} ", historyId);
-        DriveHistoryDetailResponse response = driveHistoryService.getDetailResponseById(historyId);
-        return ResponseEntity.ok().body(response);
+        return driveHistoryService.getDetailResponseById(historyId);
     }
 }

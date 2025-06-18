@@ -32,5 +32,5 @@ public interface DriveHistoryApiDocs {
             content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = DriveHistoryDetailResponse.class))
             })
-    ResponseEntity<DriveHistoryDetailResponse> detail(@PathVariable Long historyId);
+    DriveHistoryDetailResponse detail(@PathVariable Long historyId);
 }
