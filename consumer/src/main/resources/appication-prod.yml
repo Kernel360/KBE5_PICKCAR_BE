@@ -1,0 +1,32 @@
+mq:
+  cycle:
+    queue: cycle-queue
+    exchange: exchange-cycle
+    routing-key: cycle.key
+  event:
+    queue: event-queue
+    exchange: exchange-event
+    routing-key: event.key
+custom:
+  deploy:
+    domain: "https://pickcar.online"
+    cycle: "https://domain.pickcar.online"
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST}
+    port: ${SPRING_RABBITMQ_PORT}
+    username: ${SPRING_RABBITMQ_USERNAME}
+    password: ${SPRING_RABBITMQ_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true          # TODO: 추후 log 환경으로 변경
+        format_sql: true
+        use_sql_comments: true
