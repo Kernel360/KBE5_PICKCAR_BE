@@ -1,10 +1,9 @@
 package com.pickcar.application;
 
+import com.pickcar.dto.EventPayload;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.infrastructure.EventInfoRepository;
-import com.pickcar.mq.dto.EventPayload;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class EventInfoService {
+
 
     @Value("${custom.deploy.cycle}")
     private String deployDomain;

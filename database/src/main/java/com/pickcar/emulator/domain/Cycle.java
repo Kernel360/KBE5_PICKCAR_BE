@@ -1,7 +1,7 @@
 package com.pickcar.emulator.domain;
 
-import com.pickcar.mq.dto.CycleInfoConverter;
-import com.pickcar.mq.dto.CycleInfoPayload;
+import com.pickcar.dto.CycleInfoConverter;
+import com.pickcar.dto.CycleInfoPayload;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;

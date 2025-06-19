@@ -1,10 +1,10 @@
-package com.pickcar.emulator.domain.converter;
+package com.pickcar.infrastructure.conveter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.pickcar.mq.dto.CycleInfoPayload;
+import com.pickcar.dto.CycleInfoPayload;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.io.IOException;

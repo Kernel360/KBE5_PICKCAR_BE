@@ -1,4 +1,4 @@
-package com.pickcar.mq.dto;
+package com.pickcar.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;

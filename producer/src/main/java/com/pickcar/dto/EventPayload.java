@@ -1,11 +1,8 @@
-package com.pickcar.mq.dto;
+package com.pickcar.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pickcar.mq.enumType.GpsStatus;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,24 +11,26 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class CycleInfoPayload {
+@AllArgsConstructor
+public class EventPayload implements Serializable {
+    @JsonProperty("vehicle_id")
+    private Long vehicleId;
+
+    private Boolean status;
 
     @JsonFormat(pattern = "yyyyMMddHHmmss")
-    private LocalDateTime second;
+    @JsonProperty("engine_on_time")
+    private LocalDateTime engineOnTime;
+
+    @JsonFormat(pattern = "yyyyMMddHHmmss")
+    @JsonProperty("engine_off_time")
+    private LocalDateTime engineOffTime;
 
     @JsonProperty("gps_status")
-    @Enumerated(EnumType.STRING)
     private GpsStatus gpsStatus;
 
     private Double latitude;
 
     private Double longitude;
-
-    private Integer angle;
-
-    private Integer speed;
-
-    private Integer battery;
 }
