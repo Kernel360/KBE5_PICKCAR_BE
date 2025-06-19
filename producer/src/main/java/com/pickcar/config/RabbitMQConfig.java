@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
+    // NOTE: 임시 실행 오류 처리용, 충돌 시 삭제 예정
+
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
