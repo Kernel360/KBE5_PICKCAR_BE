@@ -1,10 +1,10 @@
 package com.pickcar.emulator.domain;
 
+import com.pickcar.dto.GpsStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import com.pickcar.mq.enumType.GpsStatus;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
