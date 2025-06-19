@@ -1,7 +1,7 @@
 package com.pickcar.presentation.controller;
 
 import com.pickcar.application.EventMessagePublisher;
-import com.pickcar.mq.dto.EventPayload;
+import com.pickcar.dto.EventPayload;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -195,3 +195,10 @@ docker/docker-compose.local.yml
 # 임시
 loki-data
 logs/.promtail-positions.yml
+
+# 환경파일
+.env
+
+# AWS
+*.pem
+*.pub

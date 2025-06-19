@@ -1,73 +1,117 @@
-#컨테이너로 띄울 서비스들 정의
-services:
-  mysql:
-    image: mysql:latest
-#    volumes:
-#      - mysql_data_dev:/var/lib/mysql
-    container_name: pickcar_mysql_dev
-    restart: no
-    env_file:
-      - ./.env.dev
-    environment: 
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD_DEV}
-      MYSQL_DATABASE: ${DB_NAME_DEV}
-      MYSQL_USER: ${DB_USERNAME_DEV}
-      MYSQL_PASSWORD: ${DB_PASSWORD_DEV}
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
-    ports:
-      - "3306:3306"
-    networks:
-      - backend_dev
+#개발용
+version: '3.8'
 
-  domain:
-    build: 
-      context: .. 
-      dockerfile: domain/Dockerfile.dev 
-    container_name: pickcar_domain_dev
-    restart: no
-    env_file:
-      - ./.env.dev
-    environment:
-      SPRING_PROFILES_ACTIVE: dev 
-      DEV_DB_NAME: ${DB_NAME_DEV}
-      DEV_DB_USERNAME: ${DB_USERNAME_DEV}
-      DEV_DB_PASSWORD: ${DB_PASSWORD_DEV}
+services:
+  pickcar-ws:
+    image: openjdk:21-jdk
+    container_name: pickcar-ws
+    ports:
+      - "8000:8080"
     depends_on:
+      rabbitmq:
+        condition: service_healthy
       mysql:
         condition: service_healthy
-    ports: 
-      - "8080:8080" 
+    volumes:
+      - /Users/park/IdeaProjects/KBE5_PICKCAR_BE/emulator/build/libs/emulator-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    command: ["java", "-jar", "app.jar", "--spring.profiles.active=local"]
     networks:
-      - backend_dev
+      - pickcar-net
 
-# ex)
-#  emulator:
-#    build:
-#      context: ..
-#      dockerfile: emulator/Dockerfile.dev #TODO: 운영은 .prod로 설정 필요
-#    container_name: pickcar_emulater_dev #TODO: 운영은 prod로 수정 필요
-#    restart: no #TODO: 운영은 always로 설정 필요
-#    environment: #필요한 환경변수
-#      SPRING_PROFILES_ACTIVE: dev #TODO: 운영은 prod로 설정 필요
-#      DEV_DB_NAME: ${DB_NAME_DEV}
-#      DEV_DB_USERNAME: ${DB_USERNAME_DEV}
-#      DEV_DB_PASSWORD: ${DB_PASSWORD_DEV}
-#    depends_on: #emulator 컨테이너보다 먼저 시작되어야할 것들 명시 
-#      - mysql
-#    ports:
-#      - "8081:8080" #TODO: 팀 회의를 통해 지정 필요
-#    networks:
-#      - backend_dev #TODO: 운영은 prod로 수정 필요
+  pickcar-pub:
+    image: openjdk:21-jdk
+    container_name: pickcar-pub
+    ports:
+      - "8080:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    volumes:
+      - /Users/park/IdeaProjects/KBE5_PICKCAR_BE/producer/build/libs/producer-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    command: ["java", "-jar", "app.jar", "--spring.profiles.active=local"]
+    networks:
+      - pickcar-net
 
-#컨테이너 간 통신을 위한 네트워크 정의
+  pickcar-sub:
+    image: openjdk:21-jdk
+    container_name: pickcar-sub
+    ports:
+      - "8081:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    volumes:
+      - /Users/park/IdeaProjects/KBE5_PICKCAR_BE/consumer/build/libs/consumer-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    command: ["java", "-jar", "app.jar", "--spring.profiles.active=local"]
+    networks:
+      - pickcar-net
+
+  pickcar-domain:
+    image: openjdk:21-jdk
+    container_name: pickcar-domain
+    ports:
+      - "8082:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    volumes:
+      - /Users/park/IdeaProjects/KBE5_PICKCAR_BE/domain/build/libs/domain-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    command: ["java", "-jar", "app.jar", "--spring.profiles.active=local"]
+    networks:
+      - pickcar-net
+
+  mysql:
+    image: mysql:8.0
+    container_name: pickcar-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pickcar
+      MYSQL_DATABASE: pickcar
+      MYSQL_USER: pickcar
+      MYSQL_PASSWORD: pickcar
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - pickcar-net
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: pickcar-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - pickcar-net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql-data:
+    name: mysql-data
+
 networks:
-  backend_dev:
-
-#TODO: 컨테이너가 아닌 볼륨에 저장 시 주석 해제 필요
-#volumes:
-#  mysql_data_dev:
+  pickcar-net:
+    name: pickcar-net
