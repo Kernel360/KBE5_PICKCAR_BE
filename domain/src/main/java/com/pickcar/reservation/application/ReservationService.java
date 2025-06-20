@@ -1,18 +1,35 @@
 package com.pickcar.reservation.application;
 
+import com.pickcar.auth.application.UserService;
+import com.pickcar.auth.domain.User;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
+import com.pickcar.reservation.exception.ReservationErrorCode;
+import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
+import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import com.pickcar.reservation.presentation.dto.request.ReservationCreateRequest;
+import com.pickcar.vehicle.application.VehicleService;
+import com.pickcar.vehicle.domain.Vehicle;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ReservationService {
 
+    @Value(value = "${custom.reservation.coolDownMinutes}")
+    private Long coolDownMinutes;
+
+    private final UserService userService;
+    private final VehicleService vehicleService;
     private final ReservationRepository reservationRepository;
 
     @Transactional
@@ -34,10 +51,51 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] Reservation Not Found By Id " + id));
     }
 
-    //status가 할당중인것 중 자동차가 일치하는 것 =>status 변경이 누락된 경우에 대한 예외처리 필요
-    //NOTE: 만약 즉시 예약상태가 종료되었다면?
-    public Reservation getActiveReservationByVehicleId(Long vehicleId) {
-        return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).orElseThrow(
-                () -> new IllegalArgumentException("예약중인 차량 중 해당 차량을 찾을 수 없습니다."));
+    public Reservation getActiveReservationForDriveHistory(Long vehicleId) {
+        log.info("자동차 ID를 기반으로 유효한 예약을 조회합니다 : {}", vehicleId);
+
+        try {
+            return getActiveReservation(vehicleId);
+        } catch (ReservationException e) {
+            return getLatestValidReservation(vehicleId);
+            //TODO: 여기서도 찾지 못했다면 어떻게 대처할 것인지
+        }
+    }
+
+    private Reservation getActiveReservation(Long vehicleId) {
+        Optional<Reservation> maybeReservation = reservationRepository.findByVehicleIdAndStatus(vehicleId,
+                ReservationStatus.RESERVED);
+
+        if (maybeReservation.isPresent()) {
+            //FIXME: Optional.get()을 두 번 사용중
+            log.info("활성화 여부로 탐색된 예약 ID : {}", maybeReservation.get().getId());
+            return maybeReservation.get();
+        }
+
+        throw new ReservationException(ReservationErrorCode.NOT_FOUND_ACTIVE_RESERVATION_BY_VEHICLE_ID);
+    }
+
+    private Reservation getLatestValidReservation(Long vehicleId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime coolDownMinutesAgo = now.minusMinutes(coolDownMinutes);
+
+        Optional<Reservation> maybeReservation = reservationRepository.findByVehicleIdAndUpdatedAtBetween(
+                vehicleId, coolDownMinutesAgo, now);
+
+        if (maybeReservation.isPresent()) {
+            //FIXME: Optional.get()을 두 번 사용중
+            log.info("최근 기반으로 탐색된 예약 ID : {}", maybeReservation.get().getId());
+            return maybeReservation.get();
+        }
+
+        throw new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION);
+    }
+
+    public ReservationContext getReservationContextById(Long reservationId) {
+        Reservation reservation = getById(reservationId);
+        User user = userService.getById(reservation.getUserId());
+        Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
+
+        return new ReservationContext(reservation, user.getInfo(), vehicle.getInfo());
     }
 }
