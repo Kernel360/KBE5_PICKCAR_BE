@@ -5,20 +5,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.ContentCachingResponseWrapper;
 
-@Slf4j
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingFilter.class);
 
     @Override
     protected void doFilterInternal(
@@ -30,18 +22,15 @@ public class LoggingFilter extends OncePerRequestFilter {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        //NOTE: var?
-        var requestWrapper = new ContentCachingRequestWrapper(request);
-        var responseWrapper = new ContentCachingResponseWrapper(response);
+        RequestWrapper requestWrapper = new RequestWrapper(request);
+        ResponseWrapper responseWrapper = new ResponseWrapper(response);
 
         filterChain.doFilter(requestWrapper, responseWrapper);
 
-        String requestBody = new String(requestWrapper.getContentAsByteArray(), request.getCharacterEncoding());
-        String responseBody = new String(responseWrapper.getContentAsByteArray(), response.getCharacterEncoding());
+        requestWrapper.loggingRequestAPI();
+        responseWrapper.loggingResponseAPI();
 
-        LOGGER.info("Request Body: {}", requestBody);
-        LOGGER.info("Response Body: {}", responseBody);
-
+        // 이 내용이 있어야 다음 클라이언트가 요청을 받을 수 있음
         responseWrapper.copyBodyToResponse();
     }
 }
