@@ -29,25 +29,34 @@ public class LoggingFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        Long startTime = System.currentTimeMillis();
+
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-
-        keepTraceIdIfExist(request);
-        putModuleNameToMDC();
-        putServiceNameToMDC(request);
 
         RequestWrapper requestWrapper = new RequestWrapper(request);
         ResponseWrapper responseWrapper = new ResponseWrapper(response);
 
-        filterChain.doFilter(requestWrapper, responseWrapper);
+        try {
+            keepTraceIdIfExist(request);
+            putModuleNameToMDC();
+            putServiceNameToMDC(request);
 
-        requestWrapper.loggingRequestAPI();
-        responseWrapper.loggingResponseAPI();
+            filterChain.doFilter(requestWrapper, responseWrapper);
+        } finally {
+            Long duration = System.currentTimeMillis() - startTime;
 
-        // 이 내용이 있어야 다음 클라이언트가 요청을 받을 수 있음
-        responseWrapper.copyBodyToResponse();
+            MDC.put("duration_ms", String.valueOf(duration));
+            MDC.put("statusCode", String.valueOf(response.getStatus()));
 
-        MDC.clear();
+            requestWrapper.loggingRequestAPI();
+            responseWrapper.loggingResponseAPI();
+
+            // 이 내용이 있어야 다음 클라이언트가 요청을 받을 수 있음
+            responseWrapper.copyBodyToResponse();
+
+            MDC.clear();
+        }
     }
 
     private void keepTraceIdIfExist(HttpServletRequest request) {
