@@ -5,3 +5,5 @@ spring:
 custom:
   reservation:
     coolDownMinutes: 60
+  logging:
+    moduleName: domain

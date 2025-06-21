@@ -52,8 +52,6 @@ public class ReservationService {
     }
 
     public Reservation getActiveReservationForDriveHistory(Long vehicleId) {
-        log.info("자동차 ID를 기반으로 유효한 예약을 조회합니다 : {}", vehicleId);
-
         try {
             return getActiveReservation(vehicleId);
         } catch (ReservationException e) {
@@ -68,7 +66,6 @@ public class ReservationService {
 
         if (maybeReservation.isPresent()) {
             //FIXME: Optional.get()을 두 번 사용중
-            log.info("활성화 여부로 탐색된 예약 ID : {}", maybeReservation.get().getId());
             return maybeReservation.get();
         }
 

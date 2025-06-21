@@ -5,3 +5,7 @@ spring:
     suffix: '.html'
   profiles:
     active: local
+
+custom:
+  logging:
+    moduleName: producer
