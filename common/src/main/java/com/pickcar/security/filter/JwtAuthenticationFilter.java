@@ -33,10 +33,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractToken(request);
         if (token != null) {
             //2. 토큰에 담긴 정보 추출
-            Claims claims = jwtProvider.parseToken(token);
+            jwtProvider.validateToken(token);
+            Claims claims = jwtProvider.parseToken(token).getBody();
             Long id = Long.valueOf(claims.getSubject());
-            String name = claims.get("name", String.class);
-            String role = claims.get("role", String.class);
+            String name = jwtProvider.validateAndGetClaim(claims,"name",String.class); //TODO: 값이 없을 경우의 예외처리 하기
+            String role = jwtProvider.validateAndGetClaim(claims,"role",String.class);
+            String tokenType = jwtProvider.validateAndGetClaim(claims,"token_type",String.class);
 
             //3. 로그인한 사용자의 ID와 role을 담은 객체 생성
             UserPrincipal principal = new UserPrincipal(id, name, role);

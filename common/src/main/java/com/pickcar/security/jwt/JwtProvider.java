@@ -1,37 +1,72 @@
 package com.pickcar.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
-public class JwtProvider {
-    //@Value("${jwt.secret}") TODO: secret 변수처리
-    private String secret = "ZsR872u9NukGnsjbY5olgyIPZTErn82NETmxjpozaS4=";
+public class JwtProvider { //FIX: JwtTokenProvider 로 변경하기
 
-    //TODO: 토큰 시간 변경
-    private static final long EXPIRATION = 1000 * 60 * 60L; // 1시간
-
-    //토큰 생성
-    public String generateToken(Long Id, String name, String role) {
+    //ACCESS_TOKEN 생성
+    public String createAccessToken(Long userId, String name, String role){
         return Jwts.builder()
-                .setSubject(Id.toString())
+                .setSubject(userId.toString())
                 .claim("name", name)
                 .claim("role", role)
+                .claim("token_type", "access")
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .setExpiration(new Date(System.currentTimeMillis() + JwtConstants.ACCESS_TOKEN_VALIDITY))
+                .signWith(SignatureAlgorithm.HS256, JwtConstants.JWT_SECRET_KEY)
                 .compact();
     }
 
-    //토큰 분해
-    public Claims parseToken(String token) {
+    //REFRESH_TOKEN 생성
+    public String createRefreshToken(Long userId){
+        return Jwts.builder()
+                .setSubject(userId.toString())
+                .claim("token_type", "refresh")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + JwtConstants.REFRESH_TOKEN_VALIDITY))
+                .signWith(SignatureAlgorithm.HS256, JwtConstants.JWT_SECRET_KEY)
+                .compact();
+    }
+
+    public Jws<Claims> parseToken(String token) {
         return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+                .setSigningKey(JwtConstants.JWT_SECRET_KEY)
+                .parseClaimsJws(token);
+    }
+
+    public TokenStatus validateToken(String token){
+        try{
+            parseToken(token);
+            return TokenStatus.VALID;
+        }catch (ExpiredJwtException e) {
+            return TokenStatus.EXPIRED;
+        } catch (SignatureException e) {
+            return TokenStatus.INVALID_SIGNATURE;
+        } catch (MalformedJwtException e) {
+            return TokenStatus.MALFORMED;
+        } catch (Exception e) {
+            return TokenStatus.INVALID;
+        }
+    }
+
+    public <T> T validateAndGetClaim(Claims claims,String key, Class<T> clazz){
+        return Optional.ofNullable(claims.get(key,clazz))
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "JWT 클레임 '" + key + "'값이 없습니다."));
+    }
+
+    public LocalDateTime calculateExpiryDate(long validityMillis) {
+        return LocalDateTime.ofInstant(
+                new Date(System.currentTimeMillis() + validityMillis).toInstant(),
+                ZoneId.systemDefault()
+        );
     }
 }
