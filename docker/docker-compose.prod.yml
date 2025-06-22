@@ -18,6 +18,7 @@ services:
       - "8000:8080"
     volumes:
       - /home/ubuntu/pickcar/emulator-0.0.1-SNAPSHOT.jar:/app/app.jar
+      - /home/ubuntu/pickcar/logs:/app/logs
     working_dir: /app
     command: ["java", "-jar", "app.jar"]
     networks:
@@ -39,6 +40,7 @@ services:
       - "8080:8080"
     volumes:
       - /home/ubuntu/pickcar/producer-0.0.1-SNAPSHOT.jar:/app/app.jar
+      - /home/ubuntu/pickcar/logs:/app/logs
     working_dir: /app
     command: ["java", "-jar", "app.jar"]
     networks:
@@ -60,6 +62,7 @@ services:
       - "8081:8080"
     volumes:
       - /home/ubuntu/pickcar/consumer-0.0.1-SNAPSHOT.jar:/app/app.jar
+      - /home/ubuntu/pickcar/logs:/app/logs
     working_dir: /app
     command: ["java", "-jar", "app.jar"]
     networks:
@@ -81,6 +84,7 @@ services:
       - "8082:8080"
     volumes:
       - /home/ubuntu/pickcar/domain-0.0.1-SNAPSHOT.jar:/app/app.jar
+      - /home/ubuntu/pickcar/logs:/app/logs
     working_dir: /app
     command: ["java", "-jar", "app.jar"]
     networks:
