@@ -1,4 +1,4 @@
-package com.pickcar.jwt;
+package com.pickcar.auth.jwt;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

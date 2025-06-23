@@ -2,7 +2,7 @@ package com.pickcar.auth.presentation;
 
 import com.pickcar.auth.application.UserService;
 import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
-import com.pickcar.jwt.UserPrincipal;
+import com.pickcar.auth.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

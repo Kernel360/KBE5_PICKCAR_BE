@@ -1,7 +1,6 @@
 package com.pickcar.drivehistory.presentation.dto.response;
 
 import com.pickcar.drivehistory.domain.DriveHistory;
-import com.pickcar.dto.CycleInfoPayload;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import java.time.LocalDateTime;

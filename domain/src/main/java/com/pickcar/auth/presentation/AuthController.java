@@ -2,7 +2,7 @@ package com.pickcar.auth.presentation;
 
 import com.pickcar.auth.application.LoginService;
 import com.pickcar.auth.presentation.dto.request.LoginRequest;
-import com.pickcar.jwt.JwtProvider;
+import com.pickcar.auth.jwt.JwtProvider;
 import com.pickcar.presentation.dto.response.SuccessResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

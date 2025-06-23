@@ -1,6 +1,6 @@
 package com.pickcar.emulator.domain;
 
-import com.pickcar.dto.GpsStatus;
+import com.pickcar.presentation.dto.cycle.GpsStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

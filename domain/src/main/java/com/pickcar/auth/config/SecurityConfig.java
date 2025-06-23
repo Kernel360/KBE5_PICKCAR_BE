@@ -1,6 +1,6 @@
-package com.pickcar.security.config;
+package com.pickcar.auth.config;
 
-import com.pickcar.jwt.JwtAuthenticationFilter;
+import com.pickcar.auth.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

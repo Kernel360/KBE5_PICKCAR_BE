@@ -1,3 +1,7 @@
 spring:
   profiles:
     active: local   #기본은 local (test 작성시에는 어플리케이션에 test 명시, prod 경우 docker 컨테이너 띄울 때(jar 파일 명령) profile 작성
+
+custom:
+  reservation:
+    coolDownMinutes: 30

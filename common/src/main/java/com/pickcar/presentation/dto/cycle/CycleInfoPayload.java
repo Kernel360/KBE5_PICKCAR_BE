@@ -1,4 +1,4 @@
-package com.pickcar.dto;
+package com.pickcar.presentation.dto.cycle;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package com.pickcar.jwt;
+package com.pickcar.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
