@@ -70,6 +70,7 @@ public class DriveHistoryService {
     }
 
     private void checkListFilterRequest(DriveHistoryFilterRequest filterRequest) {
+        //TODO: 유효성 검사가 추가된다면 책임 분리
         LocalDate today = LocalDate.now();
         LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
 
