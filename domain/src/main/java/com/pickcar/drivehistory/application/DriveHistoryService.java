@@ -53,14 +53,14 @@ public class DriveHistoryService {
         driveHistoryRepository.save(driveHistory);
     }
 
-    public DriveHistory getById(Long id) {
+    private DriveHistory getById(Long id) {
         return driveHistoryRepository.findById(id)
                 .orElseThrow(() -> new DriveHistoryException(DriveHistoryErrorCode.NOT_FOUND_BY_ID));
     }
 
     public Page<DriveHistoryListResponse> getFilteredListResponses(DriveHistoryFilterRequest filterRequest,
                                                                    Pageable pageable) {
-        checkListFilterRequest(filterRequest);
+        checkFilterRequest(filterRequest);
         Page<DriveHistory> filteredHistoryPage = getPageByFilter(filterRequest, pageable);
         List<Long> reservationIds = getRelatedReservationIdsByPage(filteredHistoryPage);
         Map<Long, ReservationContext> contextMap = reservationService.getContextMapByIds(reservationIds);
@@ -76,12 +76,20 @@ public class DriveHistoryService {
         return new PageImpl<>(responses, pageable, filteredHistoryPage.getTotalElements());
     }
 
-    private void checkListFilterRequest(DriveHistoryFilterRequest filterRequest) {
-        //TODO: 유효성 검사가 추가된다면 책임 분리
+    private void checkFilterRequest(DriveHistoryFilterRequest filterRequest) {
+        checkFilterRequestDate(filterRequest.from(), filterRequest.to());
+        //TODO: 검사 추가
+    }
+
+    private void checkFilterRequestDate(LocalDateTime from, LocalDateTime to) {
         LocalDate today = LocalDate.now();
         LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
 
-        if (filterRequest.from().isBefore(inquiryLimitDate)) {
+        if(from.isAfter(to)) {
+            throw new DriveHistoryException(DriveHistoryErrorCode.FROM_DATE_CANT_BE_BEFORE_TO_DATE);
+        }
+
+        if (from.isBefore(inquiryLimitDate)) {
             throw new DriveHistoryException(DriveHistoryErrorCode.MAXIMUM_INQUIRY_LIMIT_EXCEEDED);
         }
     }
