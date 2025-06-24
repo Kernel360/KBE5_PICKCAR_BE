@@ -12,7 +12,11 @@ import com.pickcar.reservation.presentation.dto.request.ReservationCreateRequest
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,5 +101,42 @@ public class ReservationService {
         Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
 
         return new ReservationContext(reservation, user.getInfo(), vehicle.getInfo());
+    }
+
+    public List<ReservationContext> getReservationContextByIds(List<Long> reservationIds) {
+        List<Reservation> reservations = reservationRepository.findAllById(reservationIds);
+        Map<Long, User> userMap = extractUserMap(reservations);
+        Map<Long, Vehicle> vehicleMap = extractVehicleMap(reservations);
+
+        return reservations.stream()
+                .map(reservation -> {
+                    User user = userMap.get(reservation.getUserId());
+                    Vehicle vehicle = vehicleMap.get(reservation.getVehicleId());
+                    return new ReservationContext(reservation, user.getInfo(), vehicle.getInfo());
+                }).toList();
+    }
+
+    private Map<Long, User> extractUserMap(List<Reservation> reservations) {
+        List<Long> userIds = reservations.stream()
+                .map(Reservation::getUserId)
+                .distinct()
+                .toList();
+
+        List<User> users = userService.getAllByIds(userIds);
+
+        return users.stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+    }
+
+    private Map<Long, Vehicle> extractVehicleMap(List<Reservation> reservations) {
+        List<Long> vehicleIds = reservations.stream()
+                .map(Reservation::getVehicleId)
+                .distinct()
+                .toList();
+
+        List<Vehicle> vehicles = vehicleService.getAllByIds(vehicleIds);
+
+        return vehicles.stream()
+                .collect(Collectors.toMap(Vehicle::getId, Function.identity()));
     }
 }

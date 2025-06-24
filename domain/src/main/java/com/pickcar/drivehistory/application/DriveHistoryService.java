@@ -15,11 +15,16 @@ import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,20 +58,30 @@ public class DriveHistoryService {
                 .orElseThrow(() -> new DriveHistoryException(DriveHistoryErrorCode.NOT_FOUND_BY_ID));
     }
 
-    public List<DriveHistoryListResponse> getFilteredListResponses(DriveHistoryFilterRequest filterRequest) {
+    public Page<DriveHistoryListResponse> getFilteredListResponses(DriveHistoryFilterRequest filterRequest,
+                                                                   Pageable pageable) {
         checkListFilterRequest(filterRequest);
-        List<DriveHistoryListResponse> responses = new ArrayList<>();
-        List<DriveHistory> histories = getFilteredList(filterRequest);
 
-        for (DriveHistory history : histories) {
-            // FIXME: N+1 여지 있음 -> histories 기반 List 조회 필요 가능성 있음
-            ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
+        Page<DriveHistory> historyPage = getFilteredAndPagingList(filterRequest, pageable);
+        List<Long> reservationIds = getRelatedReservationIdsByPage(historyPage);
 
-            log.info("context : {} ", context);
-            DriveHistoryListResponse response = DriveHistoryListResponse.of(history, context);
-            responses.add(response);
-        }
-        return responses;
+        Map<Long, ReservationContext> contextMap = reservationService
+                .getReservationContextByIds(reservationIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        ReservationContext::getReservationId,
+                        Function.identity()
+                ));
+
+        List<DriveHistoryListResponse> responses = historyPage.getContent()
+                .stream()
+                .map(history -> {
+                    ReservationContext context = contextMap.get(history.getReservationId());
+                    return DriveHistoryListResponse.of(history, context);
+                })
+                .toList();
+
+        return new PageImpl<>(responses, pageable, historyPage.getTotalElements());
     }
 
     private void checkListFilterRequest(DriveHistoryFilterRequest filterRequest) {
@@ -74,14 +89,25 @@ public class DriveHistoryService {
         LocalDate today = LocalDate.now();
         LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
 
-        if(filterRequest.from().isBefore(inquiryLimitDate)) {
+        if (filterRequest.from().isBefore(inquiryLimitDate)) {
             throw new DriveHistoryException(DriveHistoryErrorCode.MAXIMUM_INQUIRY_LIMIT_EXCEEDED);
         }
     }
 
-    private List<DriveHistory> getFilteredList(DriveHistoryFilterRequest filterRequest) {
+    private Page<DriveHistory> getFilteredAndPagingList(DriveHistoryFilterRequest filterRequest, Pageable pageable) {
         return driveHistoryRepository.findAllFilteredListByDriverNameAndDuration(
-                filterRequest.driverName(), filterRequest.from(), filterRequest.to());
+                filterRequest.driverName(),
+                filterRequest.from(),
+                filterRequest.to(),
+                pageable
+        );
+    }
+
+    private List<Long> getRelatedReservationIdsByPage(Page<DriveHistory> historyPage) {
+        return historyPage.getContent()
+                .stream()
+                .map(DriveHistory::getReservationId)
+                .toList();
     }
 
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {

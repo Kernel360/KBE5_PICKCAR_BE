@@ -9,4 +9,7 @@ public record ReservationContext(
         UserInfo reservedUserInfo,
         VehicleInfo reservedVehicleInfo
 ) {
+    public Long getReservationId() {
+        return reservation.getId();
+    }
 }
