@@ -9,12 +9,3 @@ mq:
 spring:
   profiles:
     active: local
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: true          # TODO: 추후 log 환경으로 변경
-        format_sql: true
-        use_sql_comments: true
