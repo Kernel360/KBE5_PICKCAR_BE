@@ -1,6 +1,7 @@
 package com.pickcar.auth.presentation;
 
 import com.pickcar.auth.application.UserService;
+import com.pickcar.auth.domain.UserRole;
 import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/sign-up/super-admins")
-    public void createSuperAdmin(@RequestBody UserInfoRequest request) {
-        userService.createSuperAdmin(request);
+    @PostMapping("/sign-up/admins")
+    public void registerAdmin(@RequestBody UserInfoRequest request) {
+        log.info("CREATE ADMIN");
+        userService.create(request, UserRole.SUPER_ADMIN);
     }
 
 
     @PostMapping("/sign-up")
-    public void createUser(@RequestBody UserInfoRequest request) {
-        log.info("url : /sign-up");
-        log.info("Request: {}",request);
-        userService.createEmployee(request);
+    public void registerEmployee(@RequestBody UserInfoRequest request) {
+        log.info("CREATE EMPLOYEE");
+        userService.create(request, UserRole.EMPLOYEE);
     }
 }

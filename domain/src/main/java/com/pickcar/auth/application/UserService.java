@@ -25,33 +25,18 @@ public class UserService {
     }
 
     @Transactional
-    public void createEmployee(UserInfoRequest request) {
-        checkDuplicateEmail(request.email());
+    public void create(UserInfoRequest request, UserRole role) {
+        if(userRepository.existsByInfoEmail(request.email())){ //TODO: 예외처리 하기
+            throw new IllegalArgumentException("이미 사용 중인 email 입니다.");
+        }
+
         User user = User.builder()
                 .info(toUserInfoWithEncodedPassword(request))
-                .role(UserRole.EMPLOYEE)
+                .role(role)
                 .status(UserStatus.ACTIVE)
                 .build();
 
         userRepository.save(user);
-    }
-
-    @Transactional
-    public void createSuperAdmin(UserInfoRequest request) {
-        checkDuplicateEmail(request.email());
-        User admin = User.builder()
-                .info(toUserInfoWithEncodedPassword(request))
-                .role(UserRole.SUPER_ADMIN)
-                .status(UserStatus.ACTIVE)
-                .build();
-
-        userRepository.save(admin);
-    }
-
-    private void checkDuplicateEmail(String email){ //TODO: 예외처리 하기
-        if(userRepository.existsByInfoEmail(email)){
-            throw new IllegalArgumentException("이미 사용 중인 email 입니다.");
-        }
     }
 
     private UserInfo toUserInfoWithEncodedPassword(UserInfoRequest request) {

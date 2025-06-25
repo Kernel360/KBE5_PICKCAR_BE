@@ -83,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
                 case INVALID_SIGNATURE, MALFORMED, INVALID -> {
                     // 위변조, 형식 오류, 기타 오류는 모두 인증 실패로 처리 -> 재로그인 요청
-                    // 저장된 Access Token, Refresh Token 쿠키 및 메모리에서 모두 삭제
+                    // TODO: 저장된 Access Token, Refresh Token 쿠키 및 메모리에서 모두 삭제
                     sendUnauthorizedResponse(response,"INVALID_ACCESS_TOKEN");
                     return;
                 }
