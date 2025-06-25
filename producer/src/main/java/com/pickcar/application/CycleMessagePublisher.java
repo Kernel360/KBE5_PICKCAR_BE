@@ -20,14 +20,13 @@ public class CycleMessagePublisher {
     @Value("${mq.cycle.routing-key}")
     private String routingKey;
 
-    // TODO: publish를 합칠까 고려중
     public void publish(CyclePayload Payload) {
         try {
             rabbitTemplate.convertAndSend(exchange, routingKey, Payload);
             log.info("MQ 전송 성공: exchange={}, routingKey={}, payload={}", exchange, routingKey, Payload);
         } catch (Exception e) {
             log.error("MQ 전송 실패: exchange={}, routingKey={}, payload={}", exchange, routingKey, Payload);
-            // TODO: 실패 시 재처리 고려
+            // TODO: 실패 시 Fallback 고려
         }
     }
 }
