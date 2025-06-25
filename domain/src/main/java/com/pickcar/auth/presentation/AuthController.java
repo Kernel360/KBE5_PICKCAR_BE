@@ -24,9 +24,9 @@ public class AuthController {
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public AccessTokenResponse login(@RequestBody AuthRequest request, HttpServletResponse response) {
-        log.info("url : /login");
+        log.info("User login request received");
         AuthResponse authResponse = authService.login(request.email(), request.password());
-        addRefreshTokenToCookie(response, authResponse.refreshToken());
+        setRefreshTokenCookie(response, authResponse.refreshToken());
         return new AccessTokenResponse(authResponse.accessToken());
     } //TODO: 로그인 실패 예외처리 추가
 
@@ -35,7 +35,7 @@ public class AuthController {
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        log.info("url : /logout");
+        log.info("User logout request received");
         String refreshToken = extractRefreshTokenFromCookie(request);
 
         if (refreshToken != null && !refreshToken.isBlank()) {
@@ -46,26 +46,25 @@ public class AuthController {
             }
         }
 
-        deleteRefreshTokenCookie(response); // 무조건 쿠키는 지움
+        setRefreshTokenCookie(response,null);
     }
 
-    public void deleteRefreshTokenCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie("refreshToken", null);
-        cookie.setMaxAge(0);         // 만료 처리
-        cookie.setHttpOnly(true);    // 보안용 httpOnly 설정 유지
-        cookie.setPath("/");         // 쿠키 경로
-        response.addCookie(cookie);  // 응답 헤더에 쿠키 추가 (삭제 명령)
-    }
-    private void addRefreshTokenToCookie(HttpServletResponse response,String refreshToken){
+    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) { //TODO: 자주 사용되서 Util로 빼기
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
-        cookie.setMaxAge((int) (JwtConstants.REFRESH_TOKEN_VALIDITY / 1000));
-//        cookie.setSecure(true); // HTTPS 환경에서만 쿠키가 전송되도록
-        response.addCookie(cookie);
-    } //TODO: 쿠키 설정 실패 예외처리 추가
 
-    public String extractRefreshTokenFromCookie(HttpServletRequest request) {
+        if (refreshToken == null) {
+            cookie.setMaxAge(0); // 삭제
+        } else {
+            cookie.setMaxAge((int) (JwtConstants.REFRESH_TOKEN_VALIDITY / 1000));
+//        cookie.setSecure(true); // HTTPS 환경에서만 쿠키가 전송되도록
+        }
+
+        response.addCookie(cookie);
+    }
+
+    private String extractRefreshTokenFromCookie(HttpServletRequest request) { //TODO: 자주 사용되서 Util로 빼기
         Cookie[] cookies = request.getCookies();
         if (cookies == null) return null;
 

@@ -15,7 +15,6 @@ public class JwtUserDetails implements UserDetails {
     private final Long id;
     private final String name;
     private final String role;
-//    private final String password;  // JWT 인증에서는 보통 필요 없지만, UserDetails 인터페이스 때문에 포함
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

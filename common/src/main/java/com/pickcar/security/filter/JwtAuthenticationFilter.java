@@ -37,8 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/token/refresh"
     );
 
-
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
@@ -54,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // AccessToken 추출
         String accessToken = extractToken(request);
-        log.info("AccessToken 추출: {}", accessToken);
 
         if(accessToken != null){
             TokenStatus status = jwtProvider.validateToken(accessToken);
@@ -97,7 +94,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }else{
             // RefreshToken 추출
             String refreshToken = extractRefreshTokenFromCookie(request);
-            log.info("RefreshToken 추출: {}", refreshToken);
 
             if (refreshToken != null && !refreshToken.isBlank()) {
                 sendUnauthorizedResponse(response,"ACCESS_TOKEN_EXPIRED");

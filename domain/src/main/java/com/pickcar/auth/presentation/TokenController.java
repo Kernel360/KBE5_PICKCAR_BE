@@ -26,15 +26,14 @@ public class TokenController {
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.OK)
     public AccessTokenResponse reissueRefreshToken(HttpServletRequest request, HttpServletResponse response){
-        log.info("url : /token/refresh");
+        log.info("Issued new AccessToken for refreshToken");
         String refreshToken = extractRefreshTokenFromCookie(request);
-        AuthResponse authResponse = authService.newRefreshToken(refreshToken); //TODO: 네이밍 수정
+        AuthResponse authResponse = authService.reissueTokens(refreshToken);
         addRefreshTokenToCookie(response, authResponse.refreshToken());
-        log.info("new AccessToken : {}",authResponse.accessToken());
         return new AccessTokenResponse(authResponse.accessToken());
     }
 
-    private void addRefreshTokenToCookie(HttpServletResponse response,String refreshToken){
+    private void addRefreshTokenToCookie(HttpServletResponse response,String refreshToken){//TODO: 자주 사용되서 Util로 빼기
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
@@ -43,7 +42,7 @@ public class TokenController {
         response.addCookie(cookie);
     } //TODO: 쿠키 설정 실패 예외처리 추가
 
-    public String extractRefreshTokenFromCookie(HttpServletRequest request) {
+    private String extractRefreshTokenFromCookie(HttpServletRequest request) { //TODO: 자주 사용되서 Util로 빼기
         Cookie[] cookies = request.getCookies();
         if (cookies == null) return null;
 
