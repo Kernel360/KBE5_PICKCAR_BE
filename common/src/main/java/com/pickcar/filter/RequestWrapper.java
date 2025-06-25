@@ -37,8 +37,6 @@ public class RequestWrapper extends ContentCachingRequestWrapper {
         String requestBody = this.getContentAsString();
         String requestURI = this.getRequestURI();
 
-        log.info(sensitiveFields.toString());
-
         if (!sensitiveFields.containsKey(requestURI)) {
             return requestBody;
         }
