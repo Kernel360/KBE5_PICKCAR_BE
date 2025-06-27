@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public record DriveHistoryFilterRequest(
         LocalDateTime from,
         LocalDateTime to,
-        String driverName
+        String driverName,
+        Integer page
 ) {
 }

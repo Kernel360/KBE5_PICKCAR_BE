@@ -22,6 +22,8 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing:1.5.1'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave:1.5.1'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    implementation 'org.springframework.data:spring-data-commons:3.5.0'
 }
 
 bootJar {

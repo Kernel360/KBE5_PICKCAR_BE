@@ -24,6 +24,9 @@ dependencies {
 
     implementation project(':database')       //DB 모듈 의존성 추가
     implementation project(':common')
+
+    //로그 수집
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
 }
 
 bootJar {

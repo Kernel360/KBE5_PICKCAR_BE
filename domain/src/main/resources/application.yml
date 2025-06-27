@@ -4,7 +4,9 @@ spring:
 
 custom:
   reservation:
-    coolDownMinutes: 60
+    coolDownMinutes: 30
+  driveHistory:
+    maximumInquiryDays: 30
   logging:
     moduleName: domain
     sensitiveFieldRules:

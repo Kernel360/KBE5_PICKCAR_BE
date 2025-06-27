@@ -16,6 +16,8 @@ public enum DriveHistoryErrorCode implements BaseErrorCode {
     END_TIME_BEFORE_NOW(HttpStatus.BAD_REQUEST, "DH_400_2", "운행 종료 일시는 현재 시각보다 빠를 수 없습니다."),
     START_TIME_BEFORE_NOW(HttpStatus.BAD_REQUEST, "DH_400_3", "운행 시작 일시는 현재 시각보다 빠를 수 없습니다."),
     NOT_FOUND_BY_ID(HttpStatus.BAD_REQUEST, "DH_400_4", "해당 ID를 가진 운행일지를 찾을 수 없습니다."),
+    MAXIMUM_INQUIRY_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "DH_400_5", "최대 조회 기간을 초과하였습니다"),
+    FROM_DATE_CANT_BE_BEFORE_TO_DATE(HttpStatus.BAD_REQUEST, "DH_400_6", "조회 시작 일자는 마지막 일자보다 빠를 수 없습니다."),
 
     //403(FORBIDDEN)
     TEST_403_ERROR(HttpStatus.FORBIDDEN, "DH_403_1", "테스트용 403 에러");
