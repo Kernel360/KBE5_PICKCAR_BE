@@ -2,8 +2,8 @@ package com.pickcar.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,14 +26,14 @@ public class CycleMessagingConfig {
     }
 
     @Bean
-    public DirectExchange cycleExchange() {
-        return new DirectExchange(exchange);
+    public TopicExchange cycleExchange() {
+        return new TopicExchange(exchange);
     }
 
     @Bean
-    public Binding cycleBinding(Queue cycleQueue, DirectExchange cycleExchange) {
+    public Binding cycleBinding(Queue cycleQueue, TopicExchange cycleExchange) {
         return BindingBuilder.bind(cycleQueue)
                 .to(cycleExchange)
-                .with(routingKey);
+                .with(routingKey+".*");
     }
 }
