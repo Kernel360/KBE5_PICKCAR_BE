@@ -1,5 +1,6 @@
 package com.pickcar.application;
 
+import com.pickcar.config.RestTemplateConfig;
 import com.pickcar.dto.EventPayload;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.infrastructure.EventInfoRepository;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class EventInfoService {
 
+    private final RestTemplateConfig restTemplateConfig;
 
     @Value("${custom.deploy.cycle}")
     private String deployDomain;
@@ -50,10 +52,7 @@ public class EventInfoService {
     }
 
     public void writeDriveHistoryRequestAfterOff(EventInfo offEventInfo) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        log.info("POST off -> driving history request to : {}", deployDomain);
-
+        RestTemplate restTemplate = restTemplateConfig.restTemplate();
         restTemplate.postForEntity(deployDomain + "/api/v1/history/%d".formatted(offEventInfo.getId()),
                 null, Void.class);
     }

@@ -189,9 +189,6 @@ application-dev.yml
 application-local.yml
 application-prod.yml
 
-domain/Dockerfile.local
-docker/docker-compose.local.yml
-
 # 임시
 loki-data
 logs/.promtail-positions.yml
@@ -202,3 +199,10 @@ logs/.promtail-positions.yml
 # AWS
 *.pem
 *.pub
+/docker/docker-compopse.local.yml
+**/application-docker.yml
+Dockerfile
+Dockerfile.consumer
+Dockerfile.domain
+Dockerfile.emulator
+Dockerfile.producer

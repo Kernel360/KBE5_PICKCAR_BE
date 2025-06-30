@@ -45,7 +45,7 @@ public class UserService {
     public void createAdmin(UserInfoRequest request) {
         //요청에 있는 회사ID 사용
         User admin = User.builder()
-                .companyId(request.companyId())
+//                .companyId(request.companyId())
                 .info(toEncodedUserInfo(request))
                 .role(UserRole.ADMIN)
                 .status(UserStatus.ACTIVE)

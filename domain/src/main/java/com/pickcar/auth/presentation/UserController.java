@@ -1,6 +1,7 @@
 package com.pickcar.auth.presentation;
 
 import com.pickcar.auth.application.UserService;
+import com.pickcar.auth.presentation.dto.request.TestRequest;
 import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
 import com.pickcar.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,10 @@ public class UserController {
     @PostMapping("/admins")
     public void registerAdmin(@RequestBody UserInfoRequest request) {
         userService.createAdmin(request);
+    }
+
+    @PostMapping("/test")
+    public void test(@RequestBody UserInfoRequest testRequest) {
+        return;
     }
 }

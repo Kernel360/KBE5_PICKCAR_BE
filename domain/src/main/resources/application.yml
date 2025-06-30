@@ -7,3 +7,18 @@ custom:
     coolDownMinutes: 30
   driveHistory:
     maximumInquiryDays: 30
+  logging:
+    moduleName: domain
+    sensitiveFieldRules:
+      - path: "/api/v1/auth/login"
+        fields: ["email", "password"]
+      - path: "/api/v1/auth/login_after"
+        fields: ["email", "password"]
+      - path: "/api/v1/auth/super-admins"
+        fields: ["email", "password", "name", "phoneNumber"]
+      - path: "/api/v1/auth/users"
+        fields: ["email", "password", "name", "phoneNumber"]
+      - path: "/api/v1/auth/admins"
+        fields: ["email", "password", "name", "phoneNumber"]
+      - path: "/api/v1/auth/test"
+        fields: ["email", "password", "name", "phoneNumber"]

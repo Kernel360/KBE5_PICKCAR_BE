@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Profile({"local", "test"})
+@Profile({"local", "test", "docker"})
 public class InitData implements CommandLineRunner {
 
     //FIXME: Service를 호출하는것이 바람직함

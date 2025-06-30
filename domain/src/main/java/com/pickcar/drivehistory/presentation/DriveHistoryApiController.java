@@ -33,7 +33,6 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
     @PostMapping("/{offEventInfoId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void write(@PathVariable Long offEventInfoId) {
-        log.info("POST /api/v1/history/{offEventId} : {} ", offEventInfoId);
         driveHistoryService.write(offEventInfoId);
     }
 
@@ -51,7 +50,6 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
     @GetMapping("/{historyId}/detail")
     @ResponseStatus(HttpStatus.OK)
     public DriveHistoryDetailResponse detail(@PathVariable Long historyId) {
-        log.info("GET /api/v1/history/{historyId}/detail : {} ", historyId);
         return driveHistoryService.getDetailResponseById(historyId);
     }
 }

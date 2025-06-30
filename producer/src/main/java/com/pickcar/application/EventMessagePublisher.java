@@ -2,6 +2,7 @@ package com.pickcar.application;
 
 import com.pickcar.dto.EventPayload;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,12 @@ public class EventMessagePublisher {
     private String routingKey;
 
     public void publish(EventPayload eventPayload) {
-        rabbitTemplate.convertAndSend(exchange, routingKey, eventPayload);
+
+        String traceId = MDC.get("traceId");
+
+        rabbitTemplate.convertAndSend(exchange, routingKey, eventPayload, msg -> {
+            msg.getMessageProperties().setHeader("traceId", traceId);
+            return msg;
+        });
     }
 }

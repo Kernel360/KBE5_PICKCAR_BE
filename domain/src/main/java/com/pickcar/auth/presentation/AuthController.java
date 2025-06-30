@@ -1,7 +1,7 @@
 package com.pickcar.auth.presentation;
 
 import com.pickcar.auth.application.LoginService;
-import com.pickcar.auth.presentation.dto.request.LoginRequest;
+import com.pickcar.auth.presentation.dto.request.AuthRequest;
 import com.pickcar.jwt.JwtProvider;
 import com.pickcar.presentation.dto.response.SuccessResponse;
 import jakarta.servlet.http.HttpSession;
@@ -22,13 +22,13 @@ public class AuthController {
 
     @PostMapping("/login_after")
     @ResponseBody
-    public ResponseEntity<SuccessResponse> login_after(@RequestBody LoginRequest request) {
+    public ResponseEntity<SuccessResponse> login_after(@RequestBody AuthRequest request) {
         String token = loginService.login_after(request.email(), request.password());
         return ResponseEntity.ok(new SuccessResponse(200, token));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<SuccessResponse> login(@RequestBody LoginRequest request , HttpSession session) {
+    public ResponseEntity<SuccessResponse> login(@RequestBody AuthRequest request , HttpSession session) {
         String result = loginService.login(request.email(), request.password(), session);
         return ResponseEntity.ok(new SuccessResponse(200,result));
     }

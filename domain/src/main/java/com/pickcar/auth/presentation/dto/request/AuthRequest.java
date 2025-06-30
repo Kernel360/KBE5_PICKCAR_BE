@@ -1,6 +1,7 @@
 package com.pickcar.auth.presentation.dto.request;
 
-public record LoginRequest(
+public record AuthRequest(
         String email,
-        String password) {
+        String password
+){
 }

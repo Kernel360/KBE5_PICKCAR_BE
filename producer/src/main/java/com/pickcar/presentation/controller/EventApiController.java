@@ -19,13 +19,11 @@ public class EventApiController {
 
     @PostMapping("/engine/on")
     public void emulatorEngineOn(@RequestBody EventPayload eventPayload) {
-        log.info("POST /api/v1/engine/on - EventPayload: {}", eventPayload);
         eventMessagePublisher.publish(eventPayload);
     }
 
     @PostMapping("/engine/off")
     public void emulatorEngineOff(@RequestBody EventPayload eventPayload) {
-        log.info("POST /api/v1/engine/off - EventPayload: {}", eventPayload);
         eventMessagePublisher.publish(eventPayload);
     }
 
