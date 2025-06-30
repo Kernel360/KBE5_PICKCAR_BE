@@ -25,22 +25,22 @@ public class RedisSubscriber implements MessageListener {
 
         try {
             Long vehicleId = Long.valueOf(channel.replace("vehicle-cycle-", ""));
-            log.info("📨 Redis 메시지 수신: channel={}, vehicleId={}, payload.length={}", channel, vehicleId, payload.length());
+            log.info("Redis 메시지 수신: channel={}, vehicleId={}, payload.length={}", channel, vehicleId, payload.length());
 
             emitterRepository.getEmitters(vehicleId).forEach(emitter -> {
                 try {
                     emitter.send(SseEmitter.event()
                             .name("vehicle-cycle")
                             .data(payload));
-                    log.info("📡 SSE 전송 성공: vehicleId={}, emitter={}", vehicleId, emitter);
+                    log.info("SSE 전송 성공: vehicleId={}, emitter={}", vehicleId, emitter);
                 } catch (IOException | IllegalStateException e) {
-                    log.warn("🚨 SSE 전송 실패: vehicleId={}, error={}", vehicleId, e.getMessage());
+                    log.warn("SSE 전송 실패: vehicleId={}, error={}", vehicleId, e.getMessage());
                     emitter.completeWithError(e);
                     emitterRepository.remove(vehicleId, emitter);
                 }
             });
         } catch (Exception e) {
-            System.out.println("🚨 RedisSubscriber 오류: " + e.getMessage());
+            log.error("RedisSubscriber 오류 발생 - channel={}, payload={}", channel, payload);
         }
     }
 }
