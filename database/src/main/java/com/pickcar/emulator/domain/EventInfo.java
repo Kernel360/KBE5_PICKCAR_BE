@@ -22,10 +22,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EventInfo extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private Long vehicleId;
 
     private Boolean status;
