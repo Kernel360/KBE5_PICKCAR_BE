@@ -1,5 +1,6 @@
 package com.pickcar.emulator.application;
 
+import com.pickcar.dto.EventStatus;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.emulator.exception.EventInfoQueryErrorCode;
 import com.pickcar.emulator.exception.EventInfoQueryException;
@@ -22,9 +23,8 @@ public class EventInfoQueryService {
 
     public EventInfo getOffEventById(Long offEventInfoId) {
         EventInfo eventInfo = getById(offEventInfoId);
-        
-        //FIXME: eventInfo의 상태를 true/false 말고 Enum으로 처리
-        if(eventInfo.getStatus() == true) {
+
+        if(EventStatus.ON.equals(eventInfo.getEventStatus())) {
             throw new EventInfoQueryException(EventInfoQueryErrorCode.EVENT_STATUS_NOT_OFF);
         }
 

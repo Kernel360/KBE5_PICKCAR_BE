@@ -4,8 +4,10 @@ import com.pickcar.dto.EventPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -21,7 +23,11 @@ public class EventMessagePublisher {
     @Value("${mq.event.routing-key}")
     private String routingKey;
 
-    // TODO: publish를 합칠까 고려중
+    @Bean
+    public DirectExchange eventExchange() {
+        return new DirectExchange(exchange);
+    }
+
     public void publish(EventPayload eventPayload) {
       
         String traceId = MDC.get("traceId");

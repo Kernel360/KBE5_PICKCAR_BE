@@ -1,6 +1,7 @@
 package com.pickcar.application;
 
 import com.pickcar.dto.EventPayload;
+import com.pickcar.dto.EventStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -30,10 +31,15 @@ public class EventMessageListener {
 
         log.info("RabbitMQ Listener received event: {}", eventPayload.toString());
         try {
-            if (eventPayload.getStatus()) {
+            if (EventStatus.ON.equals(eventPayload.getEventStatus())) {
+                log.info("EventStatus ON");
                 eventInfoService.on(eventPayload);
-            } else {
+            } else if (EventStatus.OFF.equals(eventPayload.getEventStatus())) {
                 eventInfoService.off(eventPayload);
+                log.info("EventStatus OFF");
+            } else if (EventStatus.RETURNED.equals(eventPayload.getEventStatus())) {
+                eventInfoService.returned(eventPayload);
+                log.info("EventStatus RETURNED");
             }
         } catch (Exception e) {
             log.error(e.getMessage());

@@ -17,7 +17,8 @@ public class EventPayload implements Serializable {
     @JsonProperty("vehicle_id")
     private Long vehicleId;
 
-    private Boolean status;
+    @JsonProperty("event_status")
+    private EventStatus eventStatus;
 
     @JsonFormat(pattern = "yyyyMMddHHmmss")
     @JsonProperty("engine_on_time")

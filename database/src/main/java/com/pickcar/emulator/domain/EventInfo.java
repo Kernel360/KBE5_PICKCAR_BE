@@ -1,13 +1,11 @@
 package com.pickcar.emulator.domain;
 
+import com.pickcar.dto.EventStatus;
 import com.pickcar.dto.GpsStatus;
 import com.pickcar.global.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,7 +22,8 @@ public class EventInfo extends BaseEntity {
 
     private Long vehicleId;
 
-    private Boolean status;
+    @Enumerated(EnumType.STRING)
+    private EventStatus eventStatus;
 
     private LocalDateTime engineOnTime;
 

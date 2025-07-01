@@ -33,12 +33,18 @@ public class EventInfoService {
         writeDriveHistoryRequestAfterOff(eventInfo);
     }
 
+    public void returned(EventPayload request) {
+        saveEventInfo(request);
+    }
+
     private EventInfo saveEventInfo(EventPayload request) {
+        log.info("Saving event info: {}", request);
         try {
             Optional<EventInfo> getEventInfo = eventInfoRepository.findTopByVehicleIdOrderByIdDesc(request.getVehicleId());
 
             getEventInfo.ifPresent(info -> {
-                if (info.getStatus().equals(request.getStatus())) {
+                if (info.getEventStatus().equals(request.getEventStatus())) {
+                    log.error("EventInfo 저장 실패: {}", request);
                     throw new RuntimeException("이미 동일한 상태입니다.");
                 }
             });
@@ -55,7 +61,7 @@ public class EventInfoService {
     private static EventInfo toEventInfo(EventPayload request) {
         return EventInfo.builder()
                 .vehicleId(request.getVehicleId())
-                .status(request.getStatus())
+                .eventStatus(request.getEventStatus())
                 .engineOnTime(request.getEngineOnTime())
                 .engineOffTime(request.getEngineOffTime())
                 .gpsStatus(request.getGpsStatus())

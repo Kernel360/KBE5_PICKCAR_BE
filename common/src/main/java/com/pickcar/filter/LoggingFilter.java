@@ -24,7 +24,8 @@ public class LoggingFilter extends OncePerRequestFilter {
     private static final Set<String> EXCLUDED_PATHS = Set.of(
             "/swagger-ui",
             "/actuator/health",
-            "/v3/api-docs"
+            "/v3/api-docs",
+            "/api/v1/sse"
     );
 
     @Override

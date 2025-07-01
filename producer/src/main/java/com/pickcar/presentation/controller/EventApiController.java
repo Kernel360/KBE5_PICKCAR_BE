@@ -2,6 +2,7 @@ package com.pickcar.presentation.controller;
 
 import com.pickcar.application.EventMessagePublisher;
 import com.pickcar.dto.EventPayload;
+import com.pickcar.dto.EventStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,24 +21,33 @@ public class EventApiController {
 
     @PostMapping("/engine/on")
     public ResponseEntity<Void> emulatorEngineOn(@RequestBody EventPayload eventPayload) {
-        log.info("POST /api/v1/engine/on - EventPayload: {}", eventPayload);
-        // HACK: 상태코드 체크는 임시 방편. 상태 enum(ON, OFF, RETURNED) 생기면 교체 필요
-        if (!eventPayload.getStatus()) {
-            log.error("POST /api/v1/engine/on - EventPayload status false: {}", eventPayload);
+        if (!EventStatus.ON.equals(eventPayload.getEventStatus())) {
+            log.error("POST /api/v1/engine/on - EventPayload status NOT ON: {}", eventPayload);
             return ResponseEntity.badRequest().build();
         }
+        log.info("POST /api/v1/engine/on - EventPayload: {}", eventPayload);
         eventMessagePublisher.publish(eventPayload);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/engine/off")
     public ResponseEntity<Void> emulatorEngineOff(@RequestBody EventPayload eventPayload) {
-        log.info("POST /api/v1/engine/off - EventPayload: {}", eventPayload);
-        // HACK: 상태코드 체크는 임시 방편. 상태 enum(ON, OFF, RETURNED) 생기면 교체 필요
-        if (eventPayload.getStatus()) {
-            log.error("POST /api/v1/engine/off - EventPayload status true: {}", eventPayload);
+        if (!EventStatus.OFF.equals(eventPayload.getEventStatus())) {
+            log.error("POST /api/v1/engine/off - EventPayload status NOT OFF: {}", eventPayload);
             return ResponseEntity.badRequest().build();
         }
+        log.info("POST /api/v1/engine/off - EventPayload: {}", eventPayload);
+        eventMessagePublisher.publish(eventPayload);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/returned")
+    public ResponseEntity<Void> emulatorEngineReturned(@RequestBody EventPayload eventPayload) {
+        if (!EventStatus.RETURNED.equals(eventPayload.getEventStatus())) {
+            log.error("POST /api/v1/returned - EventPayload status NOT RETURNED : {}", eventPayload);
+            return ResponseEntity.badRequest().build();
+        }
+        log.info("POST /api/v1/returned - EventPayload: {}", eventPayload);
         eventMessagePublisher.publish(eventPayload);
         return ResponseEntity.ok().build();
     }

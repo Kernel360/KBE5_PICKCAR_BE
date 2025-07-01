@@ -19,21 +19,21 @@ public class CycleMessagePublisher {
     @Value("${mq.cycle.exchange}")
     private String exchange;
 
+    @Value("${mq.cycle.routing-key}")
+    private String routingKey;
+
     @Bean
     public TopicExchange cycleExchange() {
         return new TopicExchange(exchange);
     }
 
-    @Value("${mq.cycle.routing-key}")
-    private String routingKey;
-
-    public void publish(CyclePayload Payload) {
-        String key = String.format("%s.%s", routingKey, Payload.getVehicleId());
+    public void publish(CyclePayload cyclePayload) {
+        String key = String.format("%s.%s", routingKey, cyclePayload.getVehicleId());
         try {
-            rabbitTemplate.convertAndSend(exchange, key, Payload);
-            log.info("MQ 전송 성공: exchange={}, routingKey={}, payload={}", exchange, key, Payload);
+            rabbitTemplate.convertAndSend(exchange, key, cyclePayload);
+            log.info("MQ 전송 성공: exchange={}, routingKey={}, payload={}", exchange, key, cyclePayload);
         } catch (Exception e) {
-            log.error("MQ 전송 실패: exchange={}, routingKey={}, payload={}", exchange, key, Payload);
+            log.error("MQ 전송 실패: exchange={}, routingKey={}, payload={}", exchange, key, cyclePayload);
             // TODO: 실패 시 재처리 고려
         }
     }
