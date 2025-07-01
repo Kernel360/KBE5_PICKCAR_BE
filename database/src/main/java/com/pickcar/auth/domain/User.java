@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseEntity {
+public class User extends BaseEntity {//TODO: companyId 제거하기
 
     private Long companyId;
 
