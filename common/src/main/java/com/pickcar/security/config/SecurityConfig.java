@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Value(value = "${custom.deploy.domain}")
+    @Value(value = "${custom.module.domain}")
     private String deployDomain;
 
     @Bean

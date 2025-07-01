@@ -18,7 +18,7 @@ public class EventInfoService {
 
     private final RestTemplateConfig restTemplateConfig;
 
-    @Value("${custom.deploy.domain}")
+    @Value("${custom.module.domain}")
     private String deployDomain;
 
     private final EventInfoRepository eventInfoRepository;
