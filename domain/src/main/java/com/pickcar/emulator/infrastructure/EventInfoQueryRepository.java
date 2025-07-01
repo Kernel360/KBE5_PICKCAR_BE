@@ -5,5 +5,4 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EventInfoQueryRepository extends JpaRepository<EventInfo, Long> {
-    Optional<EventInfo> findByStatusAndId(boolean status, Long id);
 }
