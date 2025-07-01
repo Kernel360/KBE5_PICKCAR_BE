@@ -1,7 +1,8 @@
 package com.pickcar.emulator.domain;
 
-import com.pickcar.mq.dto.CycleInfoConverter;
-import com.pickcar.mq.dto.CycleInfoPayload;
+import com.pickcar.dto.CycleInfoConverter;
+import com.pickcar.dto.CycleInfoPayload;
+import com.pickcar.global.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -26,13 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Table(name = "cycles")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cycle {
+public class Cycle extends BaseEntity {
 
     private static final Double EARTH_RADIUS_M = 6371000.0D;        //지구 반지금 * 미터(m) 단위
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     private Long vehicleId;
 

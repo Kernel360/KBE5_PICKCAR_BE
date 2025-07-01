@@ -1,9 +1,11 @@
 package com.pickcar.drivehistory.domain;
 
+import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.global.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.AccessLevel;
@@ -30,4 +32,16 @@ public class DriveHistory extends BaseEntity {
     private Double totalDistance;
 
     private LocalTime totalDrivingTime;
+
+    public DriveHistory(Long reservationId, EventInfo offEventInfo, Double totalDistance) {
+        this.reservationId = reservationId;
+        this.drivingStartedAt = offEventInfo.getEngineOnTime();
+        this.drivingEndedAt = offEventInfo.getEngineOffTime();
+        this.totalDistance = totalDistance != null ? totalDistance / 1000 : 0.0;        //FIXME: 임시 위치
+        this.totalDrivingTime = calcTotalDrivingTime(offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
+    }
+
+    private LocalTime calcTotalDrivingTime(LocalDateTime engineOnTime, LocalDateTime engineOffTime) {
+        return LocalTime.MIDNIGHT.plus(Duration.between(engineOnTime, engineOffTime));
+    }
 }

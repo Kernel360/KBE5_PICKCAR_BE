@@ -28,7 +28,6 @@ public class VehicleApiController implements VehicleApiDocs{
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void register(@RequestBody VehicleRegisterRequest vehicleRegisterRequest) {
-        log.info("Registering vehicle: {}", vehicleRegisterRequest);
         vehicleService.register(vehicleRegisterRequest);
     }
 
@@ -36,7 +35,6 @@ public class VehicleApiController implements VehicleApiDocs{
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<VehicleListResponse> allList() {
-        log.info("Retrieving all vehicles");
         return vehicleService.getAllList();
     }
 
@@ -44,7 +42,6 @@ public class VehicleApiController implements VehicleApiDocs{
     @PatchMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeStatus(@RequestBody ChangeVehicleStatusRequest request) {
-        log.info("Changing vehicle status");
         vehicleService.changeStatus(request);
     }
 }

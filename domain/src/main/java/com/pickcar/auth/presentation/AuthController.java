@@ -8,6 +8,11 @@ import com.pickcar.security.jwt.JwtConstants;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.pickcar.auth.application.LoginService;
+import com.pickcar.auth.presentation.dto.request.AuthRequest;
+import com.pickcar.jwt.JwtProvider;
+import com.pickcar.presentation.dto.response.SuccessResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,48 +37,16 @@ public class AuthController {
 
 
 
-    @PostMapping("/logout")
-    @ResponseStatus(HttpStatus.OK)
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        log.info("User logout request received");
-        String refreshToken = extractRefreshTokenFromCookie(request);
-
-        if (refreshToken != null && !refreshToken.isBlank()) {
-            try {
-                authService.deleteByToken(refreshToken);
-            } catch (Exception e) {
-                log.warn("로그아웃 중 RT 삭제 실패: {}", e.getMessage());
-            }
-        }
-
-        setRefreshTokenCookie(response,null);
+    @PostMapping("/login_after")
+    @ResponseBody
+    public ResponseEntity<SuccessResponse> login_after(@RequestBody AuthRequest request) {
+        String token = loginService.login_after(request.email(), request.password());
+        return ResponseEntity.ok(new SuccessResponse(200, token));
     }
 
-    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) { //TODO: 자주 사용되서 Util로 빼기
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-
-        if (refreshToken == null) {
-            cookie.setMaxAge(0); // 삭제
-        } else {
-            cookie.setMaxAge((int) (JwtConstants.REFRESH_TOKEN_VALIDITY / 1000));
-//        cookie.setSecure(true); // HTTPS 환경에서만 쿠키가 전송되도록
-        }
-
-        response.addCookie(cookie);
-    }
-
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) { //TODO: 자주 사용되서 Util로 빼기
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) return null;
-
-        for (Cookie cookie : cookies) {
-            if ("refreshToken".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-
-        return null; // 쿠키에 refreshToken이 없으면 null 반환
+    @PostMapping("/login")
+    public ResponseEntity<SuccessResponse> login(@RequestBody AuthRequest request , HttpSession session) {
+        String result = loginService.login(request.email(), request.password(), session);
+        return ResponseEntity.ok(new SuccessResponse(200,result));
     }
 }

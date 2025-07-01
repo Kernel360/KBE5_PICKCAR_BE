@@ -2,6 +2,7 @@ package com.pickcar.auth.presentation;
 
 import com.pickcar.auth.application.UserService;
 import com.pickcar.auth.domain.UserRole;
+import com.pickcar.auth.presentation.dto.request.TestRequest;
 import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,5 +29,10 @@ public class UserController {
     public void registerEmployee(@RequestBody UserInfoRequest request) {
         log.info("CREATE EMPLOYEE");
         userService.create(request, UserRole.EMPLOYEE);
+    }
+
+    @PostMapping("/test")
+    public void test(@RequestBody UserInfoRequest testRequest) {
+        return;
     }
 }

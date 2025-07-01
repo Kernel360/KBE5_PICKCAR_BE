@@ -1,16 +1,22 @@
 package com.pickcar.drivehistory.presentation;
 
 import com.pickcar.drivehistory.application.DriveHistoryService;
-import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryAllListResponse;
+import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
-import java.util.List;
+import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -25,25 +31,25 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
 
     @Override
     @PostMapping("/{offEventInfoId}")
-    public ResponseEntity<Void> write(@PathVariable Long offEventInfoId) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void write(@PathVariable Long offEventInfoId) {
         driveHistoryService.write(offEventInfoId);
-        return ResponseEntity.noContent().build();
     }
 
-    //관제사용 전체 리스트 조회
-    //FIXME: api 경로를 search로 바꾸고, 관제사와 고객사는 같은 api 사용, 필터링을 통해 제공 내용 변경
     @Override
     @GetMapping("/list")
-    public ResponseEntity<List<DriveHistoryAllListResponse>> list() {
-        List<DriveHistoryAllListResponse> responses = driveHistoryService.getAllList();
-        return ResponseEntity.ok().body(responses);
+    @ResponseStatus(HttpStatus.OK)
+    public Page<DriveHistoryListResponse> list(@ModelAttribute DriveHistoryFilterRequest filterRequest,
+                                               @PageableDefault(size = 10, sort = "drivingStartedAt", direction = Sort.Direction.DESC)
+                                               Pageable pageable) {
+        log.info("GET /api/v1/history/list : {} ", filterRequest);
+        return driveHistoryService.getFilteredListResponses(filterRequest, pageable);
     }
 
     @Override
     @GetMapping("/{historyId}/detail")
-    public ResponseEntity<DriveHistoryDetailResponse> detail(@PathVariable Long historyId) {
-        log.info("Requesting detail for historyId: {}", historyId);
-        DriveHistoryDetailResponse response = driveHistoryService.getDetailResponseById(historyId);
-        return ResponseEntity.ok().body(response);
+    @ResponseStatus(HttpStatus.OK)
+    public DriveHistoryDetailResponse detail(@PathVariable Long historyId) {
+        return driveHistoryService.getDetailResponseById(historyId);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @EntityScan(basePackages = {
+        "com.pickcar.global.domain",
         "com.pickcar.auth.domain",
         "com.pickcar.company.domain",
         "com.pickcar.drivehistory.domain",

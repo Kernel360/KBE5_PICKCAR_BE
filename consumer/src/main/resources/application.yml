@@ -1,3 +1,18 @@
+mq:
+  cycle:
+    exchange: exchange-cycle
+    routing-key: cycle.key
+  event:
+    exchange: exchange-event
+    routing-key: event.key
+
 spring:
   profiles:
     active: local
+
+custom:
+  logging:
+    moduleName: consumer
+    sensitiveFieldRules:
+      - path: "none"
+        fields: ["none"]

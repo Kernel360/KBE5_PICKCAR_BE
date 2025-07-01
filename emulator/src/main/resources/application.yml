@@ -1,7 +1,15 @@
+mq:
+  cycle:
+    exchange: exchange-cycle
+    routing-key: cycle.key
+
 spring:
-  thymeleaf:
-    cache: false
-    prefix: 'classpath:/templates/'
-    suffix: '.html'
   profiles:
     active: local
+
+custom:
+  logging:
+    moduleName: emulator
+    sensitiveFieldRules:
+      - path: "none"
+        fields: ["none"]

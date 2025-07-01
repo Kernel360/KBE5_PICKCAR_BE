@@ -1,10 +1,11 @@
 package com.pickcar.emulator.domain;
 
+import com.pickcar.dto.GpsStatus;
+import com.pickcar.global.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import com.pickcar.mq.enumType.GpsStatus;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
@@ -19,11 +20,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class EventInfo {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class EventInfo extends BaseEntity {
 
     private Long vehicleId;
 

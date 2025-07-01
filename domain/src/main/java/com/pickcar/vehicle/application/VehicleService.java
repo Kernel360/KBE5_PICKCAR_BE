@@ -70,4 +70,8 @@ public class VehicleService {
         vehicle.changeStatus(request.vehicleStatus());
         //FIXME: 차량의 상태 <-> 예약의 상태 사용하는 구간 / 정의 / 예시 똑바로 설정
     }
+
+    public List<Vehicle> getAllByIds(List<Long> vehicleIds) {
+        return vehicleRepository.findAllById(vehicleIds);
+    }
 }
