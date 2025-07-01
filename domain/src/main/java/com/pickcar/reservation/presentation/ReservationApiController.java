@@ -3,6 +3,8 @@ package com.pickcar.reservation.presentation;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
 import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
+import com.pickcar.security.jwt.JwtProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationApiController {
 
     private final ReservationService reservationService;
+    private final JwtProvider jwtProvider;
 
     //FIXME: 로직도 그렇고 사실 VEHICLE이 맞는듯 근데 일단 진행
     @GetMapping("/vehicles")

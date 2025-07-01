@@ -42,9 +42,14 @@ public class ReservationService {
 
     @Transactional
     public void reservation(ReservationRequest request) {
+
+        if(isAlreadyReserved(request.vehicleId())) {
+            throw new ReservationException(ReservationErrorCode.ALREADY_RESERVED);
+        }
+
         //TODO: 유효성 검사 필요
         Reservation reservation = Reservation.builder()
-                .userId(request.userId())
+                .userId(request.employeeId())
                 .vehicleId(request.vehicleId())
                 .rentedAt(LocalDateTime.now())
                 .returnedAt(null)                        //FIXME: 반납 시기를 정하기 VS 반납 했을때를 기록하기
@@ -162,5 +167,9 @@ public class ReservationService {
         return availableVehicles.stream()
                 .map(SearchAbleVehiclesResponse::from)
                 .toList();
+    }
+
+    private boolean isAlreadyReserved(Long vehicleId) {
+        return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).isPresent();
     }
 }

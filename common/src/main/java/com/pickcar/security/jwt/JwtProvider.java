@@ -1,6 +1,8 @@
 package com.pickcar.security.jwt;
 
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
@@ -70,5 +72,18 @@ public class JwtProvider { //FIX: JwtTokenProvider 로 변경하기
                 new Date(System.currentTimeMillis() + validityMillis).toInstant(),
                 ZoneId.systemDefault()
         );
+    }
+
+    public Long extractUserId(HttpServletRequest servletRequest) {
+
+        for (Cookie cookie : servletRequest.getCookies()) {
+            if(cookie.getName().equals("accessToken")) {
+                String accessToken = cookie.getValue();
+                Jws<Claims> claimsJws = parseToken(accessToken);
+                return Long.valueOf(claimsJws.getBody().getSubject());
+            }
+        }
+
+        throw new IllegalArgumentException("로그인 정보가 유효하지 않습니다");
     }
 }
