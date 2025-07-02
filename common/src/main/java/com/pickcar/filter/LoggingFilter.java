@@ -10,7 +10,6 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -91,12 +90,14 @@ public class LoggingFilter extends OncePerRequestFilter {
     private void putServiceNameToMDC(HttpServletRequest request) {
         String uri = request.getRequestURI();
 
-        String[] split = uri.split("/api/v1/");
-        String[] split1 = split[1].split("/");
+        if(uri.contains("/api/v1/")) {
+            String[] split = uri.split("/api/v1/");
+            String[] split1 = split[1].split("/");
 
-        if(split1[0] != null) {
-            MDC.put("service", split1[0]);
-            return;
+            if(split1[0] != null) {
+                MDC.put("service", split1[0]);
+                return;
+            }
         }
 
         MDC.put("service", "unknown");
