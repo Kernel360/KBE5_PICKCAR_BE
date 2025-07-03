@@ -13,7 +13,7 @@ public class ResponseWrapper extends ContentCachingResponseWrapper {
         super(response);
     }
 
-    protected void loggingResponseAPI() throws IOException {
+    public void loggingResponseAPI() throws IOException {
         String responseBody = this.getContentAsString();
         String statusCode = MDC.get("statusCode");
 
