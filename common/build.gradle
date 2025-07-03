@@ -18,6 +18,10 @@ dependencies {
     api 'io.micrometer:micrometer-tracing-bridge-brave:1.5.1'
     api 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // Spring Data Commons (Pageable 등)
+    // Swagger
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${rootProject.swaggerVersion}"
+
+    // Spring Data Commons (Pageable 등), Cycle Converter 등을 위한 jakarta
     api 'org.springframework.data:spring-data-commons'
+    compileOnly 'jakarta.persistence:jakarta.persistence-api'
 }

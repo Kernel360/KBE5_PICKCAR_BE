@@ -1,42 +1,13 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
-}
-
-group = 'com'
-version = '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management'
 }
 
 dependencies {
+    // 웹
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'com.mysql:mysql-connector-j'
 
-    //swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    implementation project(':database')       //DB 모듈 의존성 추가
+    // 모듈 의존
+    implementation project(':database')
     implementation project(':common')
-
-    //로그 수집
-    implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
-}
-
-bootJar {
-    enabled = true
-}
-
-jar {
-    enabled = false
-}
-
-test {
-    useJUnitPlatform()
 }
