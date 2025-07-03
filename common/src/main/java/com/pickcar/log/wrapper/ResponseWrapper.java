@@ -1,4 +1,4 @@
-package com.pickcar.filter;
+package com.pickcar.log.wrapper;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

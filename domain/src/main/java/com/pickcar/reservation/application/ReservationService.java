@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReservationService {
 
-    @Value(value = "${custom.reservation.coolDownMinutes}")
+    @Value(value = "${custom.reservation.cool-down-minutes}")
     private Long coolDownMinutes;
 
     private final UserService userService;

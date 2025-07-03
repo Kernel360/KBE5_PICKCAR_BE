@@ -1,6 +1,5 @@
-package com.pickcar.config;
+package com.pickcar.log.config;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,10 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "custom.logging")
+@ConfigurationProperties(prefix = "logging")
 public class LogConfigProps {
 
     private String moduleName;
+
     private List<SensitiveFieldRule> sensitiveFieldRules;
 
     public Map<String, List<String>> getSensitiveFieldAsMap() {
