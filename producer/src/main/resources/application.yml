@@ -12,6 +12,10 @@ logging:
 
 mq:
   cycle:
+    queue: cycle-queue
     exchange: exchange-cycle
     routing-key: cycle.key
-    queue: cycle-queue-sse
+  event:
+    queue: event-queue
+    exchange: exchange-event
+    routing-key: event.key

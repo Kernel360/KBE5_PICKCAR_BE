@@ -10,7 +10,7 @@ spring:
 custom:
   reservation:
     cool-down-minutes: 30
-  drive-history:
+  driveHistory:
     maximum-inquiry-days: 30
 
 logging:
