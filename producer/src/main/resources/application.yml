@@ -1,11 +1,3 @@
-mq:
-  cycle:
-    exchange: exchange-cycle
-    routing-key: cycle.key
-  event:
-    exchange: exchange-event
-    routing-key: event.key
-
 spring:
   thymeleaf:
     cache: false

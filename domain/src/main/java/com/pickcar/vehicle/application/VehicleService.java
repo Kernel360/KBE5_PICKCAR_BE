@@ -2,6 +2,7 @@ package com.pickcar.vehicle.application;
 
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
+import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.exception.VehicleErrorCode;
 import com.pickcar.vehicle.exception.VehicleException;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
@@ -73,5 +74,9 @@ public class VehicleService {
 
     public List<Vehicle> getAllByIds(List<Long> vehicleIds) {
         return vehicleRepository.findAllById(vehicleIds);
+    }
+
+    public List<Long> getAllByStatus(VehicleStatus status) {
+        return vehicleRepository.findAllIdsByStatus(status);
     }
 }

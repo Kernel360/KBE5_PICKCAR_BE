@@ -9,10 +9,12 @@ import com.pickcar.reservation.exception.ReservationErrorCode;
 import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
-import com.pickcar.reservation.presentation.dto.request.ReservationCreateRequest;
+import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
+import com.pickcar.vehicle.domain.VehicleStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +41,23 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public void create(ReservationCreateRequest request) {
+    public void reservation(ReservationRequest request) {
+
+        //이미 할당된 차량이 있는 회원에 대해
+        if(hasAlreadyReservation(request.employeeId())) {
+            throw new ReservationException(ReservationErrorCode.EMPLOYEE_ALREADY_RESERVED);
+        }
+
+        //이미 할당처리가 된 차량에 대해
+        if(isAlreadyReserved(request.vehicleId())) {
+            throw new ReservationException(ReservationErrorCode.VEHICLE_ALREADY_RESERVED);
+        }
+
         //TODO: 유효성 검사 필요
         Reservation reservation = Reservation.builder()
-                .userId(request.userId())
+                .userId(request.employeeId())
                 .vehicleId(request.vehicleId())
-                .rentedAt(request.rentedAt())
+                .rentedAt(LocalDateTime.now())
                 .returnedAt(null)                        //FIXME: 반납 시기를 정하기 VS 반납 했을때를 기록하기
                 .status(ReservationStatus.RESERVED)     //FIXME: Default로 "예약" 상태로 생성?
                 .build();
@@ -150,5 +163,23 @@ public class ReservationService {
 
     private List<Reservation> getAllByIds(List<Long> reservationIds) {
         return reservationRepository.findAllById(reservationIds);
+    }
+
+    public List<SearchAbleVehiclesResponse> getAbleVehicles() {
+        //운행 가능한 상태의 차면서 예약 상태가 아닌 것
+        List<Vehicle> availableVehicles = reservationRepository.findAvailableVehicles(VehicleStatus.OPERABLE,
+                ReservationStatus.RESERVED);
+
+        return availableVehicles.stream()
+                .map(SearchAbleVehiclesResponse::from)
+                .toList();
+    }
+
+    private boolean isAlreadyReserved(Long vehicleId) {
+        return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).isPresent();
+    }
+
+    private boolean hasAlreadyReservation(Long employeeId) {
+        return reservationRepository.findByUserIdAndStatus(employeeId, ReservationStatus.RESERVED).isPresent();
     }
 }

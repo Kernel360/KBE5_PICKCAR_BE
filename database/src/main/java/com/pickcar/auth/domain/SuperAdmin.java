@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @Table(name = "super_admins")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SuperAdmin extends BaseEntity {
+public class SuperAdmin extends BaseEntity { //TODO: super_admin 불필요, 제거하기
 
     @Embedded
     private UserInfo info;

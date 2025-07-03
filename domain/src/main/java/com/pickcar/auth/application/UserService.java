@@ -4,16 +4,20 @@ import com.pickcar.auth.domain.User;
 import com.pickcar.auth.domain.UserInfo;
 import com.pickcar.auth.domain.UserRole;
 import com.pickcar.auth.domain.UserStatus;
+import com.pickcar.auth.exception.UserErrorCode;
+import com.pickcar.auth.exception.UserException;
 import com.pickcar.auth.infrastructure.UserRepository;
 import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
-import com.pickcar.jwt.UserPrincipal;
+import com.pickcar.auth.presentation.dto.response.EmployeeListResponse;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,33 +32,22 @@ public class UserService {
     }
 
     @Transactional
-    public void createEmployee(@AuthenticationPrincipal UserPrincipal principal,
-                               UserInfoRequest request) {
-        //토큰에 있는 회사ID 사용
-        User employee = User.builder()
-                .companyId(principal.getCompanyId())
-                .info(toEncodedUserInfo(request))
-                .role(UserRole.EMPLOYEE)
+    public void create(UserInfoRequest request) {
+
+        if (userRepository.existsByInfoEmail(request.email())) {
+            throw new UserException(UserErrorCode.ALREADY_EXIST_EMAIL);
+        }
+
+        User user = User.builder()
+                .info(toUserInfoWithEncodedPassword(request))
+                .role(request.isAdmin()? UserRole.SUPER_ADMIN : UserRole.EMPLOYEE)
                 .status(UserStatus.ACTIVE)
                 .build();
 
-        userRepository.save(employee);
+        userRepository.save(user);
     }
 
-    @Transactional
-    public void createAdmin(UserInfoRequest request) {
-        //요청에 있는 회사ID 사용
-        User admin = User.builder()
-//                .companyId(request.companyId())
-                .info(toEncodedUserInfo(request))
-                .role(UserRole.ADMIN)
-                .status(UserStatus.ACTIVE)
-                .build();
-
-        userRepository.save(admin);
-    }
-
-    private UserInfo toEncodedUserInfo(UserInfoRequest request) {
+    private UserInfo toUserInfoWithEncodedPassword(UserInfoRequest request) {
         return new UserInfo(
                 request.email(),
                 passwordEncoder.encode(request.password()),
@@ -65,5 +58,17 @@ public class UserService {
 
     public List<User> getAllByIds(List<Long> userIds) {
         return userRepository.findAllById(userIds);
+    }
+
+    public List<EmployeeListResponse> getAllEmployees() {
+        List<User> users = userRepository.findAllByRole(UserRole.EMPLOYEE);
+        List<EmployeeListResponse> responses = new ArrayList<>();
+
+        users.forEach(user -> {
+            EmployeeListResponse response = EmployeeListResponse.from(user);
+            responses.add(response);
+        });
+
+        return responses;
     }
 }
