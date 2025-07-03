@@ -1,43 +1,23 @@
 plugins {
-    id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'java'
-}
-
-group = 'com'
-version = '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management'
 }
 
 dependencies {
-    implementation project(":common")
+    // 공통 모듈들
+    implementation project(':common')
+
+    // 웹 & 웹소켓
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    // 메시징
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
-    // JAXB API: XML 데이터를 Java 객체로 변환하기 위해 필요
+    // XML 처리 (필요한 경우)
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
     implementation 'org.glassfish.jaxb:jaxb-runtime'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
-}
-
-bootJar {
-    enabled = true
-}
-
-jar {
-    enabled = false
-}
-
-test {
-    useJUnitPlatform()
 }
