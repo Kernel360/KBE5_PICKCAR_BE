@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -91,19 +93,16 @@ public class LoggingFilter extends OncePerRequestFilter {
         MDC.put("moduleName", "unknown");
     }
 
+
     private void putServiceNameToMDC(HttpServletRequest request) {
         String uri = request.getRequestURI();
+        String serviceName = extractServiceName(uri);
+        MDC.put("service", serviceName);
+    }
 
-        if(uri.contains("/api/v1/")) {
-            String[] split = uri.split("/api/v1/");
-            String[] split1 = split[1].split("/");
-
-            if(split1[0] != null) {
-                MDC.put("service", split1[0]);
-                return;
-            }
-        }
-
-        MDC.put("service", "unknown");
+    private String extractServiceName(String uri) {
+        Pattern pattern = Pattern.compile(API_PREFIX + "\\d+/(^/]+)");
+        Matcher matcher = pattern.matcher(uri);
+        return matcher.find() ? matcher.group(1) : "unknown";
     }
 }
