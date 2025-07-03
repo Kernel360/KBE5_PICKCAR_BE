@@ -1,16 +1,10 @@
-mq:
-  cycle:
-    queue: cycle-queue
-    exchange: exchange-cycle
-    routing-key: cycle.key
-  event:
-    queue: event-queue
-    exchange: exchange-event
-    routing-key: event.key
-
 spring:
+  application:
+    name: pickcar-consumer
   profiles:
     active: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
   rabbitmq:
     host: rabbitmq
     port: 5672
@@ -26,9 +20,18 @@ spring:
       simple:
         default-requeue-rejected: false # 실패 메시지 재큐 금지(무한 반복 방지)
 
-custom:
-  logging:
-    moduleName: consumer
-    sensitiveFieldRules:
-      - path: "none"
-        fields: ["none"]
+mq:
+  cycle:
+    queue: cycle-queue
+    exchange: exchange-cycle
+    routing-key: cycle.key
+  event:
+    queue: event-queue
+    exchange: exchange-event
+    routing-key: event.key
+
+logging:
+  module-name: consumer
+  sensitive-field-rules:
+    - path: "none"
+      fields: ["none"]
