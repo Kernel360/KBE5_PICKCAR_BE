@@ -1,6 +1,7 @@
 package com.pickcar.log.filter;
 
 import com.pickcar.log.config.LogConfigProps;
+import com.pickcar.log.util.MDCContext;
 import com.pickcar.log.wrapper.RequestWrapper;
 import com.pickcar.log.wrapper.ResponseWrapper;
 import jakarta.servlet.FilterChain;
@@ -10,12 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,7 +24,6 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     private final LogConfigProps logConfigProps;
 
-    private static final String API_PREFIX = "/api/v1";
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
     private static final List<String> EXCLUDED_PATTERNS = Arrays.asList(
             "/swagger-ui",
@@ -57,40 +53,23 @@ public class LoggingFilter extends OncePerRequestFilter {
         ResponseWrapper responseWrapper = new ResponseWrapper(response);
 
         try {
-            putInfoToMDC(request);
+            setMDCContext(request);
             filterChain.doFilter(requestWrapper, responseWrapper);
         } finally {
-            MDC.put("statusCode", String.valueOf(response.getStatus()));
+            MDCContext.setStatusCode(response.getStatus());
 
             requestWrapper.loggingRequestAPI();
             responseWrapper.loggingResponseAPI();
 
-            // 이 내용이 있어야 다음 클라이언트가 요청을 받을 수 있음
             responseWrapper.copyBodyToResponse();
 
-            MDC.clear();
+            MDCContext.clear();
         }
     }
 
-    protected void putInfoToMDC(HttpServletRequest request) {
-        keepTraceIdIfExist(request);
-        putModuleNameToMDC();
-        putServiceNameToMDC(request.getRequestURI());
-    }
-
-    private void keepTraceIdIfExist(HttpServletRequest request) {
-        String traceId = request.getHeader("X-TraceId");
-        MDC.put("traceId", traceId != null ? traceId : "");
-    }
-
-    private void putModuleNameToMDC() {
-        String moduleName = logConfigProps.getModuleName();
-        MDC.put("moduleName", moduleName != null ? moduleName : "unknown");
-    }
-
-    private void putServiceNameToMDC(String uri) {
-        Pattern pattern = Pattern.compile(API_PREFIX + "\\d+/(^/]+)");
-        Matcher matcher = pattern.matcher(uri);
-        MDC.put("service", matcher.find() ? matcher.group(1) : "unknown");
+    protected void setMDCContext(HttpServletRequest request) {
+        MDCContext.setTraceId(request.getHeader("X-TraceId"));
+        MDCContext.setModuleName(logConfigProps.getModuleName());
+        MDCContext.setServiceName(request.getRequestURI());
     }
 }
