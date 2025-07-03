@@ -8,11 +8,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
@@ -22,12 +25,20 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     private final LogConfigProps logConfigProps;
 
-    private static final Set<String> EXCLUDED_PATHS = Set.of(
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+    private static final List<String> EXCLUDED_PATTERNS = Arrays.asList(
             "/swagger-ui",
             "/actuator/health",
-            "/v3/api-docs",
-            "/api/v1/sse"
+            "/v3/api-docs/**",
+            "/api/v1/sse/**"
     );
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return EXCLUDED_PATTERNS.stream()
+                .anyMatch(pattern -> PATH_MATCHER.match(pattern, path));
+    }
 
     @Override
     protected void doFilterInternal(
@@ -35,11 +46,6 @@ public class LoggingFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-
-        if(EXCLUDED_PATHS.stream().anyMatch(request.getRequestURI()::startsWith)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         Long startTime = System.currentTimeMillis();
 
