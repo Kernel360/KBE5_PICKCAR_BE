@@ -1,9 +1,23 @@
-plugins {
-	id 'java'
-	id 'io.spring.dependency-management' version '1.1.7'
+buildscript {
+	ext {
+		// 버전 중앙 관리
+		springBootVersion = '3.4.5'
+		springDependencyManagementVersion = '1.1.7'
+		jwtVersion = '0.11.5'
+		swaggerVersion = '2.8.6'
+		logstashVersion = '8.1'
+		mysqlVersion = '8.0.33'
+		junitVersion = '5.10.0'
+		assertjVersion = '3.27.3'
+	}
 }
 
-group = 'com'
+plugins {
+	id 'java'
+	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+}
+
+group = 'com.pickcar'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -18,7 +32,6 @@ allprojects {
 	}
 }
 
-//서브 모듈들에서 루트 프로젝트의 설정을 따라가도록 설정
 subprojects {
 	apply plugin: 'java'
 	apply plugin: 'io.spring.dependency-management'
@@ -38,40 +51,52 @@ subprojects {
 		}
 	}
 
-	//공통 dependency를 설정
+	// 공통 의존성
 	dependencies {
-		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		// 테스트
+		testImplementation "org.springframework.boot:spring-boot-starter-test"
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+		testImplementation platform("org.junit:junit-bom:${junitVersion}")
+		testImplementation 'org.junit.jupiter:junit-jupiter'
+		testImplementation "org.assertj:assertj-core:${assertjVersion}"
 
+		// 롬복
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
-
-		testImplementation platform('org.junit:junit-bom:5.10.0')
-		testImplementation 'org.junit.jupiter:junit-jupiter'
-		testImplementation 'org.assertj:assertj-core:3.27.3'
-
-		implementation 'org.springframework.boot:spring-boot-starter-security'
-		implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-		runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-		runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	}
 
-	tasks.withType(Test).configureEach {
+	tasks.named('test') {
 		useJUnitPlatform()
 	}
+
+	// bootJar/jar 설정 중앙화
+	if (name in ['domain', 'producer', 'consumer', 'emulator']) {
+		apply plugin: 'org.springframework.boot'
+		apply plugin: 'io.spring.dependency-management'
+
+		bootJar {
+			enabled = true
+		}
+		jar {
+			enabled = false
+		}
+	} else {
+		apply plugin: 'io.spring.dependency-management'
+
+		bootJar {
+			enabled = false
+		}
+		jar {
+			enabled = true
+		}
+	}
 }
 
-// 각자 필요한 모듈들에서 설정되어야 함
-/*
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-	//카프카
-	implementation 'org.springframework.kafka:spring-kafka'
-	testImplementation 'org.springframework.kafka:spring-kafka-test'
+// Spring Boot 버전 관리
+subprojects {
+	if (project.plugins.hasPlugin('org.springframework.boot')) {
+		dependencies {
+			implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+		}
+	}
 }
- */
