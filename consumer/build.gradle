@@ -1,37 +1,19 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management'
 }
 
-group = 'com'
-version = '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    implementation project(":common")
-    implementation project(":database")
+    // 공통 모듈들
+    implementation project(':common')
+    implementation project(':database')
+
+    // 웹
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // 메시징
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+    // Jackson JSR310 (날짜/시간 처리)
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation 'mysql:mysql-connector-java:8.0.33'
-}
-
-bootJar {
-    enabled = true
-}
-
-jar {
-    enabled = false
-}
-
-test {
-    useJUnitPlatform()
 }
