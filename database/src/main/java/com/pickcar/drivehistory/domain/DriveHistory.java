@@ -37,7 +37,7 @@ public class DriveHistory extends BaseEntity {
         this.reservationId = reservationId;
         this.drivingStartedAt = offEventInfo.getEngineOnTime();
         this.drivingEndedAt = offEventInfo.getEngineOffTime();
-        this.totalDistance = totalDistance;
+        this.totalDistance = totalDistance != null ? totalDistance / 1000 : 0.0;        //FIXME: 임시 위치
         this.totalDrivingTime = calcTotalDrivingTime(offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
     }
 

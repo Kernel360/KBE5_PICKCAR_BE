@@ -3,5 +3,13 @@ spring:
     cache: false
     prefix: 'classpath:/templates/'
     suffix: '.html'
+
   profiles:
     active: local
+
+custom:
+  logging:
+    moduleName: producer
+    sensitiveFieldRules:
+      - path: "none"
+        fields: ["none"]

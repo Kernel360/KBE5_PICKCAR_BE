@@ -19,7 +19,7 @@ public class ErrorResponseAdvice {
 
         StackTraceElement origin = e.getStackTrace()[0];
 
-        log.error(" ErrorCode : {}, URI {}, Message : {}, Thrown at: ({}:{})",
+        log.warn(" ErrorCode : {}, URI {}, Message : {}, Thrown at: ({}:{})",
                 e.getErrorReason().errorCode(), request.getRequestURI(), e.getErrorReason().reason(),
                 origin.getFileName(),
                 origin.getLineNumber());

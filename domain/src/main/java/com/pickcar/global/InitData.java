@@ -8,6 +8,9 @@ import com.pickcar.auth.infrastructure.UserRepository;
 import com.pickcar.company.domain.Company;
 import com.pickcar.company.domain.ContractStatus;
 import com.pickcar.company.infrastructure.CompanyRepository;
+import com.pickcar.drivehistory.application.DriveHistoryService;
+import com.pickcar.drivehistory.domain.DriveHistory;
+import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
@@ -17,6 +20,7 @@ import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Profile({"local", "test"})
+@Profile({"local", "test", "docker"})
 public class InitData implements CommandLineRunner {
 
     //FIXME: Service를 호출하는것이 바람직함
@@ -34,6 +38,7 @@ public class InitData implements CommandLineRunner {
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
     private final ReservationRepository reservationRepository;
+    private final DriveHistoryRepository driveHistoryRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -41,6 +46,7 @@ public class InitData implements CommandLineRunner {
         initDummyUsers();
         initDummyVehicles();
         initDummyReservations();
+        initDummyDriveHistories();
     }
 
     private void initDummyCompanies() {
@@ -98,5 +104,19 @@ public class InitData implements CommandLineRunner {
                                 null,
                                 ReservationStatus.RESERVED
                         )).toList());
+    }
+
+    private void initDummyDriveHistories() {
+        driveHistoryRepository.saveAll(
+                LongStream.iterate(1L, i -> i + 1)
+                        .limit(5)
+                        .mapToObj(i -> new DriveHistory(
+                                i,
+                                LocalDateTime.now().minusHours(2),
+                                LocalDateTime.now().minusMinutes(30),
+                                20.0D,
+                                LocalTime.of(1, 30)
+                        )).toList()
+        );
     }
 }

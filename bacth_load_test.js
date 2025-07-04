@@ -14,7 +14,7 @@ export default function () {
             payload: JSON.stringify({
                 vehicle_id: 1,
                 mdn: "01234567890",
-                status: true,
+                event_status: "ON",
                 engine_on_time: "20240601123000",
                 engine_off_time: "",
                 gps_status: "NORMAL",
@@ -98,7 +98,20 @@ export default function () {
             payload: JSON.stringify({
                 vehicle_id: 1,
                 mdn: "01234567890",
-                status: false,
+                event_status: "OFF",
+                engine_on_time: "20240601123000",
+                engine_off_time: "20240601123100",
+                gps_status: "NORMAL",
+                latitude: 37.4418097,
+                longitude: 12.7244062
+            })
+        },
+        {
+            url: 'http://localhost:8080/api/v1/event/returned',
+            payload: JSON.stringify({
+                vehicle_id: 1,
+                mdn: "01234567890",
+                event_status: "RETURNED",
                 engine_on_time: "20240601123000",
                 engine_off_time: "20240601123100",
                 gps_status: "NORMAL",

@@ -10,13 +10,20 @@ import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListRespon
 import com.pickcar.emulator.application.CycleQueryService;
 import com.pickcar.emulator.application.EventInfoQueryService;
 import com.pickcar.emulator.domain.EventInfo;
+import com.pickcar.emulator.presentation.context.PathContext;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class DriveHistoryService {
+
+    @Value("${custom.driveHistory.maximumInquiryDays}")
+    private Integer maximumInquiryDays;
 
     private final CycleQueryService cycleQueryService;
     private final EventInfoQueryService eventInfoQueryService;
@@ -42,37 +52,67 @@ public class DriveHistoryService {
         driveHistoryRepository.save(driveHistory);
     }
 
-    public DriveHistory getById(Long id) {
+    private DriveHistory getById(Long id) {
         return driveHistoryRepository.findById(id)
                 .orElseThrow(() -> new DriveHistoryException(DriveHistoryErrorCode.NOT_FOUND_BY_ID));
     }
 
-    public List<DriveHistoryListResponse> getFilteredListResponses(DriveHistoryFilterRequest filterRequest) {
-        List<DriveHistoryListResponse> responses = new ArrayList<>();
-        List<DriveHistory> histories = getFilteredList(filterRequest);
+    public Page<DriveHistoryListResponse> getFilteredListResponses(DriveHistoryFilterRequest filterRequest,
+                                                                   Pageable pageable) {
+        checkFilterRequest(filterRequest);
+        Page<DriveHistory> filteredHistoryPage = getPageByFilter(filterRequest, pageable);
+        List<Long> reservationIds = getRelatedReservationIdsByPage(filteredHistoryPage);
+        Map<Long, ReservationContext> contextMap = reservationService.getContextMapByIds(reservationIds);
 
-        for (DriveHistory history : histories) {
-            // FIXME: N+1 여지 있음 -> histories 기반 List 조회 필요 가능성 있음
-            ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
+        List<DriveHistoryListResponse> responses = filteredHistoryPage.getContent()
+                .stream()
+                .map(history -> {
+                    ReservationContext context = contextMap.get(history.getReservationId());
+                    return DriveHistoryListResponse.of(history, context);
+                })
+                .toList();
 
-            log.info("context : {} ", context);
-            DriveHistoryListResponse response = DriveHistoryListResponse.of(history, context);
-            responses.add(response);
-        }
-        return responses;
+        return new PageImpl<>(responses, pageable, filteredHistoryPage.getTotalElements());
     }
 
-    private List<DriveHistory> getFilteredList(DriveHistoryFilterRequest filterRequest) {
+    private void checkFilterRequest(DriveHistoryFilterRequest filterRequest) {
+        checkFilterRequestDate(filterRequest.getFrom(), filterRequest.getTo());
+        //TODO: 검사 추가
+    }
+
+    private void checkFilterRequestDate(LocalDateTime from, LocalDateTime to) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
+
+        if(from.isAfter(to)) {
+            throw new DriveHistoryException(DriveHistoryErrorCode.FROM_DATE_CANT_BE_BEFORE_TO_DATE);
+        }
+
+        if (from.isBefore(inquiryLimitDate)) {
+            throw new DriveHistoryException(DriveHistoryErrorCode.MAXIMUM_INQUIRY_LIMIT_EXCEEDED);
+        }
+    }
+
+    private Page<DriveHistory> getPageByFilter(DriveHistoryFilterRequest filterRequest, Pageable pageable) {
         return driveHistoryRepository.findAllFilteredListByDriverNameAndDuration(
-                filterRequest.driverName(), filterRequest.from(), filterRequest.to());
+                filterRequest.getDriverName(), filterRequest.getFrom(),
+                filterRequest.getTo(), pageable
+        );
+    }
+
+    private List<Long> getRelatedReservationIdsByPage(Page<DriveHistory> driveHistoryPage) {
+        return driveHistoryPage.getContent()
+                .stream()
+                .map(DriveHistory::getReservationId)
+                .toList();
     }
 
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {
         DriveHistory history = getById(historyId);
-        ReservationContext context = reservationService.getReservationContextById(history.getReservationId());
+        ReservationContext reservationContext = reservationService.getReservationContextById(history.getReservationId());
         //FIXME: path를 가져올 수 있는 다른 방법 필요
-        //Cycle cycle = cycleQueryService.getByVehicleId(context.reservedVehicleInfo().getId());
+        List<PathContext> pathContexts = cycleQueryService.getPathsByReservationAndHistory(reservationContext.reservation(), history);
 
-        return DriveHistoryDetailResponse.of(history, context);
+        return DriveHistoryDetailResponse.of(history, reservationContext, pathContexts);
     }
 }

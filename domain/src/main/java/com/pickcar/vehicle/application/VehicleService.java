@@ -2,6 +2,7 @@ package com.pickcar.vehicle.application;
 
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
+import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.exception.VehicleErrorCode;
 import com.pickcar.vehicle.exception.VehicleException;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
@@ -69,5 +70,13 @@ public class VehicleService {
 
         vehicle.changeStatus(request.vehicleStatus());
         //FIXME: 차량의 상태 <-> 예약의 상태 사용하는 구간 / 정의 / 예시 똑바로 설정
+    }
+
+    public List<Vehicle> getAllByIds(List<Long> vehicleIds) {
+        return vehicleRepository.findAllById(vehicleIds);
+    }
+
+    public List<Long> getAllByStatus(VehicleStatus status) {
+        return vehicleRepository.findAllIdsByStatus(status);
     }
 }

@@ -1,0 +1,27 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml  # 수정: 존재하는 디렉토리 사용
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: application-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: springboot
+          __path__: /var/logs/pickcar*.log  # 수정: 경로 단순화
+
+    pipeline_stages:
+      - json:
+          expressions:
+            level: level
+            ts: "'@timestamp'"
+            msg: message
+      - labels:
+          level:

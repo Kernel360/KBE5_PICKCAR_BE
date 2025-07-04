@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class SuperAdminService {
+public class SuperAdminService { //TODO: 제거하기
 
     private final SuperAdminRepository superAdminRepository;
     private final PasswordEncoder passwordEncoder;

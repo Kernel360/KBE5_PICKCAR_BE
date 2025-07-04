@@ -1,7 +1,30 @@
+mq:
+  cycle:
+    exchange: exchange-cycle
+    routing-key: cycle.key
+    queue: cycle-queue-sse
+
 spring:
-  thymeleaf:
-    cache: false
-    prefix: 'classpath:/templates/'
-    suffix: '.html'
   profiles:
     active: local
+  data:
+    redis:
+      host: pickcar-redis
+      port: 6379
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    template:
+      retry:
+        enabled: true
+        initial-interval: 1000
+        max-attempts: 5
+        multiplier: 2.0
+
+
+custom:
+  logging:
+    moduleName: emulator
+    sensitiveFieldRules:
+      - path: "none"
+        fields: ["none"]

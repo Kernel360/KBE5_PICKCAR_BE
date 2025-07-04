@@ -1,10 +1,18 @@
 package com.pickcar.drivehistory.presentation.dto.request;
 
 import java.time.LocalDateTime;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.Setter;
 
-public record DriveHistoryFilterRequest(
-        LocalDateTime from,
-        LocalDateTime to,
-        String driverName
-) {
+@Getter
+@Setter
+public class DriveHistoryFilterRequest {
+    private LocalDateTime from;
+    private LocalDateTime to;
+    private String driverName;
+    private Integer page;
+
+    public DriveHistoryFilterRequest() {
+    }
 }

@@ -1,3 +1,24 @@
 spring:
   profiles:
     active: local   #기본은 local (test 작성시에는 어플리케이션에 test 명시, prod 경우 docker 컨테이너 띄울 때(jar 파일 명령) profile 작성
+
+custom:
+  reservation:
+    coolDownMinutes: 30
+  driveHistory:
+    maximumInquiryDays: 30
+  logging:
+    moduleName: domain
+    sensitiveFieldRules:
+      - path: "/api/v1/auth/login"
+        fields: ["email", "password"]
+      - path: "/api/v1/auth/login_after"
+        fields: ["email", "password"]
+      - path: "/api/v1/auth/super-admins"
+        fields: ["email", "password", "name", "phoneNumber"]
+      - path: "/api/v1/auth/users"
+        fields: ["email", "password", "name", "phoneNumber"]
+      - path: "/api/v1/auth/admins"
+        fields: ["email", "password", "name", "phoneNumber"]
+      - path: "/api/v1/auth/test"
+        fields: ["email", "password", "name", "phoneNumber"]
