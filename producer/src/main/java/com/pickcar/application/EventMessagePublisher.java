@@ -29,14 +29,8 @@ public class EventMessagePublisher {
     }
 
     public void publish(EventPayload eventPayload) {
-      
-        String traceId = MDC.get("traceId");
-      
         try {
-            rabbitTemplate.convertAndSend(exchange, routingKey, eventPayload, msg -> {
-                msg.getMessageProperties().setHeader("traceId", traceId);
-                return msg;
-            });
+            rabbitTemplate.convertAndSend(exchange, routingKey, eventPayload);
             log.info("MQ 전송 성공: exchange={}, routingKey={}, payload={}", exchange, routingKey, eventPayload);
         } catch (Exception e) {
             log.error("MQ 전송 실패: exchange={}, routingKey={}, payload={}", exchange, routingKey, eventPayload);
