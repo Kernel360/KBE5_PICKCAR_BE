@@ -44,4 +44,9 @@ public class VehicleApiController implements VehicleApiDocs{
     public void changeStatus(@RequestBody ChangeVehicleStatusRequest request) {
         vehicleService.changeStatus(request);
     }
+
+    @PostMapping("/allocation")
+    public Long findAllocation(@RequestBody Long userId) {
+        return vehicleService.getVehicleIdByUserId(userId);
+    }
 }

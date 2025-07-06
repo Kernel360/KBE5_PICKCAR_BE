@@ -79,4 +79,9 @@ public class VehicleService {
     public List<Long> getAllByStatus(VehicleStatus status) {
         return vehicleRepository.findAllIdsByStatus(status);
     }
+
+    // TODO : 보안처리
+    public Long getVehicleIdByUserId(Long request) {
+        return vehicleRepository.findVehicleIdById(request);
+    }
 }
