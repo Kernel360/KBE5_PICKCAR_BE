@@ -45,5 +45,6 @@ public final class GlobalStatic {
         public static final String MODULE_NAME_KEY = "moduleName";
         public static final String SERVICE_NAME_KEY = "service";
         public static final String STATUS_CODE_KEY = "statusCode";
+        public static final String TRACE_ID_HEADER_KEY = "X-TraceId";
     }
 }

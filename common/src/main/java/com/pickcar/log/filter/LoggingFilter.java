@@ -1,5 +1,6 @@
 package com.pickcar.log.filter;
 
+import com.pickcar.constants.GlobalStatic.MDCConstants;
 import com.pickcar.log.config.LogConfigProps;
 import com.pickcar.log.util.MDCContext;
 import com.pickcar.log.wrapper.RequestWrapper;
@@ -68,7 +69,7 @@ public class LoggingFilter extends OncePerRequestFilter {
     }
 
     protected void setMDCContext(HttpServletRequest request) {
-        MDCContext.setTraceId(request.getHeader("X-TraceId"));
+        MDCContext.setTraceIdFromHeader(request.getHeader(MDCConstants.TRACE_ID_HEADER_KEY));
         MDCContext.setModuleName(logConfigProps.getModuleName());
         MDCContext.setServiceName(request.getRequestURI());
     }

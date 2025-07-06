@@ -4,18 +4,21 @@ import com.pickcar.constants.GlobalStatic.MDCConstants;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.MDC;
+import org.springframework.util.StringUtils;
 
 public class MDCContext {
 
     private static final Pattern SERVICE_PATTERN = Pattern.compile(MDCConstants.API_PREFIX
             + "/([^/]+)");
 
-    public static void setTraceId(String traceId) {
-        if (traceId == null || traceId.isEmpty()) {
-            MDC.remove(MDCConstants.TRACE_ID_KEY);
-            return;
+    /*
+    NOTE: 기본적으로 TraceID는 micrometer-brave를 통해 전파되지만, MQ, RestTemplate 등의 통신은
+    MDC 전파가 되지 않음. 그 때문에 MQ 헤더나 Http 헤더에 내용을 담아 전파를 해주어야 함.
+     */
+    public static void setTraceIdFromHeader(String traceId) {
+        if(StringUtils.hasText(traceId)) {
+            MDC.put(MDCConstants.TRACE_ID_KEY, traceId);
         }
-        MDC.put(MDCConstants.TRACE_ID_KEY, traceId);
     }
 
     public static void setModuleName(String moduleName) {
