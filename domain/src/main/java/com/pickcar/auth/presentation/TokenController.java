@@ -1,6 +1,7 @@
 package com.pickcar.auth.presentation;
 
 import com.pickcar.auth.application.AuthService;
+import com.pickcar.auth.application.TokenService;
 import com.pickcar.auth.presentation.dto.response.AccessTokenResponse;
 import com.pickcar.auth.presentation.dto.response.AuthResponse;
 import com.pickcar.security.jwt.JwtConstants;
@@ -21,14 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/token")
 public class TokenController {
 
-    private final AuthService authService;
+    private final TokenService tokenService;
 
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.OK)
     public AccessTokenResponse reissueRefreshToken(HttpServletRequest request, HttpServletResponse response){
         log.info("Issued new AccessToken for refreshToken");
         String refreshToken = extractRefreshTokenFromCookie(request);
-        AuthResponse authResponse = authService.reissueTokens(refreshToken);
+        AuthResponse authResponse = tokenService.reissueTokens(refreshToken);
         addRefreshTokenToCookie(response, authResponse.refreshToken());
         return new AccessTokenResponse(authResponse.accessToken());
     }
