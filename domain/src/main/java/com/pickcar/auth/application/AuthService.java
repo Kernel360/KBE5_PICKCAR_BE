@@ -1,8 +1,8 @@
 package com.pickcar.auth.application;
 
 import com.pickcar.auth.domain.*;
-import com.pickcar.auth.exception.UserErrorCode;
-import com.pickcar.auth.exception.UserException;
+import com.pickcar.auth.exception.AuthErrorCode;
+import com.pickcar.auth.exception.AuthException;
 import com.pickcar.auth.infrastructure.RefreshTokenRepository;
 import com.pickcar.auth.infrastructure.UserRepository;
 import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
@@ -45,7 +45,7 @@ public class AuthService {
     public void create(UserInfoRequest request) {
 
         if (userRepository.existsByInfoEmail(request.email())) {
-            throw new UserException(UserErrorCode.ALREADY_EXIST_EMAIL);
+            throw new AuthException(AuthErrorCode.ALREADY_EXIST_EMAIL);
         }
 
         User user = User.builder()

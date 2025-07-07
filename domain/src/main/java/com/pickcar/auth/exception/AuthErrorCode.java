@@ -8,7 +8,7 @@ import com.pickcar.swagger.annotation.ExplainError;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-public enum UserErrorCode implements BaseErrorCode {
+public enum AuthErrorCode implements BaseErrorCode {
 
     //400(BAD_REQUEST)
     ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "USER_400_1", "이미 사용중인 이메일 입니다");
@@ -17,7 +17,7 @@ public enum UserErrorCode implements BaseErrorCode {
     private String errorCode;
     private String reason;
 
-    UserErrorCode(HttpStatus httpStatus, String errorCode, String reason) {
+    AuthErrorCode(HttpStatus httpStatus, String errorCode, String reason) {
         this.httpStatus = httpStatus;
         this.errorCode = errorCode;
         this.reason = GlobalStatic.ERROR_PREFIX + reason;
