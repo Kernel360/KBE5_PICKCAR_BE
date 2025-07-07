@@ -81,7 +81,7 @@ public class VehicleService {
     }
 
     // TODO : 보안처리
-    public Long getVehicleIdByUserId(Long request) {
-        return vehicleRepository.findVehicleIdById(request);
+    public Long getIdByUserIdFromReservation(Long userId) {
+        return vehicleRepository.findVehicleIdByUserId(userId);
     }
 }
