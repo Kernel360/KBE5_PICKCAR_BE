@@ -34,9 +34,9 @@ public class EventInfoService {
         saveEventInfo(request);
     }
 
-    public void off(EventPayload request, String accessToken) {
+    public void off(EventPayload request) {
         EventInfo eventInfo = saveEventInfo(request);
-        writeDriveHistoryRequestAfterOff(eventInfo, accessToken);
+        writeDriveHistoryRequestAfterOff(eventInfo);
     }
 
     public void returned(EventPayload request) {
@@ -77,14 +77,25 @@ public class EventInfoService {
                 .build();
     }
 
-    public void writeDriveHistoryRequestAfterOff(EventInfo offEventInfo, String accessToken) {
+    public void writeDriveHistoryRequestAfterOff(EventInfo offEventInfo) {
         String url = deployDomain + "/api/v1/history/%d".formatted(offEventInfo.getId());
         try {
-            log.info("driving history accessToken: {}", accessToken);
-            HttpHeaders headers = new HttpHeaders();
-            headers.set(HttpHeaders.AUTHORIZATION, accessToken);
-            HttpEntity<String> request = new HttpEntity<>(headers);
-            restTemplate.postForEntity(url, request, Void.class);
+            log.info("Request URL : {}, OffEventInfoId : {}", url, offEventInfo.getId());
+            restTemplate.postForEntity(url, null, Void.class);
+            log.info("시동 OFF에 따른 운행일지 작성이 성공적으로 완료되었습니다. event ID : {}", offEventInfo.getId());
+        } catch (HttpClientErrorException e) {
+            Optional<ErrorResponse> errorResponse = ErrorResponse.parseHttpStatusCodeException(e);
+
+            if (errorResponse.isPresent()) {
+                log.warn("운행일지 작성에 실패하였습니다. reason : {}", errorResponse.get().errorReason().reason());
+                return;
+            }
+            log.warn("운행일지 작성과 요청 정보 파싱에 실패하였습니다. responseBody : {}", e.getResponseBodyAsString());
+        } catch (HttpServerErrorException e) {
+            log.error("서버 오류로 인해 운행일지 작성 요청에 실패하였습니다. event id : {}", offEventInfo.getId());
+        } catch (ResourceAccessException e) {
+            log.error("네트워크 오류로 인해 운행일지 작성 요청에 실패하였습니다. event id : {}, url : {}", offEventInfo.getId(), url);
+            //NOTE: 5XX 에러 (서버, 네트워크 등 오류시 재시도 여부 결정 필요)
         } catch (Exception e) {
             // FIXME: 무한 요청 방지를 위한 임시 catch
         }

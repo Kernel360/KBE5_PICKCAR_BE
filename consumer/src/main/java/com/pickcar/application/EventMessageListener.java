@@ -37,7 +37,7 @@ public class EventMessageListener {
                 log.info("EventStatus ON");
                 eventInfoService.on(eventPayload);
             } else if (EventStatus.OFF.equals(eventPayload.getEventStatus())) {
-                eventInfoService.off(eventPayload, accessToken);
+                eventInfoService.off(eventPayload);
                 log.info("EventStatus OFF");
             } else if (EventStatus.RETURNED.equals(eventPayload.getEventStatus())) {
                 eventInfoService.returned(eventPayload);
