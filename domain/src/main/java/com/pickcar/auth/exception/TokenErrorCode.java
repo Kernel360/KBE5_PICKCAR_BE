@@ -12,7 +12,9 @@ import java.util.Objects;
 public enum TokenErrorCode implements BaseErrorCode {
 
     //400(BAD_REQUEST)
-    ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "USER_400_1", "이미 사용중인 이메일 입니다");
+
+    //500(INTERNAL_SERVER_ERROR)
+    REFRESH_TOKEN_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "USER_500_1", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 
     private HttpStatus httpStatus;
     private String errorCode;

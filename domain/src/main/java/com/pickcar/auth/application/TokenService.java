@@ -2,6 +2,8 @@ package com.pickcar.auth.application;
 
 import com.pickcar.auth.domain.RefreshToken;
 import com.pickcar.auth.domain.User;
+import com.pickcar.auth.exception.TokenErrorCode;
+import com.pickcar.auth.exception.TokenException;
 import com.pickcar.auth.infrastructure.RefreshTokenRepository;
 import com.pickcar.auth.infrastructure.UserRepository;
 import com.pickcar.auth.presentation.dto.response.AuthResponse;
@@ -54,16 +56,20 @@ public class TokenService {
     }
 
     public void saveOrUpdateRefreshToken(Long userId,String refreshToken){
-        //TODO: 해시화 해서 저장하기
         LocalDateTime expiryDate = JwtUtils.calculateExpiryDate(JwtConstants.REFRESH_TOKEN_VALIDITY);
-        refreshTokenRepository.findByUserId(userId)
-                .ifPresentOrElse(
-                        token -> token.update(refreshToken,expiryDate),
-                        () -> refreshTokenRepository.save(RefreshToken.create(
-                                userId,
-                                refreshToken,
-                                JwtUtils.calculateExpiryDate(JwtConstants.REFRESH_TOKEN_VALIDITY)
-                        ))//TODO: 토큰 저장 실패 예외처리 하기
-                );
+        try {
+            refreshTokenRepository.findByUserId(userId)
+                    .ifPresentOrElse(
+                            token -> token.update(refreshToken,expiryDate),
+                            () -> refreshTokenRepository.save(RefreshToken.create(
+                                    userId,
+                                    refreshToken,
+                                    JwtUtils.calculateExpiryDate(JwtConstants.REFRESH_TOKEN_VALIDITY)
+                            ))
+                    );
+        }catch (Exception e){
+            log.error("RefreshToken DB 저장 실패");
+            throw new TokenException(TokenErrorCode.REFRESH_TOKEN_SAVE_FAILED);
+        }
     }
 }

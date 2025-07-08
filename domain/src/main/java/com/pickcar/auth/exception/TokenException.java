@@ -7,3 +7,4 @@ public class TokenException extends GlobalException {
     super(errorCode);
   }
 }
+
