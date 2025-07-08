@@ -27,7 +27,7 @@ public class EventApiController {
             return ResponseEntity.badRequest().build();
         }
         log.info("POST /api/v1/engine/on - EventPayload: {}", eventPayload);
-        eventMessagePublisher.publish(eventPayload, "");
+        eventMessagePublisher.publish(eventPayload);
         return ResponseEntity.ok().build();
     }
 
@@ -40,7 +40,7 @@ public class EventApiController {
         }
         log.info("POST /api/v1/engine/off - EventPayload: {}", eventPayload);
         log.info("POST /api/v1/engine/off - accessToken: {}", accessToken);
-        eventMessagePublisher.publish(eventPayload, accessToken);
+        eventMessagePublisher.publish(eventPayload);
         return ResponseEntity.ok().build();
     }
 
@@ -51,7 +51,7 @@ public class EventApiController {
             return ResponseEntity.badRequest().build();
         }
         log.info("POST /api/v1/returned - EventPayload: {}", eventPayload);
-        eventMessagePublisher.publish(eventPayload, "");
+        eventMessagePublisher.publish(eventPayload);
         return ResponseEntity.ok().build();
     }
     // TODO: 동일한 기능(on/off) 메서드 처리 고려
