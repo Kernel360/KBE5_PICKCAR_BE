@@ -3,6 +3,7 @@ package com.pickcar.presentation.controller;
 import com.pickcar.application.EventMessagePublisher;
 import com.pickcar.dto.EventPayload;
 import com.pickcar.dto.EventStatus;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,18 +27,20 @@ public class EventApiController {
             return ResponseEntity.badRequest().build();
         }
         log.info("POST /api/v1/engine/on - EventPayload: {}", eventPayload);
-        eventMessagePublisher.publish(eventPayload);
+        eventMessagePublisher.publish(eventPayload, "");
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/engine/off")
-    public ResponseEntity<Void> emulatorEngineOff(@RequestBody EventPayload eventPayload) {
+    public ResponseEntity<Void> emulatorEngineOff(HttpServletRequest request, @RequestBody EventPayload eventPayload) {
+        String accessToken = request.getHeader("Authorization");
         if (!EventStatus.OFF.equals(eventPayload.getEventStatus())) {
             log.error("POST /api/v1/engine/off - EventPayload status NOT OFF: {}", eventPayload);
             return ResponseEntity.badRequest().build();
         }
         log.info("POST /api/v1/engine/off - EventPayload: {}", eventPayload);
-        eventMessagePublisher.publish(eventPayload);
+        log.info("POST /api/v1/engine/off - accessToken: {}", accessToken);
+        eventMessagePublisher.publish(eventPayload, accessToken);
         return ResponseEntity.ok().build();
     }
 
@@ -48,7 +51,7 @@ public class EventApiController {
             return ResponseEntity.badRequest().build();
         }
         log.info("POST /api/v1/returned - EventPayload: {}", eventPayload);
-        eventMessagePublisher.publish(eventPayload);
+        eventMessagePublisher.publish(eventPayload, "");
         return ResponseEntity.ok().build();
     }
     // TODO: 동일한 기능(on/off) 메서드 처리 고려
