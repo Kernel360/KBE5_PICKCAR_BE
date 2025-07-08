@@ -1,4 +1,4 @@
-package com.pickcar.config;
+package com.pickcar.log.config;
 
 import java.util.List;
 

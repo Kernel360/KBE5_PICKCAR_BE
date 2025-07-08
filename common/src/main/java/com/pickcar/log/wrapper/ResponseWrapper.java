@@ -1,4 +1,4 @@
-package com.pickcar.filter;
+package com.pickcar.log.wrapper;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class ResponseWrapper extends ContentCachingResponseWrapper {
         super(response);
     }
 
-    protected void loggingResponseAPI() throws IOException {
+    public void loggingResponseAPI() throws IOException {
         String responseBody = this.getContentAsString();
         String statusCode = MDC.get("statusCode");
 

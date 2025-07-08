@@ -23,12 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-//    @PostMapping("/sign-up/admins")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public void registerAdmin(@RequestBody UserInfoRequest request) {
-//        userService.create(request, UserRole.SUPER_ADMIN);
-//    }
-
     @PostMapping("/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerEmployee(@RequestBody UserInfoRequest request) {

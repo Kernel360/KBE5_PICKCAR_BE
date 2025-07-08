@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EventMessageListener {
 
-    @Value("${custom.logging.moduleName}")
+    @Value("${logging.module-name}")
     private String moduleName;
 
     @Value("${mq.event.queue}")

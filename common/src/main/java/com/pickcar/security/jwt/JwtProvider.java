@@ -13,7 +13,7 @@ import java.util.Optional;
 @Component
 public class JwtProvider { //FIX: JwtTokenProvider 로 변경하기
 
-    @Value(value = "${custom.jwt.secret}")
+    @Value(value = "${jwt.secret-key}")
     private String jwtSecretKey;
 
     //ACCESS_TOKEN 생성

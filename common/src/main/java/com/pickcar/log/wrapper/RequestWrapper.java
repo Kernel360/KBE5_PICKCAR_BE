@@ -1,4 +1,4 @@
-package com.pickcar.filter;
+package com.pickcar.log.wrapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class RequestWrapper extends ContentCachingRequestWrapper {
         this.sensitiveFields = sensitiveFields;
     }
 
-    protected void loggingRequestAPI() throws IOException {
+    public void loggingRequestAPI() throws IOException {
         String requestBody = getRequestContent();
         String queryString = this.getQueryString();
         StringBuilder uriBuilder = new StringBuilder(this.getRequestURI());

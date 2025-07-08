@@ -1,6 +1,8 @@
-package com.pickcar.filter;
+package com.pickcar.log.filter;
 
-import com.pickcar.config.LogConfigProps;
+import com.pickcar.log.config.LogConfigProps;
+import com.pickcar.log.wrapper.RequestWrapper;
+import com.pickcar.log.wrapper.ResponseWrapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

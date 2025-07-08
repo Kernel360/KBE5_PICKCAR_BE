@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DriveHistoryService {
 
-    @Value("${custom.driveHistory.maximumInquiryDays}")
+    @Value("${custom.driveHistory.maximum-inquiry-days}")
     private Integer maximumInquiryDays;
 
     private final CycleQueryService cycleQueryService;

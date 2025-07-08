@@ -1,15 +1,21 @@
 spring:
-  thymeleaf:
-    cache: false
-    prefix: 'classpath:/templates/'
-    suffix: '.html'
-
+  application:
+    name: pickcar-producer
   profiles:
     active: local
 
-custom:
-  logging:
-    moduleName: producer
-    sensitiveFieldRules:
-      - path: "none"
-        fields: ["none"]
+logging:
+  moduleName: producer
+  sensitiveFieldRules:
+    - path: "none"
+      fields: ["none"]
+
+mq:
+  cycle:
+    queue: cycle-queue
+    exchange: exchange-cycle
+    routing-key: cycle.key
+  event:
+    queue: event-queue
+    exchange: exchange-event
+    routing-key: event.key

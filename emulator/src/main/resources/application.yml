@@ -1,10 +1,6 @@
-mq:
-  cycle:
-    exchange: exchange-cycle
-    routing-key: cycle.key
-    queue: cycle-queue-sse
-
 spring:
+  application:
+    name: pickcar-emulator
   profiles:
     active: local
   data:
@@ -21,10 +17,15 @@ spring:
         max-attempts: 5
         multiplier: 2.0
 
+mq:
+  cycle:
+    exchange: exchange-cycle
+    routing-key: cycle.key
+    queue: cycle-queue-sse
 
-custom:
-  logging:
-    moduleName: emulator
-    sensitiveFieldRules:
-      - path: "none"
-        fields: ["none"]
+
+logging:
+  module-name: consumer
+  sensitive-field-rules:
+    - path: "none"
+      fields: ["none"]
