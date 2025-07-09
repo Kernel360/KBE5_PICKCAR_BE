@@ -17,6 +17,7 @@ import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
 
     @Value(value = "${custom.reservation.cool-down-minutes}")
-    private Long coolDownMinutes;
+    private Integer coolDownMinutes;
+
+    @Value(value = "${custom.reservation.maximum-due-date}")
+    private Integer maximumDueDate;
 
     private final UserService userService;
     private final VehicleService vehicleService;
@@ -46,6 +50,7 @@ public class ReservationService {
     @Transactional
     public void reservation(ReservationRequest request) {
 
+        //FIXME: 권한 분리 및 유효성검사 통합 메서드 필요
         //이미 할당된 차량이 있는 회원에 대해
         if (hasAlreadyReservation(request.employeeId())) {
             throw new ReservationException(ReservationErrorCode.EMPLOYEE_ALREADY_RESERVED);
@@ -56,13 +61,15 @@ public class ReservationService {
             throw new ReservationException(ReservationErrorCode.VEHICLE_ALREADY_RESERVED);
         }
 
-        //TODO: 유효성 검사 필요
+        validateDueDate(request.dueDate());
+
         Reservation reservation = Reservation.builder()
                 .userId(request.employeeId())
                 .vehicleId(request.vehicleId())
                 .rentedAt(LocalDateTime.now())
-                .returnedAt(null)                        //FIXME: 반납 시기를 정하기 VS 반납 했을때를 기록하기
-                .status(ReservationStatus.RESERVED)     //FIXME: Default로 "예약" 상태로 생성?
+                .dueDate(request.dueDate())
+                .returnedAt(null)
+                .status(ReservationStatus.RESERVED)
                 .build();
 
         reservationRepository.save(reservation);
@@ -202,5 +209,15 @@ public class ReservationService {
 
     private boolean hasAlreadyReservation(Long employeeId) {
         return reservationRepository.findByUserIdAndStatus(employeeId, ReservationStatus.RESERVED).isPresent();
+    }
+
+    private void validateDueDate(LocalDate dueDate) {
+        if(dueDate.isBefore(LocalDate.now())) {
+            throw new ReservationException(ReservationErrorCode.DUE_DATE_CANNOT_BE_FUTURE);
+        }
+
+        if(dueDate.isAfter(LocalDate.now().plusDays(maximumDueDate))) {
+            throw new ReservationException(ReservationErrorCode.DUE_DATE_OVER_MAXIMUM);
+        }
     }
 }
