@@ -34,7 +34,7 @@ public class ReservationApiController {
     @GetMapping("/vehicles/done")
     @ResponseStatus(HttpStatus.OK)
     public List<SearchAbleVehiclesResponse> getDisabledVehicles() {
-        return reservationService.getAbleVehicles();
+        return reservationService.getDisabledVehicles();
     }
 
     @PostMapping
