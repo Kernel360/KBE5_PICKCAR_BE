@@ -175,6 +175,16 @@ public class ReservationService {
                 .toList();
     }
 
+    public List<SearchAbleVehiclesResponse> getDisabledVehicles() {
+        //운행 가능한 상태의 차면서 예약 상태인 것
+        List<Vehicle> availableVehicles = reservationRepository.findUnavailableVehicles(VehicleStatus.OPERABLE,
+                ReservationStatus.RESERVED);
+
+        return availableVehicles.stream()
+                .map(SearchAbleVehiclesResponse::from)
+                .toList();
+    }
+
     private boolean isAlreadyReserved(Long vehicleId) {
         return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).isPresent();
     }

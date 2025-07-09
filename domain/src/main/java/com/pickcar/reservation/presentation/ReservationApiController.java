@@ -30,6 +30,13 @@ public class ReservationApiController {
         return reservationService.getAbleVehicles();
     }
 
+    //FIXME: 이것보단 ON되어 있는 차량들만 가져오는 걸로 바꾸는 게 좋을 듯(임시)
+    @GetMapping("/vehicles/done")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SearchAbleVehiclesResponse> getDisabledVehicles() {
+        return reservationService.getAbleVehicles();
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void reservation(@RequestBody ReservationRequest request) {
