@@ -1,7 +1,9 @@
 package com.pickcar.reservation.presentation;
 
 import com.pickcar.reservation.application.ReservationService;
+import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -42,5 +44,11 @@ public class ReservationApiController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void submitReturn(HttpServletRequest servletRequest, @PathVariable Long vehicleId) {
         reservationService.submitReturn(servletRequest, vehicleId);
+    }
+
+    @GetMapping("/pre-info")
+    @ResponseStatus(HttpStatus.OK)
+    public ReservationPreInfoResponse preInfo() {
+        return reservationService.getReservationPreInfos();
     }
 }

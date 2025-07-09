@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     Optional<Reservation> findByVehicleIdAndStatus(Long vehicleId, ReservationStatus status);
@@ -24,4 +25,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     Optional<Reservation> findByUserIdAndVehicleIdAndStatusIn(Long userId, Long vehicleId, List<ReservationStatus> statuses);
     List<Reservation> findAllByDueDate(LocalDate dueDate);
+
+    @Query("SELECT DISTINCT r.userId FROM Reservation r WHERE r.status IN :statuses")
+    List<Long> findUserIdsByStatusIn(@Param("statuses") List<ReservationStatus> statuses);
+
+    @Query("SELECT DISTINCT r.vehicleId FROM Reservation r WHERE r.status IN :statuses")
+    List<Long> findVehicleIdsByStatusIn(@Param("statuses") List<ReservationStatus> statuses);
 }

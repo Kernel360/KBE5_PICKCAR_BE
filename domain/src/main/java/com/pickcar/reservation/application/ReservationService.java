@@ -3,6 +3,7 @@ package com.pickcar.reservation.application;
 import com.pickcar.auth.application.UserService;
 import com.pickcar.auth.domain.User;
 import com.pickcar.auth.domain.UserInfo;
+import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
@@ -10,12 +11,14 @@ import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.security.jwt.JwtProvider;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
+import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -80,6 +83,21 @@ public class ReservationService {
         Long userId = jwtProvider.extractUserId(servletRequest);
         Reservation reservation = getReturnTarget(userId, vehicleId);
         reservation.submitReturn();
+    }
+
+    public ReservationPreInfoResponse getReservationPreInfos() {
+        //FIXME: ID 리스트와 VEHICLE 리스트를 한 번에 가져오도록.
+        // 여기에 더해 사실장 이 response를 한 번에 가져올 수 있도록 변경 필요
+        List<Long> allocatedUserIds = reservationRepository.findUserIdsByStatusIn(
+                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+
+        List<Long> allocatedVehicleIds = reservationRepository.findVehicleIdsByStatusIn(
+                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+
+        List<UnAllocatedEmployeeResponse> employeeInfos = userService.getUnAllocatedEmployeeInfos(allocatedUserIds);
+        List<UnAllocatedVehicleResponse> vehicleInfos = vehicleService.getAllUnAllocatedVehicleInfos(allocatedVehicleIds);
+
+        return new ReservationPreInfoResponse(employeeInfos, vehicleInfos);
     }
 
     private Reservation getReturnTarget(Long userId, Long vehicleId) {
@@ -212,11 +230,11 @@ public class ReservationService {
     }
 
     private void validateDueDate(LocalDate dueDate) {
-        if(dueDate.isBefore(LocalDate.now())) {
+        if (dueDate.isBefore(LocalDate.now())) {
             throw new ReservationException(ReservationErrorCode.DUE_DATE_CANNOT_BE_FUTURE);
         }
 
-        if(dueDate.isAfter(LocalDate.now().plusDays(maximumDueDate))) {
+        if (dueDate.isAfter(LocalDate.now().plusDays(maximumDueDate))) {
             throw new ReservationException(ReservationErrorCode.DUE_DATE_OVER_MAXIMUM);
         }
     }
