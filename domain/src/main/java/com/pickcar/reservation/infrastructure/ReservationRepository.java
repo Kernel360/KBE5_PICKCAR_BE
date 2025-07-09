@@ -21,5 +21,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "WHERE r.vehicleId = v.id AND r.status = :reservationStatus)")
     List<Vehicle> findAvailableVehicles(VehicleStatus vehicleStatus, ReservationStatus reservationStatus);
 
-    Optional<Reservation> findByUserIdAndVehicleId(Long userId, Long vehicleId);
+    Optional<Reservation> findByUserIdAndVehicleIdAndStatusIn(Long userId, Long vehicleId, List<ReservationStatus> statuses);
 }

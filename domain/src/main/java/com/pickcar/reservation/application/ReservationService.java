@@ -47,12 +47,12 @@ public class ReservationService {
     public void reservation(ReservationRequest request) {
 
         //이미 할당된 차량이 있는 회원에 대해
-        if(hasAlreadyReservation(request.employeeId())) {
+        if (hasAlreadyReservation(request.employeeId())) {
             throw new ReservationException(ReservationErrorCode.EMPLOYEE_ALREADY_RESERVED);
         }
 
         //이미 할당처리가 된 차량에 대해
-        if(isAlreadyReserved(request.vehicleId())) {
+        if (isAlreadyReserved(request.vehicleId())) {
             throw new ReservationException(ReservationErrorCode.VEHICLE_ALREADY_RESERVED);
         }
 
@@ -71,15 +71,19 @@ public class ReservationService {
     @Transactional
     public void submitReturn(HttpServletRequest servletRequest, Long vehicleId) {
         Long userId = jwtProvider.extractUserId(servletRequest);
+        Reservation reservation = getReturnTarget(userId, vehicleId);
+        reservation.submitReturn();
+    }
 
-        log.info("userId : {}, vehicleId : {}", userId, vehicleId);
+    private Reservation getReturnTarget(Long userId, Long vehicleId) {
+        Optional<Reservation> maybeReservation = reservationRepository.findByUserIdAndVehicleIdAndStatusIn(userId,
+                vehicleId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
-        Optional<Reservation> maybeReservation = reservationRepository.findByUserIdAndVehicleId(userId, vehicleId);
-
-        if(maybeReservation.isEmpty()) {
-            //FIXME: 임시 예외 -> 실제 케이스로 변경 필요
-            throw new ReservationException(ReservationErrorCode.NOT_FOUND_ACTIVE_RESERVATION_BY_VEHICLE_ID);
+        if (maybeReservation.isEmpty()) {
+            throw new ReservationException(ReservationErrorCode.UNAUTHORIZED_FOR_RETURN);
         }
+
+        return maybeReservation.get();
     }
 
     public Reservation getById(Long id) {

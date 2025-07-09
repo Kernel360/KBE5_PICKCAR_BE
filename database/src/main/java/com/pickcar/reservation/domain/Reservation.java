@@ -33,4 +33,9 @@ public class Reservation extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    public void submitReturn() {
+        this.status = ReservationStatus.RETURNED;
+        this.returnedAt = LocalDateTime.now();
+    }
 }

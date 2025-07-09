@@ -1,5 +1,5 @@
 package com.pickcar.reservation.domain;
 
 public enum ReservationStatus {
-    RESERVED, CANCELLED, RETURNED;
+    RESERVED, CANCELLED, RETURNED, DELAYED;
 }
