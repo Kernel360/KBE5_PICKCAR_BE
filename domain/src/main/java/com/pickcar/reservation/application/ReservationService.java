@@ -243,6 +243,7 @@ public class ReservationService {
         return reservationRepository.countByStatusIn(List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
     }
 
+    //FIXME: getDelayedCount와 getExpectedReturnCount 통합 가능
     public Long getExpectedReturnCount() {
         LocalDate today = LocalDate.now();
         LocalDate after3Days = today.plusDays(3);
@@ -252,5 +253,9 @@ public class ReservationService {
         Long expectedReturnCount = reservationRepository.countByStatusAndDueDateBetween(ReservationStatus.RESERVED, today, after3Days);
 
         return delayedCount + expectedReturnCount;
+    }
+
+    public Long getDelayedCount() {
+        return reservationRepository.countByStatus(ReservationStatus.DELAYED);
     }
 }

@@ -20,6 +20,7 @@ public class AnalyticsService {
         Long totalVehicleCount = vehicleService.getAllCount();
         Long reservedVehiclesCount = reservationService.getReservedVehiclesCount();
         Long expectedReturnCount = reservationService.getExpectedReturnCount();
+        Long delayedCount = reservationService.getDelayedCount();
 
     /* TODO:
             Integer delayedCount
@@ -29,7 +30,8 @@ public class AnalyticsService {
                 totalVehicleCount,
                 reservedVehiclesCount,
                 totalVehicleCount - reservedVehiclesCount,
-                expectedReturnCount, null);
+                expectedReturnCount,
+                delayedCount);
     }
 
 
