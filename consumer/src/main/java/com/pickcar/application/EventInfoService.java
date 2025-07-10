@@ -35,31 +35,29 @@ public class EventInfoService {
     }
 
     public void off(EventPayload request) {
-        EventInfo eventInfo = saveEventInfo(request);
-        writeDriveHistoryRequestAfterOff(eventInfo);
+        Optional<Long> offEventInfoId = saveEventInfo(request);
+        offEventInfoId.ifPresent(this::writeDriveHistoryRequestAfterOff);
     }
 
     public void returned(EventPayload request) {
         saveEventInfo(request);
     }
 
-    private EventInfo saveEventInfo(EventPayload request) {
-        log.info("Saving event info: {}", request);
-        try {
-            Optional<EventInfo> getEventInfo = eventInfoRepository.findTopByVehicleIdOrderByIdDesc(
-                    request.getVehicleId());
+    private Optional<Long> saveEventInfo(EventPayload request) {
+        log.info("EventPayload: {}", request);
+        Optional<EventInfo> getEventInfo = eventInfoRepository.findTopByVehicleIdOrderByIdDesc(
+                request.getVehicleId());
 
-            if (getEventInfo.isPresent() && getEventInfo.get().getEventStatus().equals(request.getEventStatus())) {
-                throw new IllegalStateException("동일한 EventStatus에 대해 중복 저장 시도");
-            }
-
-            EventInfo eventInfo = toEventInfo(request);
-            return eventInfoRepository.save(eventInfo);
-        } catch (Exception e) {
-            log.error("EventInfo 저장 실패: {}", e.getMessage(), e);
-            // TODO: 커스텀 예외 고려
-            throw e;
+        if (getEventInfo.isPresent() &&
+                getEventInfo.get().getEventStatus().equals(request.getEventStatus())) {
+            log.warn("동일한 상태의 Event가 이미 존재합니다. 운행일지 생성 생략.");
+            return Optional.empty();
         }
+
+        EventInfo eventInfo = toEventInfo(request);
+        EventInfo save = eventInfoRepository.save(eventInfo);
+        log.info("EventInfo: {}", save);
+        return Optional.of(save.getId());
     }
 
     private static EventInfo toEventInfo(EventPayload request) {
@@ -74,36 +72,14 @@ public class EventInfoService {
                 .build();
     }
 
-    public void writeDriveHistoryRequestAfterOff(EventInfo offEventInfo) {
-        String url = deployDomain + "/api/v1/history/%d".formatted(offEventInfo.getId());
+    public void writeDriveHistoryRequestAfterOff(Long offEventInfoId) {
+        String url = deployDomain + "/api/v1/history/%d".formatted(offEventInfoId);
+        log.info("Request URL : {}, OffEventInfoId : {}", url, offEventInfoId);
         try {
-            log.info("Request URL : {}, OffEventInfoId : {}", url, offEventInfo.getId());
-            try {
-                restTemplate.postForEntity(url, null, Void.class);
-            } catch (Exception e) {
-                log.warn("히스토리 저장 API 실패, 메시지는 DLQ로 이동, OffEventInfoId : {}", offEventInfo.getId());
-            }
-            log.info("시동 OFF에 따른 운행일지 작성이 성공적으로 완료되었습니다. event ID : {}", offEventInfo.getId());
-        } catch (HttpClientErrorException e) {
-            Optional<ErrorResponse> errorResponse = ErrorResponse.parseHttpStatusCodeException(e);
-
-            if (errorResponse.isPresent()) {
-                ErrorResponse response = errorResponse.get();
-                if (response.errorReason() != null) {
-                    log.warn("운행일지 작성에 실패하였습니다. reason : {}", response.errorReason().reason());
-                } else {
-                    log.warn("운행일지 작성에 실패하였으나 reason 정보가 누락되었습니다. errorResponse: {}", response);
-                }
-                return;
-            }
-            log.warn("운행일지 작성과 요청 정보 파싱에 실패하였습니다. responseBody : {}", e.getResponseBodyAsString());
-        } catch (HttpServerErrorException e) {
-            log.error("서버 오류로 인해 운행일지 작성 요청에 실패하였습니다. event id : {}", offEventInfo.getId());
-        } catch (ResourceAccessException e) {
-            log.error("네트워크 오류로 인해 운행일지 작성 요청에 실패하였습니다. event id : {}, url : {}", offEventInfo.getId(), url);
-            //NOTE: 5XX 에러 (서버, 네트워크 등 오류시 재시도 여부 결정 필요)
+            restTemplate.postForEntity(url, null, Void.class);
+            log.info("시동 OFF에 따른 운행일지 작성이 성공적으로 완료되었습니다. event ID : {}", offEventInfoId);
         } catch (Exception e) {
-            // FIXME: 무한 요청 방지를 위한 임시 catch
+            log.error("운행일지 작성에 실패하였습니다. reason : {}", offEventInfoId);
         }
     }
 
