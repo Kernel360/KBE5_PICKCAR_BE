@@ -238,4 +238,8 @@ public class ReservationService {
             throw new ReservationException(ReservationErrorCode.DUE_DATE_OVER_MAXIMUM);
         }
     }
+
+    public Long getReservedVehiclesCount() {
+        return reservationRepository.countByStatusIn(List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+    }
 }

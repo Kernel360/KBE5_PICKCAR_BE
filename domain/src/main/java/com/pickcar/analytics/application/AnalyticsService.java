@@ -1,6 +1,7 @@
 package com.pickcar.analytics.application;
 
 import com.pickcar.analytics.presentation.dto.response.StaticAnalyticsResponse;
+import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.vehicle.application.VehicleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,11 +11,12 @@ import org.springframework.stereotype.Service;
 public class AnalyticsService {
 
     private final VehicleService vehicleService;
+    private final ReservationService reservationService;
 
     public StaticAnalyticsResponse getStaticAnalytics() {
 
         Long totalVehicleCount = vehicleService.getAllCount();
-
+        Long reservedVehiclesCount = reservationService.getReservedVehiclesCount();
 
     /* TODO:
             Integer totalVehicleCount,
@@ -24,7 +26,7 @@ public class AnalyticsService {
             Integer delayedCount
      */
 
-        return new StaticAnalyticsResponse(totalVehicleCount, null, null, null, null);
+        return new StaticAnalyticsResponse(totalVehicleCount, reservedVehiclesCount, null, null, null);
     }
 
 

@@ -31,4 +31,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT DISTINCT r.vehicleId FROM Reservation r WHERE r.status IN :statuses")
     List<Long> findVehicleIdsByStatusIn(@Param("statuses") List<ReservationStatus> statuses);
+
+    Long countByStatusIn(List<ReservationStatus> reservationstatuses);
 }
