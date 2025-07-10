@@ -33,4 +33,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Long> findVehicleIdsByStatusIn(@Param("statuses") List<ReservationStatus> statuses);
 
     Long countByStatusIn(List<ReservationStatus> reservationstatuses);
+    Long countByStatus(ReservationStatus reservationStatus);
+    Long countByStatusAndDueDateBetween(ReservationStatus reservationStatus, LocalDate from, LocalDate to);
 }
