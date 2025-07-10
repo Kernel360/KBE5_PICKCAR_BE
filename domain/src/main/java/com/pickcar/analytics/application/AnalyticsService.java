@@ -5,8 +5,8 @@ import com.pickcar.analytics.domain.StaticInfo;
 import com.pickcar.analytics.infrastructure.AnalyticsRepository;
 import com.pickcar.analytics.presentation.dto.response.StaticAnalyticsResponse;
 import com.pickcar.reservation.application.ReservationService;
-import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.vehicle.application.VehicleService;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -22,10 +22,10 @@ public class AnalyticsService {
 
     @Transactional
     public void save(StaticInfo staticInfo) {
-        analyticsRepository.save(new Analytics(staticInfo));
+        analyticsRepository.save(new Analytics(staticInfo, LocalDate.now()));
     }
 
-    private StaticInfo collectStaticInfos() {
+    public StaticInfo collectStaticInfos() {
         //FIXME: 각 서비스를 호출하며 JPA 조회를 하지 않고 JPA 없이 Analytics 레포지토리를 만들어서 context를 한 번에 조회하도록
         Long totalVehicleCount = vehicleService.getAllCount();
         Long reservedVehiclesCount = reservationService.getReservedVehiclesCount();
@@ -40,14 +40,7 @@ public class AnalyticsService {
                 delayedCount);
     }
 
-    @Scheduled(cron = "1 0 0 * * *")
-    public void collectInfos() {
-        StaticInfo staticInfo = collectStaticInfos();
-        collectNonStaticInfos();
-        save(staticInfo);
-    }
-
-    private void collectNonStaticInfos() {
+    public void collectNonStaticInfos() {
         //TODO: 정적 데이터 수집
     }
 
