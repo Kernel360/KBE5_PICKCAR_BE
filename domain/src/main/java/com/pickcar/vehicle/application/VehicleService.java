@@ -92,4 +92,8 @@ public class VehicleService {
     public Long getIdByUserIdFromReservation(Long userId) {
         return vehicleRepository.findVehicleIdByUserId(userId);
     }
+
+    public Long getAllCount() {
+        return vehicleRepository.count();
+    }
 }
