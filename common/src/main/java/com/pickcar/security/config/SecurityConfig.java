@@ -55,8 +55,9 @@ public class SecurityConfig {
 //                                "/api/v1/auth/employees"
 //                        ).hasRole("SUPER_ADMIN")
 //                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/").permitAll()
+//                        .requestMatchers("/**").permitAll()
 //                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .build();
     }

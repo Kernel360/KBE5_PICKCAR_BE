@@ -55,11 +55,7 @@ public class AuthController {
         String refreshToken = TokenUtils.extractRefreshTokenFromCookie(request);
 
         if (refreshToken != null && !refreshToken.isBlank()) {
-            try {
-                tokenService.deleteByToken(refreshToken);
-            } catch (Exception e) {
-                log.warn("로그아웃 중 RT 삭제 실패: {}", e.getMessage());
-            }
+            tokenService.deleteByToken(refreshToken);
         }
 
         TokenUtils.setRefreshTokenCookie(response,null);

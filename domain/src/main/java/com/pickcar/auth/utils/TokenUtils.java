@@ -9,9 +9,9 @@ public class TokenUtils {
 
     public static void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setPath("/api/v1/token/refresh");
+        cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setAttribute("SameSite", "Strict");
+//        cookie.setAttribute("SameSite", "Strict"); //TODO: 환경변수 설정
 //        cookie.setDomain("pickcar.online");
 //        cookie.setSecure(true); // 운영 환경에서는 주석 해제 필요 //TODO: 환경변수 설정
 
@@ -25,14 +25,13 @@ public class TokenUtils {
 
     public static String extractRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies == null) return null;
-
-        for (Cookie cookie : cookies) {
-            if ("refreshToken".equals(cookie.getName())) {
-                return cookie.getValue();
+        if (cookies != null){
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
             }
         }
-
-        return null; // 쿠키에 refreshToken이 없으면 null 반환
+        return null;
     }
 }

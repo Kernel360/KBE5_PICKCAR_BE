@@ -52,7 +52,11 @@ public class TokenService {
 
     @Transactional
     public void deleteByToken(String token){
-        refreshTokenRepository.deleteByToken(token);
+        try {
+            refreshTokenRepository.deleteByToken(token);
+        } catch (Exception e) {
+            log.warn("로그아웃 중 refreshToken 삭제 실패: {}", e.getMessage());
+        }
     }
 
     public void saveOrUpdateRefreshToken(Long userId,String refreshToken){
