@@ -1,6 +1,7 @@
 package com.pickcar.analytics.presentation;
 
 import com.pickcar.analytics.application.AnalyticsService;
+import com.pickcar.analytics.domain.Analytics;
 import com.pickcar.analytics.presentation.dto.response.StaticAnalyticsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ public class AnalyticsApiController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public StaticAnalyticsResponse getAnalytics() {
+    public Analytics getAnalytics() {
         return analyticsService.getStaticAnalytics();
     }
 }
