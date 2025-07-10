@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/history/**",
             "/api/v1/cycle/**",
             "/api/v1/event/**",
+            "/api/v1/sse/**",
             "/api/v1/token/refresh"
     );
 
