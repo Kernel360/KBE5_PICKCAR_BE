@@ -2,6 +2,7 @@ package com.pickcar.drivehistory.infrastructure;
 
 import com.pickcar.drivehistory.domain.DriveHistory;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,6 @@ public interface DriveHistoryRepository extends JpaRepository<DriveHistory, Long
             """)
     Page<DriveHistory> findAllFilteredListByDriverNameAndDuration(String driverName, LocalDateTime from,
                                                                   LocalDateTime to, Pageable pageable);
+
+    List<DriveHistory> findAllByDrivingEndedAtBetween(LocalDateTime from, LocalDateTime to);
 }

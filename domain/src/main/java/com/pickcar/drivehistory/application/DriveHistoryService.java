@@ -115,4 +115,12 @@ public class DriveHistoryService {
 
         return DriveHistoryDetailResponse.of(history, reservationContext, pathContexts);
     }
+
+    //FIXME: DriveHistory 객체 반환이 아닌 진짜 사용할 내용으로만 적절한 context 개념으로 반환 필요
+    public List<DriveHistory> getAllByDate(LocalDate localDate) {
+        LocalDateTime from = localDate.atStartOfDay();
+        LocalDateTime to = localDate.atTime(23, 59, 59);
+
+        return driveHistoryRepository.findAllByDrivingEndedAtBetween(from, to);
+    }
 }
