@@ -17,7 +17,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "com.pickcar.reservation.domain",
         "com.pickcar.vehicle.domain",
         "com.pickcar.emulator.domain",
-        "com.pickcar.analytics.domain"
+        "com.pickcar.dailyreport.domain"
 })
 @ComponentScan(basePackages = {"com.pickcar", "com.pickcar.security"})
 @EnableJpaAuditing

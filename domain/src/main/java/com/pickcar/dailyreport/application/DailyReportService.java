@@ -1,28 +1,26 @@
-package com.pickcar.analytics.application;
+package com.pickcar.dailyreport.application;
 
-import com.pickcar.analytics.domain.Analytics;
-import com.pickcar.analytics.domain.StaticInfo;
-import com.pickcar.analytics.infrastructure.AnalyticsRepository;
-import com.pickcar.analytics.presentation.dto.response.StaticAnalyticsResponse;
+import com.pickcar.dailyreport.domain.DailyReport;
+import com.pickcar.dailyreport.domain.StaticInfo;
+import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.vehicle.application.VehicleService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class AnalyticsService {
+public class DailyReportService {
 
     private final VehicleService vehicleService;
     private final ReservationService reservationService;
-    private final AnalyticsRepository analyticsRepository;
+    private final DailyReportRepository dailyReportRepository;
 
     @Transactional
     public void save(StaticInfo staticInfo) {
-        analyticsRepository.save(new Analytics(staticInfo, LocalDate.now()));
+        dailyReportRepository.save(new DailyReport(LocalDate.now(), staticInfo));
     }
 
     public StaticInfo collectStaticInfos() {
@@ -44,8 +42,8 @@ public class AnalyticsService {
         //TODO: 정적 데이터 수집
     }
 
-    public StaticAnalyticsResponse getStaticAnalytics(Long vehicleId) {
-        return null;
+    public void getStaticAnalytics(Long vehicleId) {
+        return;
     }
 
 }

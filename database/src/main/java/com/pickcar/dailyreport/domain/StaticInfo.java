@@ -1,4 +1,4 @@
-package com.pickcar.analytics.domain;
+package com.pickcar.dailyreport.domain;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

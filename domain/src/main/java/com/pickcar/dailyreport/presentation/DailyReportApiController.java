@@ -1,8 +1,7 @@
-package com.pickcar.analytics.presentation;
+package com.pickcar.dailyreport.presentation;
 
-import com.pickcar.analytics.application.AnalyticsService;
-import com.pickcar.analytics.domain.Analytics;
-import com.pickcar.analytics.presentation.dto.response.StaticAnalyticsResponse;
+import com.pickcar.dailyreport.application.DailyReportService;
+import com.pickcar.dailyreport.domain.DailyReport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/analytics")
 @RequiredArgsConstructor
-public class AnalyticsApiController {
+public class DailyReportApiController {
 
-    private final AnalyticsService analyticsService;
+    private final DailyReportService dailyReportService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Analytics getAnalytics() {
-        return analyticsService.getStaticAnalytics();
+    public void getAnalytics() {
+//        return dailyReportService.getStaticAnalytics(0L);
     }
 }
