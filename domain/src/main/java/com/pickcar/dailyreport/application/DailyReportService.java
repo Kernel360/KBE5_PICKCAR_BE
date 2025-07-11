@@ -3,13 +3,16 @@ package com.pickcar.dailyreport.application;
 import com.pickcar.dailyreport.domain.DailyReport;
 import com.pickcar.dailyreport.domain.StaticInfo;
 import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
+import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.vehicle.application.VehicleService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DailyReportService {
@@ -44,6 +47,20 @@ public class DailyReportService {
 
     public void getStaticAnalytics(Long vehicleId) {
         return;
+    }
+
+    public void saveDummy(GenerateDummyReportRequest request) {
+
+//        LocalDate reportDate,
+//        Long totalVehicleCount,
+//        Long reservedVehicleCount,
+//        Long notOperableVehicleCount,
+//        Long expectedReturnCount,
+//        Long delayedCount
+
+        log.info(request.staticInfo().getDelayedCount().toString());
+
+        dailyReportRepository.save(new DailyReport(request.reportDate(), request.staticInfo()));
     }
 
 }

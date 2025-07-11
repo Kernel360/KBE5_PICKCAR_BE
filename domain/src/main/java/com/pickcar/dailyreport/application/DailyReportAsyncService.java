@@ -17,5 +17,4 @@ public class DailyReportAsyncService {
         dailyReportService.collectNonStaticInfos();           // TODO: 기능 구현 필요
         dailyReportService.save(staticInfo);
     }
-
 }
