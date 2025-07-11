@@ -94,7 +94,7 @@ public class ReservationService {
         List<Long> allocatedVehicleIds = reservationRepository.findVehicleIdsByStatusIn(
                 List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
-        List<UnAllocatedEmployeeResponse> employeeInfos = userService.getUnAllocatedEmployeeInfos(allocatedUserIds);
+        List<UnAllocatedEmployeeResponse> employeeInfos = authService.getUnAllocatedEmployeeInfos(allocatedUserIds);
         List<UnAllocatedVehicleResponse> vehicleInfos = vehicleService.getAllUnAllocatedVehicleInfos(allocatedVehicleIds);
 
         return new ReservationPreInfoResponse(employeeInfos, vehicleInfos);
