@@ -10,6 +10,7 @@ spring:
 custom:
   reservation:
     cool-down-minutes: 30
+    maximum-due-date: 60
   driveHistory:
     maximum-inquiry-days: 30
 

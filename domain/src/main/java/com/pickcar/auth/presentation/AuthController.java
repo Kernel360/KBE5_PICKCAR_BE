@@ -1,17 +1,21 @@
 package com.pickcar.auth.presentation;
 
 import com.pickcar.auth.application.AuthService;
+import com.pickcar.auth.application.TokenService;
 import com.pickcar.auth.presentation.dto.request.AuthRequest;
+import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
 import com.pickcar.auth.presentation.dto.response.AccessTokenResponse;
 import com.pickcar.auth.presentation.dto.response.AuthResponse;
-import com.pickcar.security.jwt.JwtConstants;
-import jakarta.servlet.http.Cookie;
+import com.pickcar.auth.presentation.dto.response.EmployeeListResponse;
+import com.pickcar.auth.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -20,74 +24,40 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenService tokenService;
+
+    @PostMapping("/sign-up")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void register(@RequestBody UserInfoRequest request) {
+        authService.create(request);
+    }
+
+    @GetMapping("/employees")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EmployeeListResponse> getEmployees() {
+        List<EmployeeListResponse> responses = authService.getAllEmployees();
+        return responses;
+    }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public AccessTokenResponse login(@RequestBody AuthRequest request, HttpServletResponse response) {
         log.info("User login request received");
         AuthResponse authResponse = authService.login(request.email(), request.password());
-        setRefreshTokenCookie(response, authResponse.refreshToken());
-        setAccessTokenCookie(response, authResponse.accessToken());
+        TokenUtils.setRefreshTokenCookie(response, authResponse.refreshToken());
         return new AccessTokenResponse(authResponse.accessToken());
-    } //TODO: 로그인 실패 예외처리 추가
-
-
+    }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         log.info("User logout request received");
-        String refreshToken = extractRefreshTokenFromCookie(request);
+        String refreshToken = TokenUtils.extractRefreshTokenFromCookie(request);
 
         if (refreshToken != null && !refreshToken.isBlank()) {
-            try {
-                authService.deleteByToken(refreshToken);
-            } catch (Exception e) {
-                log.warn("로그아웃 중 RT 삭제 실패: {}", e.getMessage());
-            }
+            tokenService.deleteByToken(refreshToken);
         }
 
-        setRefreshTokenCookie(response,null);
-    }
-
-    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) { //TODO: 자주 사용되서 Util로 빼기
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        if (refreshToken == null) {
-            cookie.setMaxAge(0); // 삭제
-        } else {
-            cookie.setMaxAge((int) (JwtConstants.REFRESH_TOKEN_VALIDITY / 1000));
-//        cookie.setSecure(true); // HTTPS 환경에서만 쿠키가 전송되도록
-        }
-        response.addCookie(cookie);
-    }
-
-    private void setAccessTokenCookie(HttpServletResponse response, String accessToken) { //TODO: 자주 사용되서 Util로 빼기
-        Cookie cookie = new Cookie("accessToken", accessToken);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        if (accessToken == null) {
-            cookie.setMaxAge(0); // 삭제
-        } else {
-            cookie.setMaxAge((int) (JwtConstants.REFRESH_TOKEN_VALIDITY / 1000));
-//        cookie.setSecure(true); // HTTPS 환경에서만 쿠키가 전송되도록
-        }
-        response.addCookie(cookie);
-    }
-
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) { //TODO: 자주 사용되서 Util로 빼기
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) return null;
-
-        for (Cookie cookie : cookies) {
-            if ("refreshToken".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-
-        return null; // 쿠키에 refreshToken이 없으면 null 반환
+        TokenUtils.setRefreshTokenCookie(response,null);
     }
 }

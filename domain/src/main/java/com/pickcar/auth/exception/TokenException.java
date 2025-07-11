@@ -2,8 +2,9 @@ package com.pickcar.auth.exception;
 
 import com.pickcar.exception.GlobalException;
 
-public class UserException extends GlobalException {
-  public UserException(UserErrorCode errorCode) {
+public class TokenException extends GlobalException {
+  public TokenException(TokenErrorCode errorCode) {
     super(errorCode);
   }
 }
+

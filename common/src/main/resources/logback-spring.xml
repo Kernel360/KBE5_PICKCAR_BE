@@ -9,11 +9,14 @@
             <Pattern>
                 ${CONSOLE_LOG_PATTERN_COLOR}
             </Pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
     <appender name="AUTH_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <charset>UTF-8</charset>
+        </encoder>
         <file>${LOG_PATH}/${AUTH_LOG_FILE_NAME}.log</file>
 
         <!-- 회원 기능은 시간 기준 롤링 -->
@@ -25,7 +28,9 @@
     </appender>
 
     <appender name="PICKCAR_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <charset>UTF-8</charset>
+        </encoder>
         <file>${LOG_PATH}/${PICKCAR_LOG_FILE_NAME}.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -38,7 +43,9 @@
 
     <!-- 프로젝트 전체적인 에러 추적용 appender -->
     <appender name="ERROR_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <charset>UTF-8</charset>
+        </encoder>
         <file>${LOG_PATH}/${ERROR_LOG_FILE_NAME}.log</file>
 
         <!-- 로깅 레벨 필터를 통해 WARN, ERROR만 기록함 -->

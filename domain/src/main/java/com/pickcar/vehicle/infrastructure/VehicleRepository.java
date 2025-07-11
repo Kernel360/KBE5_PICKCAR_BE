@@ -15,4 +15,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     // TODO : 단수만 처리하도록 고려
     @Query("SELECT r.vehicleId FROM Reservation r WHERE r.userId = :id AND r.status = 'RESERVED' ")
     Long findVehicleIdByUserId(@Param("id") Long userId);
+
+    List<Vehicle> findAllByIdNotInAndStatus(List<Long> allocatedVehicleIds, VehicleStatus status);
 }

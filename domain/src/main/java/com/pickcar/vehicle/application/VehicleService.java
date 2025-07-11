@@ -8,6 +8,7 @@ import com.pickcar.vehicle.exception.VehicleException;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
 import com.pickcar.vehicle.presentation.dto.request.ChangeVehicleStatusRequest;
 import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
+import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
 import com.pickcar.vehicle.presentation.dto.response.VehicleListResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -76,8 +77,15 @@ public class VehicleService {
         return vehicleRepository.findAllById(vehicleIds);
     }
 
-    public List<Long> getAllByStatus(VehicleStatus status) {
-        return vehicleRepository.findAllIdsByStatus(status);
+    public List<UnAllocatedVehicleResponse> getAllUnAllocatedVehicleInfos(List<Long> allocatedVehicleIds) {
+        List<Vehicle> unAllocatedVehicles = vehicleRepository.findAllByIdNotInAndStatus(allocatedVehicleIds, VehicleStatus.OPERABLE);
+        List<UnAllocatedVehicleResponse> responses = new ArrayList<>();
+
+        unAllocatedVehicles.forEach(vehicle -> {
+            responses.add(UnAllocatedVehicleResponse.from(vehicle));
+        });
+
+        return responses;
     }
 
     // TODO : 보안처리
