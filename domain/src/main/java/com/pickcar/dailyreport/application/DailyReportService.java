@@ -13,13 +13,21 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DailyReportService {
+
+    @Value("${kakao.map.rest-api-key}")
+    private String kakaoMapSecretKey;
 
     private final VehicleService vehicleService;
     private final ReservationService reservationService;
@@ -74,6 +82,9 @@ public class DailyReportService {
         //어제자 기준 가장 이요량이 많은 사원 TOP3 + 총 이동 거리
         List<Top3DriverDistanceContext> yesterdayTop3MovementContext = getYesterdayTop3MovementContext();
 
+        //전일 기준 지역별 차량 분포 (reverse geocoding)
+        reverseGeoCoding(123.123D, 37.123D);
+
         log.info("Total moved distance: {}", movedDistance);
         log.info("yesterdayTop3MovementContext: {}", yesterdayTop3MovementContext);
     }
@@ -83,7 +94,7 @@ public class DailyReportService {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         List<DriveHistory> yesterdayHistory = driveHistoryService.getAllByDate(yesterday);
 
-        for(DriveHistory history : yesterdayHistory) {
+        for (DriveHistory history : yesterdayHistory) {
             movedDistance += history.getTotalDistance();
         }
 
@@ -93,6 +104,25 @@ public class DailyReportService {
     private List<Top3DriverDistanceContext> getYesterdayTop3MovementContext() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         return driveHistoryService.getTop3MovementInfo(yesterday);
+    }
+
+    private void reverseGeoCoding(Double lat, Double lon) {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        String apiUrl = "https://dapi.kakao.com/v2/local/geo/coord2regioncode?x=%f&y=%f".formatted(lat, lon);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakaoMapSecretKey);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            Object response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, Object.class);
+            log.info("response : {} ", response);
+        } catch (Exception e) {
+            log.warn("카카오 API 호출 오류", e);
+        }
     }
 
 }

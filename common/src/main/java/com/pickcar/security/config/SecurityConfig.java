@@ -55,6 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOriginPattern(allowedOrigins);
+        configuration.addAllowedOriginPattern("https://dapi.kakao.com");        // NOTE: KAKAO MAP API
         configuration.setAllowedMethods(
                 Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
         );
