@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,9 +29,20 @@ public class Reservation extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime rentedAt;
 
+    private LocalDate dueDate;
+
     private LocalDateTime returnedAt;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    public void submitReturn() {
+        this.status = ReservationStatus.RETURNED;
+        this.returnedAt = LocalDateTime.now();
+    }
+
+    public void changeToDelayed() {
+        this.status = ReservationStatus.DELAYED;
+    }
 }

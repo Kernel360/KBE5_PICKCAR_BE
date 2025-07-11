@@ -7,6 +7,7 @@ import com.pickcar.auth.infrastructure.UserRepository;
 import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
 import com.pickcar.auth.presentation.dto.response.AuthResponse;
 import com.pickcar.auth.presentation.dto.response.EmployeeListResponse;
+import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
 import com.pickcar.security.jwt.JwtProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -93,5 +94,17 @@ public class AuthService {
                 request.phoneNumber()
         );
     }
+
+    public List<UnAllocatedEmployeeResponse> getUnAllocatedEmployeeInfos(List<Long> allocatedUserIds) {
+        List<User> unAllocatedUsers = userRepository.findAllByIdNotIn(allocatedUserIds);
+        List<UnAllocatedEmployeeResponse> responses = new ArrayList<>();
+
+        unAllocatedUsers.forEach(user -> {
+            responses.add(UnAllocatedEmployeeResponse.from(user));
+        });
+
+        return responses;
+    }
+
 }
 

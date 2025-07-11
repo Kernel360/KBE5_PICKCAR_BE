@@ -3,7 +3,6 @@ package com.pickcar.application;
 import com.pickcar.constants.GlobalStatic.MDCConstants;
 import com.pickcar.dto.EventPayload;
 import com.pickcar.dto.EventStatus;
-import com.pickcar.log.util.MDCContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -26,7 +25,8 @@ public class EventMessageListener {
     private final EventInfoService eventInfoService;
 
     @RabbitListener(queues = "${mq.event.queue}")
-    public void eventMessage(EventPayload eventPayload, @Header(MDCConstants.TRACE_ID_HEADER_KEY) String traceId) {
+    public void eventMessage(EventPayload eventPayload, @Header(MDCConstants.TRACE_ID_HEADER_KEY) String traceId,
+                             @Header(value = "Authorization", required = false) String accessToken) {
         MDC.put(MDCConstants.TRACE_ID_KEY, traceId);
         MDC.put(MDCConstants.MODULE_NAME_KEY, moduleName);
         MDC.put(MDCConstants.SERVICE_NAME_KEY, queueName);
@@ -40,7 +40,13 @@ public class EventMessageListener {
                 eventInfoService.off(eventPayload);
                 log.info("EventStatus OFF");
             } else if (EventStatus.RETURNED.equals(eventPayload.getEventStatus())) {
-                eventInfoService.returned(eventPayload);
+
+                if (accessToken == null) {
+                    //FIXME: 단순 로그 말고 예외처리로
+                    log.warn("반납 요청을 했지만 액세스 토큰이 없어 작업을 진행할 수 없습니다.");
+                    return;
+                }
+                eventInfoService.returned(eventPayload, accessToken);
                 log.info("EventStatus RETURNED");
             }
         } catch (Exception e) {

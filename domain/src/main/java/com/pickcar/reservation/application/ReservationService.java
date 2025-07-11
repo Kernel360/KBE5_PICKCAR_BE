@@ -3,6 +3,7 @@ package com.pickcar.reservation.application;
 import com.pickcar.auth.application.AuthService;
 import com.pickcar.auth.domain.User;
 import com.pickcar.auth.domain.UserInfo;
+import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
@@ -10,11 +11,16 @@ import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
+import com.pickcar.security.jwt.JwtProvider;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
+import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -34,35 +40,75 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
 
     @Value(value = "${custom.reservation.cool-down-minutes}")
-    private Long coolDownMinutes;
+    private Integer coolDownMinutes;
+
+    @Value(value = "${custom.reservation.maximum-due-date}")
+    private Integer maximumDueDate;
 
     private final AuthService authService;
     private final VehicleService vehicleService;
+    private final JwtProvider jwtProvider;
     private final ReservationRepository reservationRepository;
 
     @Transactional
     public void reservation(ReservationRequest request) {
 
+        //FIXME: 권한 분리 및 유효성검사 통합 메서드 필요
         //이미 할당된 차량이 있는 회원에 대해
-        if(hasAlreadyReservation(request.employeeId())) {
+        if (hasAlreadyReservation(request.employeeId())) {
             throw new ReservationException(ReservationErrorCode.EMPLOYEE_ALREADY_RESERVED);
         }
 
         //이미 할당처리가 된 차량에 대해
-        if(isAlreadyReserved(request.vehicleId())) {
+        if (isAlreadyReserved(request.vehicleId())) {
             throw new ReservationException(ReservationErrorCode.VEHICLE_ALREADY_RESERVED);
         }
 
-        //TODO: 유효성 검사 필요
+        validateDueDate(request.dueDate());
+
         Reservation reservation = Reservation.builder()
                 .userId(request.employeeId())
                 .vehicleId(request.vehicleId())
                 .rentedAt(LocalDateTime.now())
-                .returnedAt(null)                        //FIXME: 반납 시기를 정하기 VS 반납 했을때를 기록하기
-                .status(ReservationStatus.RESERVED)     //FIXME: Default로 "예약" 상태로 생성?
+                .dueDate(request.dueDate())
+                .returnedAt(null)
+                .status(ReservationStatus.RESERVED)
                 .build();
 
         reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void submitReturn(HttpServletRequest servletRequest, Long vehicleId) {
+        Long userId = jwtProvider.extractUserId(servletRequest);
+        Reservation reservation = getReturnTarget(userId, vehicleId);
+        reservation.submitReturn();
+    }
+
+    public ReservationPreInfoResponse getReservationPreInfos() {
+        //FIXME: ID 리스트와 VEHICLE 리스트를 한 번에 가져오도록.
+        // 여기에 더해 사실장 이 response를 한 번에 가져올 수 있도록 변경 필요
+        List<Long> allocatedUserIds = reservationRepository.findUserIdsByStatusIn(
+                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+
+        List<Long> allocatedVehicleIds = reservationRepository.findVehicleIdsByStatusIn(
+                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+
+        List<UnAllocatedEmployeeResponse> employeeInfos = authService.getUnAllocatedEmployeeInfos(allocatedUserIds);
+        List<UnAllocatedVehicleResponse> vehicleInfos = vehicleService.getAllUnAllocatedVehicleInfos(allocatedVehicleIds);
+
+        return new ReservationPreInfoResponse(employeeInfos, vehicleInfos);
+    }
+
+    private Reservation getReturnTarget(Long userId, Long vehicleId) {
+        Optional<Reservation> maybeReservation = reservationRepository.findByUserIdAndVehicleIdAndStatusIn(userId,
+                vehicleId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+
+        if (maybeReservation.isEmpty()) {
+            throw new ReservationException(ReservationErrorCode.UNAUTHORIZED_FOR_RETURN);
+        }
+
+        return maybeReservation.get();
     }
 
     public Reservation getById(Long id) {
@@ -191,5 +237,15 @@ public class ReservationService {
 
     private boolean hasAlreadyReservation(Long employeeId) {
         return reservationRepository.findByUserIdAndStatus(employeeId, ReservationStatus.RESERVED).isPresent();
+    }
+
+    private void validateDueDate(LocalDate dueDate) {
+        if (dueDate.isBefore(LocalDate.now())) {
+            throw new ReservationException(ReservationErrorCode.DUE_DATE_CANNOT_BE_FUTURE);
+        }
+
+        if (dueDate.isAfter(LocalDate.now().plusDays(maximumDueDate))) {
+            throw new ReservationException(ReservationErrorCode.DUE_DATE_OVER_MAXIMUM);
+        }
     }
 }

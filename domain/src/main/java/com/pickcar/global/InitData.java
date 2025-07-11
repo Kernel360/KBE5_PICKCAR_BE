@@ -8,7 +8,6 @@ import com.pickcar.auth.infrastructure.UserRepository;
 import com.pickcar.company.domain.Company;
 import com.pickcar.company.domain.ContractStatus;
 import com.pickcar.company.infrastructure.CompanyRepository;
-import com.pickcar.drivehistory.application.DriveHistoryService;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.reservation.domain.Reservation;
@@ -19,14 +18,15 @@ import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -40,6 +40,7 @@ public class InitData implements CommandLineRunner {
     private final VehicleRepository vehicleRepository;
     private final ReservationRepository reservationRepository;
     private final DriveHistoryRepository driveHistoryRepository;
+    private final PasswordEncoder  passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -75,7 +76,7 @@ public class InitData implements CommandLineRunner {
                         .limit(5L)
                         .mapToObj(i -> new User(
                                 i,
-                                new UserInfo("user" + i + "@kernel.com", "1234" + i, "user" + i, "0101234567" + i),
+                                new UserInfo("user" + i + "@kernel.com", passwordEncoder.encode("1234"), "user" + i, "0101234567" + i),
                                 UserRole.EMPLOYEE,
                                 UserStatus.ACTIVE
                         ))
@@ -104,6 +105,7 @@ public class InitData implements CommandLineRunner {
                                 i,
                                 i,
                                 LocalDateTime.now(),
+                                LocalDate.now().plusDays(50),
                                 null,
                                 ReservationStatus.RESERVED
                         )).toList());

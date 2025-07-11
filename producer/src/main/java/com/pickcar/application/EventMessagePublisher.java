@@ -1,9 +1,10 @@
 package com.pickcar.application;
 
 import com.pickcar.dto.EventPayload;
+import com.pickcar.security.jwt.JwtProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EventMessagePublisher {
 
+    private final JwtProvider jwtProvider;
     private final RabbitTemplate rabbitTemplate;
 
     @Value("${mq.event.exchange}")
@@ -28,9 +30,15 @@ public class EventMessagePublisher {
         return new DirectExchange(exchange);
     }
 
-    public void publish(EventPayload eventPayload) {
+    public void publish(EventPayload eventPayload, HttpServletRequest request) {
+        String accessToken = request.getHeader("Authorization");
         try {
-            rabbitTemplate.convertAndSend(exchange, routingKey, eventPayload);
+            rabbitTemplate.convertAndSend(exchange, routingKey, eventPayload, msg -> {
+                if(accessToken != null) {
+                    msg.getMessageProperties().setHeader("Authorization", accessToken);
+                }
+                return msg;
+            });
             log.info("MQ 전송 성공: exchange={}, routingKey={}, payload={}", exchange, routingKey, eventPayload);
         } catch (Exception e) {
             log.error("MQ 전송 실패: exchange={}, routingKey={}, payload={}", exchange, routingKey, eventPayload);

@@ -1,7 +1,10 @@
 package com.pickcar.reservation.presentation.dto.request;
 
+import java.time.LocalDate;
+
 public record ReservationRequest(
         Long employeeId,
-        Long vehicleId
+        Long vehicleId,
+        LocalDate dueDate
 ) {
 }
