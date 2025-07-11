@@ -25,9 +25,17 @@ public class TokenController {
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.OK)
     public AccessTokenResponse reissueRefreshToken(HttpServletRequest request, HttpServletResponse response){
-        log.info("Issued new AccessToken for refreshToken");
-        String refreshToken = TokenUtils.extractRefreshTokenFromCookie(request);
-        AuthResponse authResponse = tokenService.reissueTokens(refreshToken);
+        String refreshToken = request.getAttribute("refreshToken").toString();
+        AuthResponse authResponse = tokenService.reissueTokens(refreshToken,false);
+        TokenUtils.setRefreshTokenCookie(response, authResponse.refreshToken());
+        return new AccessTokenResponse(authResponse.accessToken());
+    }
+
+    @PostMapping("/refresh-expired")
+    @ResponseStatus(HttpStatus.OK)
+    public AccessTokenResponse reissueRefreshTokenExpired(HttpServletRequest request, HttpServletResponse response){
+        String refreshToken = request.getAttribute("refreshToken").toString();
+        AuthResponse authResponse = tokenService.reissueTokens(refreshToken,true);
         TokenUtils.setRefreshTokenCookie(response, authResponse.refreshToken());
         return new AccessTokenResponse(authResponse.accessToken());
     }

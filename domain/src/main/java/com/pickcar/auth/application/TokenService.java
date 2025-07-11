@@ -2,6 +2,8 @@ package com.pickcar.auth.application;
 
 import com.pickcar.auth.domain.RefreshToken;
 import com.pickcar.auth.domain.User;
+import com.pickcar.auth.exception.AuthErrorCode;
+import com.pickcar.auth.exception.AuthException;
 import com.pickcar.auth.exception.TokenErrorCode;
 import com.pickcar.auth.exception.TokenException;
 import com.pickcar.auth.infrastructure.RefreshTokenRepository;
@@ -27,26 +29,42 @@ public class TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public AuthResponse reissueTokens(String refreshToken){
+    public AuthResponse reissueTokens(String refreshToken, boolean isExpired){
         //TODO : 변수명, 예외처리 수정하기
+        //TODO: 일치하는 토큰 없으면 재로그인 요청(프론트)
         RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(() -> new IllegalArgumentException("token이 없음"));
+                .orElseThrow(() -> {
+                    //TODO: 쿠키에서 rt 삭제 필요
+                    throw new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND);
+                });
 
-        if(token.isExpired()){ //TODO: 없는 경우 예외처리 수정하기
-            throw new IllegalStateException("Refresh token has expired.");
-        }
-
+        //TODO: 유저가 존재하지 않으면 RT 삭제 / 에러 메세지 출력(프론트)
         User user = userRepository.findById(token.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                .orElseThrow(() -> {
+                    deleteByToken(refreshToken);
+                    return new AuthException(AuthErrorCode.USER_NOT_FOUND);
+                });
 
-        String newAccessToken = jwtProvider.createAccessToken(
-                user.getId(),
-                user.getInfo().getName(),
-                user.getRole().name()
-        );
+        String newAccessToken = "";
+        if(isExpired){
+            log.info("만료된 토큰 발급");
+            newAccessToken = jwtProvider.createExpiredAccessToken(
+                    user.getId(),
+                    user.getInfo().getName(),
+                    user.getRole().name()
+            );
+        }else {
+            log.info("정상 토큰 발급");
+            newAccessToken = jwtProvider.createAccessToken(
+                    user.getId(),
+                    user.getInfo().getName(),
+                    user.getRole().name()
+            );
+        }
 
         String newRefreshToken = jwtProvider.createRefreshToken(user.getId());
         saveOrUpdateRefreshToken(user.getId(), newRefreshToken);
+        log.info("newAccessToken: {}", newAccessToken);
         return new AuthResponse(newAccessToken, newRefreshToken);
     }
 
@@ -55,7 +73,7 @@ public class TokenService {
         try {
             refreshTokenRepository.deleteByToken(token);
         } catch (Exception e) {
-            log.warn("로그아웃 중 refreshToken 삭제 실패: {}", e.getMessage());
+            log.warn("refreshToken 삭제 실패: {}", e.getMessage());
         }
     }
 
