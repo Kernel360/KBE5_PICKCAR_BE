@@ -6,10 +6,10 @@ import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
 import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
 import com.pickcar.drivehistory.application.DriveHistoryService;
 import com.pickcar.drivehistory.domain.DriveHistory;
+import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.vehicle.application.VehicleService;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +71,11 @@ public class DailyReportService {
         //어제자 총 운행 km 수
         Double movedDistance = calcTotalMovedDistance();
 
+        //어제자 기준 가장 이요량이 많은 사원 TOP3 + 총 이동 거리
+        List<Top3DriverDistanceContext> yesterdayTop3MovementContext = getYesterdayTop3MovementContext();
+
         log.info("Total moved distance: {}", movedDistance);
+        log.info("yesterdayTop3MovementContext: {}", yesterdayTop3MovementContext);
     }
 
     private Double calcTotalMovedDistance() {
@@ -84,6 +88,11 @@ public class DailyReportService {
         }
 
         return movedDistance;
+    }
+
+    private List<Top3DriverDistanceContext> getYesterdayTop3MovementContext() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        return driveHistoryService.getTop3MovementInfo(yesterday);
     }
 
 }

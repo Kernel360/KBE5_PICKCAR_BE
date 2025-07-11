@@ -4,6 +4,7 @@ import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
 import com.pickcar.drivehistory.exception.DriveHistoryException;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
+import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
@@ -84,7 +85,7 @@ public class DriveHistoryService {
         LocalDate today = LocalDate.now();
         LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
 
-        if(from.isAfter(to)) {
+        if (from.isAfter(to)) {
             throw new DriveHistoryException(DriveHistoryErrorCode.FROM_DATE_CANT_BE_BEFORE_TO_DATE);
         }
 
@@ -109,9 +110,11 @@ public class DriveHistoryService {
 
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {
         DriveHistory history = getById(historyId);
-        ReservationContext reservationContext = reservationService.getReservationContextById(history.getReservationId());
+        ReservationContext reservationContext = reservationService.getReservationContextById(
+                history.getReservationId());
         //FIXME: path를 가져올 수 있는 다른 방법 필요
-        List<PathContext> pathContexts = cycleQueryService.getPathsByReservationAndHistory(reservationContext.reservation(), history);
+        List<PathContext> pathContexts = cycleQueryService.getPathsByReservationAndHistory(
+                reservationContext.reservation(), history);
 
         return DriveHistoryDetailResponse.of(history, reservationContext, pathContexts);
     }
@@ -122,5 +125,9 @@ public class DriveHistoryService {
         LocalDateTime to = localDate.atTime(23, 59, 59);
 
         return driveHistoryRepository.findAllByDrivingEndedAtBetween(from, to);
+    }
+
+    public List<Top3DriverDistanceContext> getTop3MovementInfo(LocalDate yesetday) {
+        return driveHistoryRepository.findTop3EmployeeNameAndTotalDistance(yesetday);
     }
 }
