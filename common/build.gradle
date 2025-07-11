@@ -1,37 +1,32 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management' version '1.1.7'
-}
-
-group = 'com'
-version = '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
-
-    implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
-    implementation 'io.micrometer:micrometer-tracing:1.5.1'
-    implementation 'io.micrometer:micrometer-tracing-bridge-brave:1.5.1'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.data:spring-data-commons:3.5.0'
-}
-
-bootJar {
-    enabled = false
+    id 'java-library'
 }
 
 jar {
     enabled = true
 }
 
-test {
-    useJUnitPlatform()
+dependencies {
+    // 웹 기본
+    api 'org.springframework.boot:spring-boot-starter-web'
+
+    // 보안
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api "io.jsonwebtoken:jjwt-api:${rootProject.jwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${rootProject.jwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${rootProject.jwtVersion}"
+
+    api "org.springdoc:springdoc-openapi-starter-webmvc-ui:${rootProject.swaggerVersion}"
+
+    // 로깅 및 모니터링
+    api "net.logstash.logback:logstash-logback-encoder:${rootProject.logstashVersion}"
+    api 'io.micrometer:micrometer-tracing:1.5.1'
+    api 'io.micrometer:micrometer-tracing-bridge-brave:1.5.1'
+    api 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Spring Data Commons (Pageable 등)
+    api 'org.springframework.data:spring-data-commons'
+
+    // JPA 관련 (DTO에서 Entity 참조할 수 있도록) + api로 노출
+    api 'jakarta.persistence:jakarta.persistence-api'
 }

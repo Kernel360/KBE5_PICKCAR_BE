@@ -34,13 +34,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final List<String> EXCLUDE_URLS = List.of(
             "/api/v1/auth/**",
+            "/api/v1/history/**",
+            "/api/v1/cycle/**",
+            "/api/v1/event/**",
+            "/api/v1/sse/**",
             "/api/v1/token/refresh"
     );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         if (EXCLUDE_URLS.stream()
                 .map(patternParser::parse)
                 .anyMatch(pathPattern -> pathPattern.matches(PathContainer.parsePath(request.getRequestURI())))) {

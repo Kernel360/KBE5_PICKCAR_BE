@@ -9,8 +9,11 @@ import com.pickcar.auth.exception.UserException;
 import com.pickcar.auth.infrastructure.UserRepository;
 import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
 import com.pickcar.auth.presentation.dto.response.EmployeeListResponse;
+import com.pickcar.security.jwt.JwtProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +28,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     public User getById(Long id) {
         return userRepository.findById(id)
@@ -70,5 +74,13 @@ public class UserService {
         });
 
         return responses;
+    }
+
+    // TODO 보안처리 고려
+    public UserRole findUserRole(HttpServletRequest request) {
+        Long userId = jwtProvider.extractUserId(request);
+        return userRepository.findById(userId)
+                .map(User::getRole)
+                .orElseThrow(NoSuchElementException::new);
     }
 }

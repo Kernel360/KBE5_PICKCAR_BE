@@ -1,3 +1,6 @@
-custom:
-  logging:
-    moduleName: common
+spring:
+  application:
+    name: pickcar-common
+
+logging:
+  moduleName: common

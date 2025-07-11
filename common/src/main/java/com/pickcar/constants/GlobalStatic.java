@@ -1,6 +1,6 @@
 package com.pickcar.constants;
 
-public class GlobalStatic {
+public final class GlobalStatic {
 
     public static final String ERROR_PREFIX = "[ERROR] ";
 
@@ -37,5 +37,14 @@ public class GlobalStatic {
         public String getDescription() {
             return description;
         }
+    }
+
+    public static final class MDCConstants {
+        public static final String API_PREFIX = "/api/v1";
+        public static final String TRACE_ID_KEY = "traceId";
+        public static final String MODULE_NAME_KEY = "moduleName";
+        public static final String SERVICE_NAME_KEY = "service";
+        public static final String STATUS_CODE_KEY = "statusCode";
+        public static final String TRACE_ID_HEADER_KEY = "X-TraceId";
     }
 }

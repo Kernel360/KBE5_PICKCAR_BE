@@ -17,9 +17,11 @@ public class RabbitProducerConfig {
 
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
-                                         MessageConverter messageConverter) {
+                                         MessageConverter messageConverter,
+                                         MDCMessagePostProcessor mdcMessagePostProcessor) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter);
+        template.setBeforePublishPostProcessors(mdcMessagePostProcessor);
         return template;
     }
 }

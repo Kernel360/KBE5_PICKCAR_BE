@@ -1,5 +1,7 @@
 package com.pickcar.config;
 
+import com.pickcar.config.interceptor.TraceIdPropagationInterceptor;
+import com.pickcar.constants.GlobalStatic.MDCConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.context.annotation.Bean;
@@ -11,17 +13,9 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
+    public RestTemplate restTemplate(TraceIdPropagationInterceptor interceptor) {
         RestTemplate restTemplate = new RestTemplate();
-
-        restTemplate.getInterceptors().add((request, body, execution) -> {
-            String traceId = MDC.get("traceId");
-            if (traceId != null) {
-                request.getHeaders().add("X-TraceId", traceId);
-            }
-            return execution.execute(request, body);
-        });
-
+        restTemplate.getInterceptors().add(interceptor);
         return restTemplate;
     }
 }

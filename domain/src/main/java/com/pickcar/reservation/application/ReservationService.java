@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReservationService {
 
-    @Value(value = "${custom.reservation.coolDownMinutes}")
+    @Value(value = "${custom.reservation.cool-down-minutes}")
     private Long coolDownMinutes;
 
     private final UserService userService;
@@ -168,6 +168,16 @@ public class ReservationService {
     public List<SearchAbleVehiclesResponse> getAbleVehicles() {
         //운행 가능한 상태의 차면서 예약 상태가 아닌 것
         List<Vehicle> availableVehicles = reservationRepository.findAvailableVehicles(VehicleStatus.OPERABLE,
+                ReservationStatus.RESERVED);
+
+        return availableVehicles.stream()
+                .map(SearchAbleVehiclesResponse::from)
+                .toList();
+    }
+
+    public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
+        //운행 가능한 상태의 차면서 예약 상태인 것
+        List<Vehicle> availableVehicles = reservationRepository.findAssignedVehicles(VehicleStatus.OPERABLE,
                 ReservationStatus.RESERVED);
 
         return availableVehicles.stream()

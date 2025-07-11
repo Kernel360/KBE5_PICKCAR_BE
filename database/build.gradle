@@ -1,19 +1,19 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management' version '1.1.7'
-}
-
-dependencies {
-    implementation project(":common")
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-}
-
-bootJar {
-    enabled = false
+    id 'java-library'
 }
 
 jar {
     enabled = true
+}
+
+dependencies {
+    // api로 노출 (다른 모듈에서 Entity 사용)
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    api 'jakarta.persistence:jakarta.persistence-api'
+
+    // MySQL (database 모듈에서만 관리)
+    runtimeOnly "com.mysql:mysql-connector-j:${rootProject.mysqlVersion}"
+
+    // common 의존
+    implementation project(':common')
 }

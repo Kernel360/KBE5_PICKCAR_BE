@@ -21,6 +21,7 @@ import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import lombok.RequiredArgsConstructor;
@@ -42,11 +43,13 @@ public class InitData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        initDummyCompanies();
-        initDummyUsers();
-        initDummyVehicles();
-        initDummyReservations();
-        initDummyDriveHistories();
+        if(userRepository.findByInfoEmail("user1@kernel.com").isEmpty()) {
+            initDummyCompanies();
+            initDummyUsers();
+            initDummyVehicles();
+            initDummyReservations();
+            initDummyDriveHistories();
+        }
     }
 
     private void initDummyCompanies() {

@@ -1,7 +1,9 @@
 package com.pickcar.application;
 
+import com.pickcar.constants.GlobalStatic.MDCConstants;
 import com.pickcar.dto.EventPayload;
 import com.pickcar.dto.EventStatus;
+import com.pickcar.log.util.MDCContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -15,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EventMessageListener {
 
-    @Value("${custom.logging.moduleName}")
+    @Value("${logging.module-name}")
     private String moduleName;
 
     @Value("${mq.event.queue}")
@@ -24,10 +26,10 @@ public class EventMessageListener {
     private final EventInfoService eventInfoService;
 
     @RabbitListener(queues = "${mq.event.queue}")
-    public void eventMessage(EventPayload eventPayload, @Header("traceId") String traceId) {
-        MDC.put("traceId", traceId);
-        MDC.put("moduleName", moduleName);
-        MDC.put("service", queueName);
+    public void eventMessage(EventPayload eventPayload, @Header(MDCConstants.TRACE_ID_HEADER_KEY) String traceId) {
+        MDC.put(MDCConstants.TRACE_ID_KEY, traceId);
+        MDC.put(MDCConstants.MODULE_NAME_KEY, moduleName);
+        MDC.put(MDCConstants.SERVICE_NAME_KEY, queueName);
 
         log.info("RabbitMQ Listener received event: {}", eventPayload.toString());
         try {
@@ -43,7 +45,6 @@ public class EventMessageListener {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new RuntimeException(e.getMessage());
         } finally {
             MDC.clear();
         }

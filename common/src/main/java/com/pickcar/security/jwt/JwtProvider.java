@@ -13,7 +13,7 @@ import java.util.Optional;
 @Component
 public class JwtProvider { //FIX: JwtTokenProvider 로 변경하기
 
-    @Value(value = "${custom.jwt.secret}")
+    @Value(value = "${jwt.secret-key}")
     private String jwtSecretKey;
 
     //ACCESS_TOKEN 생성
@@ -74,16 +74,34 @@ public class JwtProvider { //FIX: JwtTokenProvider 로 변경하기
         );
     }
 
-    public Long extractUserId(HttpServletRequest servletRequest) {
-
-        for (Cookie cookie : servletRequest.getCookies()) {
-            if(cookie.getName().equals("accessToken")) {
-                String accessToken = cookie.getValue();
-                Jws<Claims> claimsJws = parseToken(accessToken);
-                return Long.valueOf(claimsJws.getBody().getSubject());
+    public Long extractUserId(HttpServletRequest request) {
+        try {
+            // 1. 쿠키에서 accessToken 우선 검색
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if (cookie.getName().equals("accessToken")) {
+                        String accessToken = cookie.getValue();
+                        return extractUserIdFromToken(accessToken);
+                    }
+                }
             }
-        }
 
-        throw new IllegalArgumentException("로그인 정보가 유효하지 않습니다");
+            // 2. Authorization 헤더에서 Bearer 토큰 검색
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                String token = header.substring(7); // "Bearer " 이후 자르기
+                return extractUserIdFromToken(token);
+            }
+
+            throw new IllegalArgumentException("인증 정보가 존재하지 않습니다");
+        } catch (Exception e) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다", e);
+        }
+    }
+
+    private Long extractUserIdFromToken(String token) {
+        Jws<Claims> claimsJws = parseToken(token);
+        return Long.valueOf(claimsJws.getBody().getSubject());
     }
 }
+
