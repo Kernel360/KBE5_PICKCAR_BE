@@ -115,8 +115,6 @@ public class InitData implements CommandLineRunner {
     }
 
     private void initDummyDriveHistories() {
-        List<Long> dummyCycleIds = new ArrayList<>();
-
         driveHistoryRepository.saveAll(
                 LongStream.iterate(1L, i -> i + 1)
                         .limit(5)
@@ -126,7 +124,7 @@ public class InitData implements CommandLineRunner {
                                 LocalDateTime.now().minusMinutes(30),
                                 20.0D,
                                 LocalTime.of(1, 30),
-                                dummyCycleIds
+                                new ArrayList<>()
                         )).toList()
         );
     }

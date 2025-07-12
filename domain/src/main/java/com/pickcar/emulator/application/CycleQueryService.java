@@ -6,6 +6,7 @@ import com.pickcar.emulator.domain.Cycle;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.emulator.infrastructure.CycleQueryRepository;
 import com.pickcar.emulator.presentation.context.PathContext;
+import com.pickcar.emulator.presentation.dto.CycleIdAndDistance;
 import com.pickcar.reservation.domain.Reservation;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class CycleQueryService {
         );
     }
 
-    public List<Cycle> getCyclesBetweenOnOffTime(DriveHistoryPayload payload) {
+    public List<CycleIdAndDistance> getCyclesBetweenOnOffTime(DriveHistoryPayload payload) {
         return cycleQueryRepository.findAllByVehicleIdAndOccurredAtBetween(payload.getVehicleId(),
                 payload.getEngineOnTime(), payload.getEngineOffTime());
     }
@@ -36,18 +37,19 @@ public class CycleQueryService {
         LocalDateTime endedAt = driveHistory.getDrivingEndedAt();
         Long vehicleId = reservation.getVehicleId();
 
-        List<Cycle> cycles = cycleQueryRepository.findAllByVehicleIdAndOccurredAtBetween(vehicleId, startedAt, endedAt);
-        List<PathContext> paths = new ArrayList<>();
-
-        cycles.stream()
-                .forEach((cycle) -> {
-                    cycle.getCycleInfos().stream()
-                                    .forEach((cycleInfo) -> {
-                                        PathContext path = PathContext.of(cycleInfo);
-                                        paths.add(path);
-                                    });
-                });
-
-        return paths;
+//        List<Cycle> cycles = cycleQueryRepository.findAllByVehicleIdAndOccurredAtBetween(vehicleId, startedAt, endedAt);
+//        List<PathContext> paths = new ArrayList<>();
+//
+//        cycles.stream()
+//                .forEach((cycle) -> {
+//                    cycle.getCycleInfos().stream()
+//                                    .forEach((cycleInfo) -> {
+//                                        PathContext path = PathContext.of(cycleInfo);
+//                                        paths.add(path);
+//                                    });
+//                });
+//
+//        return paths;
+        return null;
     }
 }

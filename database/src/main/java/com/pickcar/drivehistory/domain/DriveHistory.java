@@ -46,22 +46,23 @@ public class DriveHistory extends BaseEntity {
     @Convert(converter = CycleIdsConverter.class)
     List<Long> cycleIds;
 
-    public DriveHistory(Long reservationId, LocalDateTime engineOnTime, LocalDateTime engineOffTime, List<Cycle> cycles) {
+    public DriveHistory(Long reservationId, LocalDateTime engineOnTime, LocalDateTime engineOffTime,
+                        List<Long> cycleIds, List<Double> distances) {
         this.reservationId = reservationId;
         this.drivingStartedAt = engineOnTime;
         this.drivingEndedAt = engineOffTime;
-        this.totalDistance = calcTotalDistance(cycles);
+        this.totalDistance = calcTotalDistance(distances);
         this.totalDrivingTime = calcTotalDrivingTime(engineOnTime, engineOffTime);
-        this.cycleIds = cycles.stream().map(Cycle::getId).collect(Collectors.toList());
+        this.cycleIds = cycleIds;
     }
 
     private LocalTime calcTotalDrivingTime(LocalDateTime engineOnTime, LocalDateTime engineOffTime) {
         return LocalTime.MIDNIGHT.plus(Duration.between(engineOnTime, engineOffTime));
     }
 
-    private Double calcTotalDistance(List<Cycle> cycles) {
-        return cycles.stream()
-                .mapToDouble(Cycle::getDistance)
+    private Double calcTotalDistance(List<Double> distances) {
+        return distances.stream()
+                .mapToDouble(Double::doubleValue)
                 .sum();
     }
 }

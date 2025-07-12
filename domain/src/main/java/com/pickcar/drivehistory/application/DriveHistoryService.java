@@ -12,6 +12,7 @@ import com.pickcar.emulator.application.CycleQueryService;
 import com.pickcar.emulator.application.EventInfoQueryService;
 import com.pickcar.emulator.domain.Cycle;
 import com.pickcar.emulator.presentation.context.PathContext;
+import com.pickcar.emulator.presentation.dto.CycleIdAndDistance;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
@@ -44,12 +45,11 @@ public class DriveHistoryService {
     @Transactional
     public void write(DriveHistoryPayload payload) {
         Long reservationId = reservationService.getActiveReservationId(payload.getVehicleId(), payload.getUserId());
-        List<Cycle> cycles = cycleQueryService.getCyclesBetweenOnOffTime(payload);
-
-        log.info(cycles.toString());
+        List<CycleIdAndDistance> cycles = cycleQueryService.getCyclesBetweenOnOffTime(payload);
 
         DriveHistory driveHistory =
-                new DriveHistory(reservationId, payload.getEngineOnTime(), payload.getEngineOffTime(), cycles);
+                new DriveHistory(reservationId, payload.getEngineOnTime(), payload.getEngineOffTime(),
+                        CycleIdAndDistance.toCycleIds(cycles), CycleIdAndDistance.toDistances(cycles));
         driveHistoryRepository.save(driveHistory);
     }
 
