@@ -4,6 +4,7 @@ import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
 import com.pickcar.drivehistory.exception.DriveHistoryException;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
+import com.pickcar.drivehistory.presentation.dto.payload.DriveHistoryPayload;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
@@ -42,14 +43,16 @@ public class DriveHistoryService {
     private final DriveHistoryRepository driveHistoryRepository;
 
     @Transactional
-    public void write(Long offEventInfoId) {
-        EventInfo offEventInfo = eventInfoQueryService.getOffEventById(offEventInfoId);
-        Reservation reservation = reservationService.getActiveReservationForDriveHistory(offEventInfo.getVehicleId());
-        Double totalDistance = cycleQueryService.getTotalDistanceForHistory(offEventInfo);
-
-        DriveHistory driveHistory = new DriveHistory(reservation.getId(), offEventInfo, totalDistance);
-
-        driveHistoryRepository.save(driveHistory);
+    public void write(DriveHistoryPayload payload) {
+        // FIXME: 리팩토링 필요
+//        EventInfo offEventInfo = eventInfoQueryService.getOffEventById(offEventInfoId);
+//        Reservation reservation = reservationService.getActiveReservationForDriveHistory(offEventInfo.getVehicleId());
+//        Double totalDistance = cycleQueryService.getTotalDistanceForHistory(offEventInfo);
+//
+//        DriveHistory driveHistory = new DriveHistory(reservation.getId(), offEventInfo, totalDistance);
+//
+//        driveHistoryRepository.save(driveHistory);
+        return;
     }
 
     private DriveHistory getById(Long id) {

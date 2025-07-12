@@ -33,7 +33,7 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
     @PostMapping("/{offEventInfoId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void write(@PathVariable Long offEventInfoId) {
-        driveHistoryService.write(offEventInfoId);
+//        driveHistoryService.write(offEventInfoId);
     }
 
     @Override

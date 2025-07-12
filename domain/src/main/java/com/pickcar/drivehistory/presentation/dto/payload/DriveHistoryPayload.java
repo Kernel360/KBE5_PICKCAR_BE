@@ -1,4 +1,4 @@
-package com.pickcar.drivehistory.presentation.dto;
+package com.pickcar.drivehistory.presentation.dto.payload;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

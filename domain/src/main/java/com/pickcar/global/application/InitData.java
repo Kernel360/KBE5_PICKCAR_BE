@@ -1,4 +1,4 @@
-package com.pickcar.global;
+package com.pickcar.global.application;
 
 import com.pickcar.auth.domain.User;
 import com.pickcar.auth.domain.UserInfo;
