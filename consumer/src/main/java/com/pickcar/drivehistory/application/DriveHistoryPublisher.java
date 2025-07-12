@@ -43,6 +43,8 @@ public class DriveHistoryPublisher {
                 .offEventInfoId(offEventInfo.getId())
                 .engineOnTime(offEventInfo.getEngineOnTime())
                 .engineOffTime(offEventInfo.getEngineOffTime())
+                .destLon(offEventInfo.getLongitude())
+                .destLat(offEventInfo.getLatitude())
                 .traceId(MDC.get(MDCConstants.TRACE_ID_KEY))
                 .build();
 

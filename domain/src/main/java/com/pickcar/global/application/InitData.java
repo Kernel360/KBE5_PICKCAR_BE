@@ -9,6 +9,7 @@ import com.pickcar.company.domain.Company;
 import com.pickcar.company.domain.ContractStatus;
 import com.pickcar.company.infrastructure.CompanyRepository;
 import com.pickcar.drivehistory.domain.DriveHistory;
+import com.pickcar.drivehistory.domain.Region1Depth;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
@@ -124,7 +125,8 @@ public class InitData implements CommandLineRunner {
                                 LocalDateTime.now().minusMinutes(30),
                                 20.0D,
                                 LocalTime.of(1, 30),
-                                new ArrayList<>()
+                                new ArrayList<>(),
+                                Region1Depth.valueOf("서울특별시")
                         )).toList()
         );
     }

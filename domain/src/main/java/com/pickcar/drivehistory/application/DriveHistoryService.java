@@ -4,6 +4,7 @@ import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
 import com.pickcar.drivehistory.exception.DriveHistoryException;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
+import com.pickcar.drivehistory.presentation.dto.api.KakaoReverseGeocodeResponse;
 import com.pickcar.drivehistory.presentation.dto.payload.DriveHistoryPayload;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
@@ -26,8 +27,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
@@ -38,6 +44,10 @@ public class DriveHistoryService {
     @Value("${custom.driveHistory.maximum-inquiry-days}")
     private Integer maximumInquiryDays;
 
+    @Value("${kakao.map.rest-api-key}")
+    private String kakaoMapRestApiKey;
+
+    private final RestTemplate restTemplate = new RestTemplate();
     private final CycleQueryService cycleQueryService;
     private final ReservationService reservationService;
     private final DriveHistoryRepository driveHistoryRepository;
@@ -46,10 +56,11 @@ public class DriveHistoryService {
     public void write(DriveHistoryPayload payload) {
         Long reservationId = reservationService.getActiveReservationId(payload.getVehicleId(), payload.getUserId());
         List<CycleIdAndDistance> cycles = cycleQueryService.getCyclesBetweenOnOffTime(payload);
+        String destination = reverseGeocoding(payload.getDestLon(), payload.getDestLat());
 
         DriveHistory driveHistory =
                 new DriveHistory(reservationId, payload.getEngineOnTime(), payload.getEngineOffTime(),
-                        CycleIdAndDistance.toCycleIds(cycles), CycleIdAndDistance.toDistances(cycles));
+                        CycleIdAndDistance.toCycleIds(cycles), CycleIdAndDistance.toDistances(cycles), destination);
         driveHistoryRepository.save(driveHistory);
     }
 
@@ -117,5 +128,32 @@ public class DriveHistoryService {
                 reservationContext.reservation(), history);
 
         return DriveHistoryDetailResponse.of(history, reservationContext, pathContexts);
+    }
+
+    private String reverseGeocoding(Double lon, Double lat) {
+
+        String apiUrl = "https://dapi.kakao.com/v2/local/geo/coord2regioncode?x=%f&y=%f".formatted(lon, lat);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakaoMapRestApiKey);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<KakaoReverseGeocodeResponse> response = restTemplate.exchange(
+                    apiUrl, HttpMethod.GET, entity, KakaoReverseGeocodeResponse.class
+            );
+
+            KakaoReverseGeocodeResponse body = response.getBody();
+            log.info("response : {} ", body.getDocuments().get(0).getRegion2depthName());
+            if (body != null && body.getDocuments() != null && !body.getDocuments().isEmpty()) {
+                return body.getDocuments().get(0).getRegion2depthName();
+            }
+        } catch (Exception e) {
+            log.warn("카카오 API 호출 오류");
+            return "조회_불가";
+        }
+
+        return "조회_불가";
     }
 }

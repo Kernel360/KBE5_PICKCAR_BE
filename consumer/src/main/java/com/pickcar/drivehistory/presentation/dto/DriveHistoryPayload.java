@@ -18,5 +18,7 @@ public class DriveHistoryPayload {
     private Long offEventInfoId;
     private LocalDateTime engineOnTime;
     private LocalDateTime engineOffTime;
+    private Double destLon;
+    private Double destLat;
     private String traceId;
 }

@@ -10,6 +10,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -46,14 +48,18 @@ public class DriveHistory extends BaseEntity {
     @Convert(converter = CycleIdsConverter.class)
     List<Long> cycleIds;
 
+    @Enumerated(EnumType.STRING)
+    private Region1Depth destination;
+
     public DriveHistory(Long reservationId, LocalDateTime engineOnTime, LocalDateTime engineOffTime,
-                        List<Long> cycleIds, List<Double> distances) {
+                        List<Long> cycleIds, List<Double> distances, String destination) {
         this.reservationId = reservationId;
         this.drivingStartedAt = engineOnTime;
         this.drivingEndedAt = engineOffTime;
         this.totalDistance = calcTotalDistance(distances);
         this.totalDrivingTime = calcTotalDrivingTime(engineOnTime, engineOffTime);
         this.cycleIds = cycleIds;
+        this.destination = Region1Depth.valueOf(destination);
     }
 
     private LocalTime calcTotalDrivingTime(LocalDateTime engineOnTime, LocalDateTime engineOffTime) {
