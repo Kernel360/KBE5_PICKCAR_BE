@@ -14,9 +14,9 @@ public record DriveHistoryListResponse(
         LocalDateTime drivingStartedAt,
         LocalDateTime drivingEndedAt,
         LocalTime totalDrivingTime,
-        Double totalDistance
-
-        //String currentLocation
+        Double totalDistance,
+        String destination,
+        Long reservationId
 ) {
 
     public static DriveHistoryListResponse of(DriveHistory history, ReservationContext context) {

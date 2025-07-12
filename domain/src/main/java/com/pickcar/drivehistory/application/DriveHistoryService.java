@@ -1,9 +1,14 @@
 package com.pickcar.drivehistory.application;
 
+import com.pickcar.drivehistory.application.mapper.DriveHistoryResponseMapper;
+import com.pickcar.drivehistory.application.query.CycleInfoQuery;
+import com.pickcar.drivehistory.application.query.ReservationQuery;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
 import com.pickcar.drivehistory.exception.DriveHistoryException;
+import com.pickcar.drivehistory.infrastructure.DriveHistoryQueryRepository;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
+import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
 import com.pickcar.drivehistory.presentation.dto.api.KakaoReverseGeocodeResponse;
 import com.pickcar.drivehistory.presentation.dto.payload.DriveHistoryPayload;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
@@ -17,12 +22,10 @@ import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -45,16 +48,21 @@ public class DriveHistoryService {
     private String kakaoMapRestApiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
+
+    private final ReservationQuery reservationQuery;
+    private final CycleInfoQuery cycleInfoQuery;
+    private final DriveHistoryResponseMapper responseMapper;
+
     private final CycleQueryService cycleQueryService;
     private final ReservationService reservationService;
-    private final ReservationFinder reservationFinder;
-    private final CycleDataExtractor cycleDataExtractor;
+
+    private final DriveHistoryQueryRepository queryRepository;
     private final DriveHistoryRepository driveHistoryRepository;
 
     @Transactional
     public void write(DriveHistoryPayload payload) {
-        Long reservationId = reservationFinder.findActiveReservation(payload);
-        TotalCycleData cycleData = cycleDataExtractor.extract(payload);
+        Long reservationId = reservationQuery.findActiveReservation(payload);
+        TotalCycleData cycleData = cycleInfoQuery.findCycleInfo(payload);
 
         // NOTE: 외부 API 호출 비동기 Update 처리 고려 가능
         String destination = reverseGeocoding(payload.getDestLon(), payload.getDestLat());
@@ -66,54 +74,13 @@ public class DriveHistoryService {
         driveHistoryRepository.save(driveHistory);
     }
 
-    private DriveHistory getById(Long id) {
-        return driveHistoryRepository.findById(id)
-                .orElseThrow(() -> new DriveHistoryException(DriveHistoryErrorCode.NOT_FOUND_BY_ID));
-    }
-
     public Page<DriveHistoryListResponse> getFilteredListResponses(DriveHistoryFilterRequest filterRequest,
                                                                    Pageable pageable) {
         checkFilterRequestDate(filterRequest.getFrom(), filterRequest.getTo());
-        Page<DriveHistory> filteredHistoryPage = getPageByFilter(filterRequest, pageable);
-        List<Long> reservationIds = getRelatedReservationIdsByPage(filteredHistoryPage);
-        Map<Long, ReservationContext> contextMap = reservationService.getContextMapByIds(reservationIds);
 
-        List<DriveHistoryListResponse> responses = filteredHistoryPage.getContent()
-                .stream()
-                .map(history -> {
-                    ReservationContext context = contextMap.get(history.getReservationId());
-                    return DriveHistoryListResponse.of(history, context);
-                })
-                .toList();
+        Page<DriveHistoryListProjection> projectionPage = queryRepository.findFilteredList(filterRequest, pageable);
 
-        return new PageImpl<>(responses, pageable, filteredHistoryPage.getTotalElements());
-    }
-
-    private void checkFilterRequestDate(LocalDateTime from, LocalDateTime to) {
-        LocalDate today = LocalDate.now();
-        LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
-
-        if (from.isAfter(to)) {
-            throw new DriveHistoryException(DriveHistoryErrorCode.FROM_DATE_CANT_BE_BEFORE_TO_DATE);
-        }
-
-        if (from.isBefore(inquiryLimitDate)) {
-            throw new DriveHistoryException(DriveHistoryErrorCode.MAXIMUM_INQUIRY_LIMIT_EXCEEDED);
-        }
-    }
-
-    private Page<DriveHistory> getPageByFilter(DriveHistoryFilterRequest filterRequest, Pageable pageable) {
-        return driveHistoryRepository.findAllFilteredListByDriverNameAndDuration(
-                filterRequest.getDriverName(), filterRequest.getFrom(),
-                filterRequest.getTo(), pageable
-        );
-    }
-
-    private List<Long> getRelatedReservationIdsByPage(Page<DriveHistory> driveHistoryPage) {
-        return driveHistoryPage.getContent()
-                .stream()
-                .map(DriveHistory::getReservationId)
-                .toList();
+        return responseMapper.toResponsePage(projectionPage);
     }
 
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {
@@ -125,6 +92,25 @@ public class DriveHistoryService {
                 reservationContext.reservation(), history);
 
         return DriveHistoryDetailResponse.of(history, reservationContext, pathContexts);
+    }
+
+    private DriveHistory getById(Long id) {
+        return driveHistoryRepository.findById(id)
+                .orElseThrow(() -> new DriveHistoryException(DriveHistoryErrorCode.NOT_FOUND_BY_ID));
+    }
+
+    //NOTE: Validator 클래스 분리 가능
+    private void checkFilterRequestDate(LocalDateTime from, LocalDateTime to) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
+
+        if (from.isAfter(to)) {
+            throw new DriveHistoryException(DriveHistoryErrorCode.FROM_DATE_CANT_BE_BEFORE_TO_DATE);
+        }
+
+        if (from.isBefore(inquiryLimitDate)) {
+            throw new DriveHistoryException(DriveHistoryErrorCode.MAXIMUM_INQUIRY_LIMIT_EXCEEDED);
+        }
     }
 
     private String reverseGeocoding(Double lon, Double lat) {

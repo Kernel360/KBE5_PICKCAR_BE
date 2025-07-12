@@ -1,4 +1,4 @@
-package com.pickcar.drivehistory.application;
+package com.pickcar.drivehistory.application.query;
 
 import com.pickcar.drivehistory.presentation.dto.payload.DriveHistoryPayload;
 import com.pickcar.reservation.application.ReservationService;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ReservationFinder {
+public class ReservationQuery {
 
     private final ReservationService reservationService;
 
