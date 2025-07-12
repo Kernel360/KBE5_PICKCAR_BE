@@ -30,13 +30,6 @@ public class DriveHistoryApiController implements DriveHistoryApiDocs {
     private final DriveHistoryService driveHistoryService;
 
     @Override
-    @PostMapping("/{offEventInfoId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void write(@PathVariable Long offEventInfoId) {
-//        driveHistoryService.write(offEventInfoId);
-    }
-
-    @Override
     @GetMapping("/list")
     @ResponseStatus(HttpStatus.OK)
     public Page<DriveHistoryListResponse> list(@ModelAttribute DriveHistoryFilterRequest filterRequest,

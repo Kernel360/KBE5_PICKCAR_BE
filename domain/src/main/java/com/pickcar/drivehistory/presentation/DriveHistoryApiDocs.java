@@ -18,10 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Tag(name = "DriveHistory(운행 일지) 기능 API", description = "운행일지 관련 기능 API 문서입니다.")
 public interface DriveHistoryApiDocs {
 
-    @Operation(summary = "운행일지 작성 API", description = "시동 OFF 이벤트 후 운행일지 작성을 위해 호출됩니다.")
-    @ApiResponse(responseCode = "204", description = "운행일지가 성공적으로 작성되었습니다.")
-    void write(@PathVariable Long offEventId);
-
     @Operation(summary = "운행일지 리스트 조회", description = "관제사 입장에서 전체 운행일지 리스트를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "최근 30일간의 전체 운행일지 리스트를 불러오는데 성공하였음을 의미합니다.",
             content = {
