@@ -26,13 +26,7 @@ public class CycleQueryService {
         );
     }
 
-    public Double getTotalDistanceForHistory(DriveHistoryPayload payload) {
-        return getCyclesBetweenOnOffTime(payload).stream()
-                .mapToDouble(Cycle::getDistance)
-                .sum();
-    }
-
-    private List<Cycle> getCyclesBetweenOnOffTime(DriveHistoryPayload payload) {
+    public List<Cycle> getCyclesBetweenOnOffTime(DriveHistoryPayload payload) {
         return cycleQueryRepository.findAllByVehicleIdAndOccurredAtBetween(payload.getVehicleId(),
                 payload.getEngineOnTime(), payload.getEngineOffTime());
     }

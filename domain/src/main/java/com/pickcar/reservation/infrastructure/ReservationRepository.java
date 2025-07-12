@@ -17,8 +17,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     Optional<Reservation> findByUserIdAndStatus(Long userId, ReservationStatus status);
 
-    Optional<Reservation> findByVehicleIdAndUpdatedAtBetween(Long vehicleId, LocalDateTime from, LocalDateTime to);
-
     @Query("SELECT v FROM Vehicle v " +
             "WHERE v.status = :vehicleStatus " +
             "AND NOT EXISTS (SELECT r FROM Reservation r " +
@@ -42,10 +40,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "WHERE r.vehicleId = v.id AND r.status = :reservationStatus)")
     List<Vehicle> findAssignedVehicles(VehicleStatus vehicleStatus, ReservationStatus reservationStatus);
 
-    Optional<Reservation> findByVehicleIdAndUserIdAndStatusIn(Long vehicleId, Long userId,
+    @Query("SELECT r.id FROM Reservation r WHERE r.vehicleId = :vehicleId " +
+            "AND r.userId = :userId AND r.status IN :statuses")
+    Optional<Long> findIdByVehicleIdAndUserIdAndStatusIn(Long vehicleId, Long userId,
                                                               List<ReservationStatus> statuses);
 
-    Optional<Reservation> findByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(Long vehicleId, Long userId,
+    @Query("SELECT r.id FROM Reservation r WHERE r.vehicleId = :vehicleId " +
+            "AND r.userId = :userId AND r.status = :status " +
+            "AND r.updatedAt BETWEEN :from AND :to")
+    Optional<Long> findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(Long vehicleId, Long userId,
                                                                                ReservationStatus returnStatus,
                                                                                LocalDateTime from, LocalDateTime now);
 }

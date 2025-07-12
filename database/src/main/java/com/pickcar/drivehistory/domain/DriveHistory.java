@@ -1,13 +1,22 @@
 package com.pickcar.drivehistory.domain;
 
+import com.pickcar.dto.CycleInfoConverter;
+import com.pickcar.emulator.domain.Cycle;
 import com.pickcar.emulator.domain.EventInfo;
+import com.pickcar.emulator.infrastructure.CycleIdsConverter;
 import com.pickcar.global.domain.BaseEntity;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,15 +42,26 @@ public class DriveHistory extends BaseEntity {
 
     private LocalTime totalDrivingTime;
 
-    public DriveHistory(Long reservationId, EventInfo offEventInfo, Double totalDistance) {
+    @Column(columnDefinition = "text")
+    @Convert(converter = CycleIdsConverter.class)
+    List<Long> cycleIds;
+
+    public DriveHistory(Long reservationId, LocalDateTime engineOnTime, LocalDateTime engineOffTime, List<Cycle> cycles) {
         this.reservationId = reservationId;
-        this.drivingStartedAt = offEventInfo.getEngineOnTime();
-        this.drivingEndedAt = offEventInfo.getEngineOffTime();
-        this.totalDistance = totalDistance != null ? totalDistance / 1000 : 0.0;        //FIXME: 임시 위치
-        this.totalDrivingTime = calcTotalDrivingTime(offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
+        this.drivingStartedAt = engineOnTime;
+        this.drivingEndedAt = engineOffTime;
+        this.totalDistance = calcTotalDistance(cycles);
+        this.totalDrivingTime = calcTotalDrivingTime(engineOnTime, engineOffTime);
+        this.cycleIds = cycles.stream().map(Cycle::getId).collect(Collectors.toList());
     }
 
     private LocalTime calcTotalDrivingTime(LocalDateTime engineOnTime, LocalDateTime engineOffTime) {
         return LocalTime.MIDNIGHT.plus(Duration.between(engineOnTime, engineOffTime));
+    }
+
+    private Double calcTotalDistance(List<Cycle> cycles) {
+        return cycles.stream()
+                .mapToDouble(Cycle::getDistance)
+                .sum();
     }
 }

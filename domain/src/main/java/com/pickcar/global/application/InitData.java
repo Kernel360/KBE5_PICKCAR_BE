@@ -21,6 +21,8 @@ import com.pickcar.vehicle.infrastructure.VehicleRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +42,11 @@ public class InitData implements CommandLineRunner {
     private final VehicleRepository vehicleRepository;
     private final ReservationRepository reservationRepository;
     private final DriveHistoryRepository driveHistoryRepository;
-    private final PasswordEncoder  passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
-        if(userRepository.findByInfoEmail("user1@kernel.com").isEmpty()) {
+        if (userRepository.findByInfoEmail("user1@kernel.com").isEmpty()) {
             initDummyCompanies();
             initDummyUsers();
             initDummyVehicles();
@@ -76,7 +78,8 @@ public class InitData implements CommandLineRunner {
                         .limit(5L)
                         .mapToObj(i -> new User(
                                 i,
-                                new UserInfo("user" + i + "@kernel.com", passwordEncoder.encode("1234"), "user" + i, "0101234567" + i),
+                                new UserInfo("user" + i + "@kernel.com", passwordEncoder.encode("1234"), "user" + i,
+                                        "0101234567" + i),
                                 UserRole.EMPLOYEE,
                                 UserStatus.ACTIVE
                         ))
@@ -112,6 +115,8 @@ public class InitData implements CommandLineRunner {
     }
 
     private void initDummyDriveHistories() {
+        List<Long> dummyCycleIds = new ArrayList<>();
+
         driveHistoryRepository.saveAll(
                 LongStream.iterate(1L, i -> i + 1)
                         .limit(5)
@@ -120,7 +125,8 @@ public class InitData implements CommandLineRunner {
                                 LocalDateTime.now().minusHours(2),
                                 LocalDateTime.now().minusMinutes(30),
                                 20.0D,
-                                LocalTime.of(1, 30)
+                                LocalTime.of(1, 30),
+                                dummyCycleIds
                         )).toList()
         );
     }

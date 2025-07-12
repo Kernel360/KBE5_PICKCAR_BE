@@ -10,6 +10,7 @@ import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResp
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import com.pickcar.emulator.application.CycleQueryService;
 import com.pickcar.emulator.application.EventInfoQueryService;
+import com.pickcar.emulator.domain.Cycle;
 import com.pickcar.emulator.presentation.context.PathContext;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.domain.Reservation;
@@ -37,19 +38,19 @@ public class DriveHistoryService {
     private Integer maximumInquiryDays;
 
     private final CycleQueryService cycleQueryService;
-    private final EventInfoQueryService eventInfoQueryService;
     private final ReservationService reservationService;
     private final DriveHistoryRepository driveHistoryRepository;
 
     @Transactional
     public void write(DriveHistoryPayload payload) {
-        Reservation reservation = reservationService.getActiveReservation(payload.getVehicleId(), payload.getUserId());
-        Double totalDistance = cycleQueryService.getTotalDistanceForHistory(payload);
+        Long reservationId = reservationService.getActiveReservationId(payload.getVehicleId(), payload.getUserId());
+        List<Cycle> cycles = cycleQueryService.getCyclesBetweenOnOffTime(payload);
 
-//        DriveHistory driveHistory = new DriveHistory(reservation.getId(), payload, totalDistance);
+        log.info(cycles.toString());
 
-//        driveHistoryRepository.save(driveHistory);
-        return;
+        DriveHistory driveHistory =
+                new DriveHistory(reservationId, payload.getEngineOnTime(), payload.getEngineOffTime(), cycles);
+        driveHistoryRepository.save(driveHistory);
     }
 
     private DriveHistory getById(Long id) {
@@ -84,7 +85,7 @@ public class DriveHistoryService {
         LocalDate today = LocalDate.now();
         LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
 
-        if(from.isAfter(to)) {
+        if (from.isAfter(to)) {
             throw new DriveHistoryException(DriveHistoryErrorCode.FROM_DATE_CANT_BE_BEFORE_TO_DATE);
         }
 
@@ -109,9 +110,11 @@ public class DriveHistoryService {
 
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {
         DriveHistory history = getById(historyId);
-        ReservationContext reservationContext = reservationService.getReservationContextById(history.getReservationId());
+        ReservationContext reservationContext = reservationService.getReservationContextById(
+                history.getReservationId());
         //FIXME: path를 가져올 수 있는 다른 방법 필요
-        List<PathContext> pathContexts = cycleQueryService.getPathsByReservationAndHistory(reservationContext.reservation(), history);
+        List<PathContext> pathContexts = cycleQueryService.getPathsByReservationAndHistory(
+                reservationContext.reservation(), history);
 
         return DriveHistoryDetailResponse.of(history, reservationContext, pathContexts);
     }

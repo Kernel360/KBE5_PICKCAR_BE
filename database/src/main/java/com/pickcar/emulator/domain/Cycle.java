@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @AllArgsConstructor
 @Table(name = "cycles")
+@ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cycle extends BaseEntity {
 

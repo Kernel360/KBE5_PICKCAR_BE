@@ -116,7 +116,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] Reservation Not Found By Id " + id));
     }
 
-    public Reservation getActiveReservation(Long vehicleId, Long userId) {
+    public Long getActiveReservationId(Long vehicleId, Long userId) {
         try {
             return getActiveReservationByVehicleIdAndUserId(vehicleId, userId);
         } catch (ReservationException e) {
@@ -124,30 +124,30 @@ public class ReservationService {
         }
     }
 
-    private Reservation getActiveReservationByVehicleIdAndUserId(Long vehicleId, Long userId) {
+    private Long getActiveReservationByVehicleIdAndUserId(Long vehicleId, Long userId) {
         List<ReservationStatus> validateStatuses = List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED);
-        Optional<Reservation> maybeReservation = reservationRepository.findByVehicleIdAndUserIdAndStatusIn(vehicleId, userId, validateStatuses);
+        Optional<Long> maybeReservationId = reservationRepository.findIdByVehicleIdAndUserIdAndStatusIn(vehicleId, userId, validateStatuses);
 
-        if (maybeReservation.isPresent()) {
-            return maybeReservation.get();
+        if (maybeReservationId.isPresent()) {
+            return maybeReservationId.get();
         }
 
         throw new ReservationException(ReservationErrorCode.NOT_FOUND_ACTIVE_RESERVATION_BY_VEHICLE_ID);
     }
 
-    private Reservation getLatestValidReservation(Long vehicleId, Long userId) {
+    private Long getLatestValidReservation(Long vehicleId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime coolDownMinutesAgo = now.minusMinutes(coolDownMinutes);
 
-        Optional<Reservation> maybeReservation = reservationRepository.findByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
+        Optional<Long> maybeReservationId = reservationRepository.findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
                 vehicleId,
                 userId,
                 ReservationStatus.RETURNED,
                 coolDownMinutesAgo,
                 now);
 
-        if (maybeReservation.isPresent()) {
-            return maybeReservation.get();
+        if (maybeReservationId.isPresent()) {
+            return maybeReservationId.get();
         }
 
         throw new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION);
