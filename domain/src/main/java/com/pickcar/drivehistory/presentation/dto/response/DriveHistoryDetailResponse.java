@@ -1,8 +1,7 @@
 package com.pickcar.drivehistory.presentation.dto.response;
 
 import com.pickcar.drivehistory.domain.DriveHistory;
-import com.pickcar.dto.CycleInfoPayload;
-import com.pickcar.emulator.presentation.context.PathContext;
+import com.pickcar.emulator.presentation.dto.context.PathContext;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import java.time.LocalDateTime;
@@ -21,10 +20,6 @@ public record DriveHistoryDetailResponse(
         Double totalDistance,
         String driverName,
         List<PathContext> paths
-//        Double speedAvg
-//        Double lastLongitude,
-//        Double lastLatitude
-
 ) {
 
     public static DriveHistoryDetailResponse of(DriveHistory history, ReservationContext context, List<PathContext> paths) {

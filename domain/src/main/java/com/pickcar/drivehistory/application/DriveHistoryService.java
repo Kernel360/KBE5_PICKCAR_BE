@@ -10,12 +10,9 @@ import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterReque
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import com.pickcar.emulator.application.CycleQueryService;
-import com.pickcar.emulator.application.EventInfoQueryService;
-import com.pickcar.emulator.domain.Cycle;
-import com.pickcar.emulator.presentation.context.PathContext;
-import com.pickcar.emulator.presentation.dto.CycleIdAndDistance;
+import com.pickcar.emulator.infrastructure.dto.CycleProjection.TotalCycleData;
+import com.pickcar.emulator.presentation.dto.context.PathContext;
 import com.pickcar.reservation.application.ReservationService;
-import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,17 +47,22 @@ public class DriveHistoryService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final CycleQueryService cycleQueryService;
     private final ReservationService reservationService;
+    private final ReservationFinder reservationFinder;
+    private final CycleDataExtractor cycleDataExtractor;
     private final DriveHistoryRepository driveHistoryRepository;
 
     @Transactional
     public void write(DriveHistoryPayload payload) {
-        Long reservationId = reservationService.getActiveReservationId(payload.getVehicleId(), payload.getUserId());
-        List<CycleIdAndDistance> cycles = cycleQueryService.getCyclesBetweenOnOffTime(payload);
+        Long reservationId = reservationFinder.findActiveReservation(payload);
+        TotalCycleData cycleData = cycleDataExtractor.extract(payload);
+
+        // NOTE: 외부 API 호출 비동기 Update 처리 고려 가능
         String destination = reverseGeocoding(payload.getDestLon(), payload.getDestLat());
 
         DriveHistory driveHistory =
                 new DriveHistory(reservationId, payload.getEngineOnTime(), payload.getEngineOffTime(),
-                        CycleIdAndDistance.toCycleIds(cycles), CycleIdAndDistance.toDistances(cycles), destination);
+                        cycleData.getCycleIds(), cycleData.getTotalDistance() , destination);
+        
         driveHistoryRepository.save(driveHistory);
     }
 
@@ -71,7 +73,7 @@ public class DriveHistoryService {
 
     public Page<DriveHistoryListResponse> getFilteredListResponses(DriveHistoryFilterRequest filterRequest,
                                                                    Pageable pageable) {
-        checkFilterRequest(filterRequest);
+        checkFilterRequestDate(filterRequest.getFrom(), filterRequest.getTo());
         Page<DriveHistory> filteredHistoryPage = getPageByFilter(filterRequest, pageable);
         List<Long> reservationIds = getRelatedReservationIdsByPage(filteredHistoryPage);
         Map<Long, ReservationContext> contextMap = reservationService.getContextMapByIds(reservationIds);
@@ -85,11 +87,6 @@ public class DriveHistoryService {
                 .toList();
 
         return new PageImpl<>(responses, pageable, filteredHistoryPage.getTotalElements());
-    }
-
-    private void checkFilterRequest(DriveHistoryFilterRequest filterRequest) {
-        checkFilterRequestDate(filterRequest.getFrom(), filterRequest.getTo());
-        //TODO: 검사 추가
     }
 
     private void checkFilterRequestDate(LocalDateTime from, LocalDateTime to) {

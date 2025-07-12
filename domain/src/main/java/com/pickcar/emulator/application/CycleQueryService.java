@@ -3,13 +3,11 @@ package com.pickcar.emulator.application;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.presentation.dto.payload.DriveHistoryPayload;
 import com.pickcar.emulator.domain.Cycle;
-import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.emulator.infrastructure.CycleQueryRepository;
-import com.pickcar.emulator.presentation.context.PathContext;
-import com.pickcar.emulator.presentation.dto.CycleIdAndDistance;
+import com.pickcar.emulator.presentation.dto.context.PathContext;
+import com.pickcar.emulator.infrastructure.dto.CycleProjection;
 import com.pickcar.reservation.domain.Reservation;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +25,7 @@ public class CycleQueryService {
         );
     }
 
-    public List<CycleIdAndDistance> getCyclesBetweenOnOffTime(DriveHistoryPayload payload) {
+    public List<CycleProjection> getCyclesBetweenOnOffTime(DriveHistoryPayload payload) {
         return cycleQueryRepository.findAllByVehicleIdAndOccurredAtBetween(payload.getVehicleId(),
                 payload.getEngineOnTime(), payload.getEngineOffTime());
     }

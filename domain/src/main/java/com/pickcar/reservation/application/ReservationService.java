@@ -95,7 +95,8 @@ public class ReservationService {
                 List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
         List<UnAllocatedEmployeeResponse> employeeInfos = authService.getUnAllocatedEmployeeInfos(allocatedUserIds);
-        List<UnAllocatedVehicleResponse> vehicleInfos = vehicleService.getAllUnAllocatedVehicleInfos(allocatedVehicleIds);
+        List<UnAllocatedVehicleResponse> vehicleInfos = vehicleService.getAllUnAllocatedVehicleInfos(
+                allocatedVehicleIds);
 
         return new ReservationPreInfoResponse(employeeInfos, vehicleInfos);
     }
@@ -126,7 +127,8 @@ public class ReservationService {
 
     private Long getActiveReservationByVehicleIdAndUserId(Long vehicleId, Long userId) {
         List<ReservationStatus> validateStatuses = List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED);
-        Optional<Long> maybeReservationId = reservationRepository.findIdByVehicleIdAndUserIdAndStatusIn(vehicleId, userId, validateStatuses);
+        Optional<Long> maybeReservationId = reservationRepository.findIdByVehicleIdAndUserIdAndStatusIn(vehicleId,
+                userId, validateStatuses);
 
         if (maybeReservationId.isPresent()) {
             return maybeReservationId.get();
@@ -139,18 +141,9 @@ public class ReservationService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime coolDownMinutesAgo = now.minusMinutes(coolDownMinutes);
 
-        Optional<Long> maybeReservationId = reservationRepository.findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
-                vehicleId,
-                userId,
-                ReservationStatus.RETURNED,
-                coolDownMinutesAgo,
-                now);
-
-        if (maybeReservationId.isPresent()) {
-            return maybeReservationId.get();
-        }
-
-        throw new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION);
+        return reservationRepository.findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
+                        vehicleId, userId, ReservationStatus.RETURNED, coolDownMinutesAgo, now)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION));
     }
 
     public ReservationContext getReservationContextById(Long reservationId) {

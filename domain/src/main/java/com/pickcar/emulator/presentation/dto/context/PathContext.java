@@ -1,4 +1,4 @@
-package com.pickcar.emulator.presentation.context;
+package com.pickcar.emulator.presentation.dto.context;
 
 import com.pickcar.dto.CycleInfoPayload;
 public record PathContext(
