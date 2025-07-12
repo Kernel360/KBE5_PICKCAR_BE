@@ -1,4 +1,4 @@
-package com.pickcar.config;
+package com.pickcar.emulator.config;
 
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

@@ -1,8 +1,8 @@
-package com.pickcar.application;
+package com.pickcar.emulator.application;
 
-import com.pickcar.dto.EventPayload;
+import com.pickcar.emulator.dto.EventPayload;
 import com.pickcar.emulator.domain.EventInfo;
-import com.pickcar.infrastructure.EventInfoRepository;
+import com.pickcar.emulator.infrastructure.EventInfoRepository;
 import com.pickcar.presentation.dto.response.ErrorResponse;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j

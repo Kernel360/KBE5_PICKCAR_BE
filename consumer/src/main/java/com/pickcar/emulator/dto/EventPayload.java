@@ -1,7 +1,9 @@
-package com.pickcar.dto;
+package com.pickcar.emulator.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pickcar.dto.EventStatus;
+import com.pickcar.dto.GpsStatus;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

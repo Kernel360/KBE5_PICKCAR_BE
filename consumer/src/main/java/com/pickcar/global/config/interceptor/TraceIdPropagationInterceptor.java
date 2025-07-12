@@ -1,4 +1,4 @@
-package com.pickcar.config.interceptor;
+package com.pickcar.global.config.interceptor;
 
 import com.pickcar.constants.GlobalStatic.MDCConstants;
 import java.io.IOException;

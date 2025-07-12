@@ -1,7 +1,8 @@
-package com.pickcar.dto;
+package com.pickcar.emulator.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pickcar.dto.CycleInfoPayload;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
