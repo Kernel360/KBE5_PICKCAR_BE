@@ -8,17 +8,15 @@ import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
 import com.pickcar.drivehistory.exception.DriveHistoryException;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryQueryRepository;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
+import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
 import com.pickcar.drivehistory.presentation.dto.api.KakaoReverseGeocodeResponse;
 import com.pickcar.drivehistory.presentation.dto.payload.DriveHistoryPayload;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
-import com.pickcar.emulator.application.CycleQueryService;
 import com.pickcar.emulator.infrastructure.dto.CycleProjection.TotalCycleData;
 import com.pickcar.emulator.presentation.dto.context.PathContext;
-import com.pickcar.reservation.application.ReservationService;
-import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,9 +51,6 @@ public class DriveHistoryService {
     private final CycleInfoQuery cycleInfoQuery;
     private final DriveHistoryResponseMapper responseMapper;
 
-    private final CycleQueryService cycleQueryService;
-    private final ReservationService reservationService;
-
     private final DriveHistoryQueryRepository queryRepository;
     private final DriveHistoryRepository driveHistoryRepository;
 
@@ -84,19 +79,13 @@ public class DriveHistoryService {
     }
 
     public DriveHistoryDetailResponse getDetailResponseById(Long historyId) {
-        DriveHistory history = getById(historyId);
-        ReservationContext reservationContext = reservationService.getReservationContextById(
-                history.getReservationId());
-        //FIXME: path를 가져올 수 있는 다른 방법 필요
-        List<PathContext> pathContexts = cycleQueryService.getPathsByReservationAndHistory(
-                reservationContext.reservation(), history);
-
-        return DriveHistoryDetailResponse.of(history, reservationContext, pathContexts);
-    }
-
-    private DriveHistory getById(Long id) {
-        return driveHistoryRepository.findById(id)
+        DriveHistoryDetailProjection detailProjection = driveHistoryRepository
+                .findDetailProjectionById(historyId)
                 .orElseThrow(() -> new DriveHistoryException(DriveHistoryErrorCode.NOT_FOUND_BY_ID));
+
+        List<PathContext> pathContexts = cycleInfoQuery.findPathsByCycleIds(detailProjection.cycleIds());
+
+        return responseMapper.toResponseDetail(detailProjection, pathContexts);
     }
 
     //NOTE: Validator 클래스 분리 가능

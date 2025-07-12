@@ -1,7 +1,9 @@
 package com.pickcar.drivehistory.infrastructure;
 
+import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,11 +18,15 @@ public class DriveHistoryQueryRepository {
     public Page<DriveHistoryListProjection> findFilteredList(
             DriveHistoryFilterRequest filterRequest,
             Pageable pageable) {
-        return driveHistoryRepository.findFilteredListProjections(
+        return driveHistoryRepository.findFilteredListProjection(
                 filterRequest.getDriverName(),
                 filterRequest.getFrom(),
                 filterRequest.getTo(),
                 pageable
         );
+    }
+
+    public Optional<DriveHistoryDetailProjection> findDetailById(Long historyId) {
+        return driveHistoryRepository.findDetailProjectionById(historyId);
     }
 }
