@@ -12,7 +12,6 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class DriveHistoryPayload {
     private Long userId;
     private Long vehicleId;

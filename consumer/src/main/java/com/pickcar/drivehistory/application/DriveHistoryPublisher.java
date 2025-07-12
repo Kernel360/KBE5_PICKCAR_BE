@@ -29,7 +29,7 @@ public class DriveHistoryPublisher {
                 message.getMessageProperties().setHeader(MDCConstants.TRACE_ID_HEADER_KEY, payload.getTraceId());
                 return message;
             });
-            log.info("운행일지 작성 요청 완료. payload: {}", payload.toString());
+            log.info("운행일지 작성 요청 완료. payload: {}", payload);
         } catch (Exception e) {
             log.warn("운행일지 작성 요청 실패. payload: {}, error: {}",
                     payload.toString(), e.getMessage());

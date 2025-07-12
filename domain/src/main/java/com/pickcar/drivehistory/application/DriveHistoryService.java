@@ -43,7 +43,7 @@ public class DriveHistoryService {
 
     @Transactional
     public void write(DriveHistoryPayload payload) {
-        Reservation reservation = reservationService.getActiveReservationForDriveHistory(payload.getVehicleId(), payload.getUserId());
+        Reservation reservation = reservationService.getActiveReservation(payload.getVehicleId(), payload.getUserId());
         Double totalDistance = cycleQueryService.getTotalDistanceForHistory(payload);
 
 //        DriveHistory driveHistory = new DriveHistory(reservation.getId(), payload, totalDistance);

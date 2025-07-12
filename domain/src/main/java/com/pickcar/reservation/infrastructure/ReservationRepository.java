@@ -14,7 +14,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     Optional<Reservation> findByVehicleIdAndStatus(Long vehicleId, ReservationStatus status);
+
     Optional<Reservation> findByUserIdAndStatus(Long userId, ReservationStatus status);
+
     Optional<Reservation> findByVehicleIdAndUpdatedAtBetween(Long vehicleId, LocalDateTime from, LocalDateTime to);
 
     @Query("SELECT v FROM Vehicle v " +
@@ -23,7 +25,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "WHERE r.vehicleId = v.id AND r.status = :reservationStatus)")
     List<Vehicle> findAvailableVehicles(VehicleStatus vehicleStatus, ReservationStatus reservationStatus);
 
-    Optional<Reservation> findByUserIdAndVehicleIdAndStatusIn(Long userId, Long vehicleId, List<ReservationStatus> statuses);
+    Optional<Reservation> findByUserIdAndVehicleIdAndStatusIn(Long userId, Long vehicleId,
+                                                              List<ReservationStatus> statuses);
+
     List<Reservation> findAllByDueDate(LocalDate dueDate);
 
     @Query("SELECT DISTINCT r.userId FROM Reservation r WHERE r.status IN :statuses")
@@ -37,4 +41,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "AND EXISTS (SELECT r FROM Reservation r " +
             "WHERE r.vehicleId = v.id AND r.status = :reservationStatus)")
     List<Vehicle> findAssignedVehicles(VehicleStatus vehicleStatus, ReservationStatus reservationStatus);
+
+    Optional<Reservation> findByVehicleIdAndUserIdAndStatusIn(Long vehicleId, Long userId,
+                                                              List<ReservationStatus> statuses);
+
+    Optional<Reservation> findByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(Long vehicleId, Long userId,
+                                                                               ReservationStatus returnStatus,
+                                                                               LocalDateTime from, LocalDateTime now);
 }

@@ -116,36 +116,37 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] Reservation Not Found By Id " + id));
     }
 
-    public Reservation getActiveReservationForDriveHistory(Long vehicleId, Long userId) {
+    public Reservation getActiveReservation(Long vehicleId, Long userId) {
         try {
-            return getActiveReservation(vehicleId);
+            return getActiveReservationByVehicleIdAndUserId(vehicleId, userId);
         } catch (ReservationException e) {
-            return getLatestValidReservation(vehicleId);
-            //TODO: 여기서도 찾지 못했다면 어떻게 대처할 것인지
+            return getLatestValidReservation(vehicleId, userId);
         }
     }
 
-    private Reservation getActiveReservation(Long vehicleId) {
-        Optional<Reservation> maybeReservation = reservationRepository.findByVehicleIdAndStatus(vehicleId,
-                ReservationStatus.RESERVED);
+    private Reservation getActiveReservationByVehicleIdAndUserId(Long vehicleId, Long userId) {
+        List<ReservationStatus> validateStatuses = List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED);
+        Optional<Reservation> maybeReservation = reservationRepository.findByVehicleIdAndUserIdAndStatusIn(vehicleId, userId, validateStatuses);
 
         if (maybeReservation.isPresent()) {
-            //FIXME: Optional.get()을 두 번 사용중
             return maybeReservation.get();
         }
 
         throw new ReservationException(ReservationErrorCode.NOT_FOUND_ACTIVE_RESERVATION_BY_VEHICLE_ID);
     }
 
-    private Reservation getLatestValidReservation(Long vehicleId) {
+    private Reservation getLatestValidReservation(Long vehicleId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime coolDownMinutesAgo = now.minusMinutes(coolDownMinutes);
 
-        Optional<Reservation> maybeReservation = reservationRepository.findByVehicleIdAndUpdatedAtBetween(
-                vehicleId, coolDownMinutesAgo, now);
+        Optional<Reservation> maybeReservation = reservationRepository.findByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
+                vehicleId,
+                userId,
+                ReservationStatus.RETURNED,
+                coolDownMinutesAgo,
+                now);
 
         if (maybeReservation.isPresent()) {
-            //FIXME: Optional.get()을 두 번 사용중
             return maybeReservation.get();
         }
 
