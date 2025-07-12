@@ -2,7 +2,6 @@ package com.pickcar.drivehistory.application;
 
 import com.pickcar.constants.GlobalStatic.MDCConstants;
 import com.pickcar.drivehistory.presentation.dto.DriveHistoryPayload;
-import com.pickcar.drivehistory.presentation.dto.DriveHistoryPayload.DriveHistoryPayloadBuilder;
 import com.pickcar.emulator.domain.EventInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,18 +29,18 @@ public class DriveHistoryPublisher {
                 message.getMessageProperties().setHeader(MDCConstants.TRACE_ID_HEADER_KEY, payload.getTraceId());
                 return message;
             });
-            log.info("운행일지 작성 이벤트 발행 완료. offEventInfoId: {}", payload.getOffEventInfoId());
+            log.info("운행일지 작성 요청 완료. payload: {}", payload.toString());
         } catch (Exception e) {
-            log.warn("운행일지 작성 이벤트 발행 실패. offEventInfoId: {}, error: {}",
-                    payload.getOffEventInfoId(), e.getMessage());
+            log.warn("운행일지 작성 요청 실패. payload: {}, error: {}",
+                    payload.toString(), e.getMessage());
         }
     }
 
-    public void publishDriveHistory(EventInfo offEventInfo) {
-
+    public void publishDriveHistory(EventInfo offEventInfo, Long userId) {
         DriveHistoryPayload payload = DriveHistoryPayload.builder()
-                .offEventInfoId(offEventInfo.getId())
+                .userId(userId)
                 .vehicleId(offEventInfo.getVehicleId())
+                .offEventInfoId(offEventInfo.getId())
                 .engineOnTime(offEventInfo.getEngineOnTime())
                 .engineOffTime(offEventInfo.getEngineOffTime())
                 .traceId(MDC.get(MDCConstants.TRACE_ID_KEY))

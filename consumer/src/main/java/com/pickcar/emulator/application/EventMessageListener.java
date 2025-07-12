@@ -26,27 +26,21 @@ public class EventMessageListener {
 
     @RabbitListener(queues = "${mq.event.queue}")
     public void eventMessage(EventPayload eventPayload, @Header(MDCConstants.TRACE_ID_HEADER_KEY) String traceId,
-                             @Header(value = "Authorization", required = false) String accessToken) {
+                             @Header(value = "userId", required = false) Long userId) {
         MDC.put(MDCConstants.TRACE_ID_KEY, traceId);
         MDC.put(MDCConstants.MODULE_NAME_KEY, moduleName);
         MDC.put(MDCConstants.SERVICE_NAME_KEY, queueName);
 
-        log.info("RabbitMQ Listener received event: {}", eventPayload.toString());
+        log.info("RabbitMQ Listener received event: {}", eventPayload.toString());      // NOTE: 추적되지 않으므로 로그 O
         try {
             if (EventStatus.ON.equals(eventPayload.getEventStatus())) {
                 log.info("EventStatus ON");
                 eventInfoService.on(eventPayload);
             } else if (EventStatus.OFF.equals(eventPayload.getEventStatus())) {
-                eventInfoService.off(eventPayload);
+                eventInfoService.off(eventPayload, userId);
                 log.info("EventStatus OFF");
             } else if (EventStatus.RETURNED.equals(eventPayload.getEventStatus())) {
-
-                if (accessToken == null) {
-                    //FIXME: 단순 로그 말고 예외처리로
-                    log.warn("반납 요청을 했지만 액세스 토큰이 없어 작업을 진행할 수 없습니다.");
-                    return;
-                }
-                eventInfoService.returned(eventPayload, accessToken);
+                eventInfoService.returned(eventPayload, userId);
                 log.info("EventStatus RETURNED");
             }
         } catch (Exception e) {

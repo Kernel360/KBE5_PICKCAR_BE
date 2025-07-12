@@ -16,9 +16,9 @@ custom:
 
 mq:
   drive-history:
-    queue: event-queue
-    exchange: exchange-event
-    routing-key: event.key
+    queue: drive-history-queue
+    exchange: exchange-drive-history
+    routing-key: drivehistory.key
 
 logging:
   module-name: domain

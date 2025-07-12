@@ -30,16 +30,12 @@ public class EventMessagePublisher {
         return new DirectExchange(exchange);
     }
 
-    public void publish(EventPayload eventPayload, HttpServletRequest request) {
-        String accessToken = request.getHeader("Authorization");
+    public void publish(EventPayload eventPayload, Long userId) {
         try {
             rabbitTemplate.convertAndSend(exchange, routingKey, eventPayload, msg -> {
-                if(accessToken != null) {
-                    msg.getMessageProperties().setHeader("Authorization", accessToken);
-                }
+                msg.getMessageProperties().setHeader("userId", userId);
                 return msg;
             });
-            log.info("MQ 전송 성공: exchange={}, routingKey={}, payload={}", exchange, routingKey, eventPayload);
         } catch (Exception e) {
             log.error("MQ 전송 실패: exchange={}, routingKey={}, payload={}", exchange, routingKey, eventPayload);
             // TODO: 실패 시 재처리 고려

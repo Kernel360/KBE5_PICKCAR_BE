@@ -33,22 +33,24 @@ public class EventInfoService {
         saveEventInfo(request);
     }
 
-    public void off(EventPayload request) {
+    public void off(EventPayload request, Long userId) {
         Optional<EventInfo> offEventInfo = saveEventInfo(request);
-        offEventInfo.ifPresent(driveHistoryPublisher::publishDriveHistory);
+        offEventInfo.ifPresent(eventInfo -> {
+            driveHistoryPublisher.publishDriveHistory(eventInfo, userId);
+        });
     }
 
-    public void returned(EventPayload request, String accessToken) {
+    public void returned(EventPayload request, Long userId) {
         EventInfo eventInfo = saveEventInfo(request).get();
-        submitReturn(accessToken, eventInfo.getVehicleId());
+        submitReturn(userId, eventInfo.getVehicleId());
     }
 
-    private void submitReturn(String accessToken, Long vehicleId) {
+    private void submitReturn(Long userId, Long vehicleId) {
         String requestUrl = deployDomain + "/api/v1/reservation/return/" + vehicleId;
 
-        //FIXME: RestTemplate Config 설정으로 중복 해결 필요
+        //FIXME: RestTemplate 말고 다른 방식으로 진행되도록
         HttpHeaders headers = new HttpHeaders();
-        headers.put("Authorization", List.of(accessToken));
+        headers.put("userId", List.of(userId.toString()));
         HttpEntity<Void> requestEntity = new HttpEntity<>(null, headers);
 
         try {
@@ -67,7 +69,6 @@ public class EventInfoService {
     }
 
     private Optional<EventInfo> saveEventInfo(EventPayload request) {
-        log.info("EventPayload: {}", request);
         Optional<EventInfo> getEventInfo = eventInfoRepository.findTopByVehicleIdOrderByIdDesc(
                 request.getVehicleId());
 
@@ -79,7 +80,7 @@ public class EventInfoService {
 
         EventInfo eventInfo = toEventInfo(request);
         EventInfo save = eventInfoRepository.save(eventInfo);
-        log.info("EventInfo: {}", save);
+        log.info("EventInfo: {}", save.toString());
         return Optional.of(save);
     }
 

@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @Builder
@@ -36,4 +37,17 @@ public class EventPayload implements Serializable {
     private Double latitude;
 
     private Double longitude;
+
+    @Override
+    public String toString() {
+        return "EventPayload{" +
+                "vehicleId=" + vehicleId +
+                ", eventStatus=" + eventStatus +
+                ", engineOnTime=" + engineOnTime +
+                ", engineOffTime=" + engineOffTime +
+                ", gpsStatus=" + gpsStatus +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }

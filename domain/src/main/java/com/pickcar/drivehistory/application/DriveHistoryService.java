@@ -10,7 +10,6 @@ import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResp
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import com.pickcar.emulator.application.CycleQueryService;
 import com.pickcar.emulator.application.EventInfoQueryService;
-import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.emulator.presentation.context.PathContext;
 import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.domain.Reservation;
@@ -44,13 +43,11 @@ public class DriveHistoryService {
 
     @Transactional
     public void write(DriveHistoryPayload payload) {
-        // FIXME: 리팩토링 필요
-//        EventInfo offEventInfo = eventInfoQueryService.getOffEventById(offEventInfoId);
-//        Reservation reservation = reservationService.getActiveReservationForDriveHistory(offEventInfo.getVehicleId());
-//        Double totalDistance = cycleQueryService.getTotalDistanceForHistory(offEventInfo);
-//
-//        DriveHistory driveHistory = new DriveHistory(reservation.getId(), offEventInfo, totalDistance);
-//
+        Reservation reservation = reservationService.getActiveReservationForDriveHistory(payload.getVehicleId(), payload.getUserId());
+        Double totalDistance = cycleQueryService.getTotalDistanceForHistory(payload);
+
+//        DriveHistory driveHistory = new DriveHistory(reservation.getId(), payload, totalDistance);
+
 //        driveHistoryRepository.save(driveHistory);
         return;
     }

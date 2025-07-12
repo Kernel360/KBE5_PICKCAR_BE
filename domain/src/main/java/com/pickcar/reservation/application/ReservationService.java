@@ -116,7 +116,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] Reservation Not Found By Id " + id));
     }
 
-    public Reservation getActiveReservationForDriveHistory(Long vehicleId) {
+    public Reservation getActiveReservationForDriveHistory(Long vehicleId, Long userId) {
         try {
             return getActiveReservation(vehicleId);
         } catch (ReservationException e) {

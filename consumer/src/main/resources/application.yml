@@ -16,12 +16,12 @@ mq:
     exchange: exchange-event
     routing-key: event.key
   drive-history:
-    queue: event-queue
-    exchange: exchange-event
-    routing-key: event.key
+    queue: drive-history-queue
+    exchange: exchange-drive-history
+    routing-key: drivehistory.key
 
 logging:
   module-name: consumer
   sensitive-field-rules:
     - path: "none"
-      fields: ["none"]
+      fields: [ "none" ]
