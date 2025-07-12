@@ -192,7 +192,6 @@ application-prod.yml
 # 임시
 loki-data
 logs/.promtail-positions.yml
-C:\Users\seomoon\Desktop\KBE5_PICKCAR_BE\docker\produce\front\loki-config.yml
 
 # 환경파일
 .env

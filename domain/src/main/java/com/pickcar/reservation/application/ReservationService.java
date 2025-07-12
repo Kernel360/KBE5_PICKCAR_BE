@@ -1,6 +1,6 @@
 package com.pickcar.reservation.application;
 
-import com.pickcar.auth.application.UserService;
+import com.pickcar.auth.application.AuthService;
 import com.pickcar.auth.domain.User;
 import com.pickcar.auth.domain.UserInfo;
 import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
@@ -45,7 +45,7 @@ public class ReservationService {
     @Value(value = "${custom.reservation.maximum-due-date}")
     private Integer maximumDueDate;
 
-    private final UserService userService;
+    private final AuthService authService;
     private final VehicleService vehicleService;
     private final JwtProvider jwtProvider;
     private final ReservationRepository reservationRepository;
@@ -94,7 +94,7 @@ public class ReservationService {
         List<Long> allocatedVehicleIds = reservationRepository.findVehicleIdsByStatusIn(
                 List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
-        List<UnAllocatedEmployeeResponse> employeeInfos = userService.getUnAllocatedEmployeeInfos(allocatedUserIds);
+        List<UnAllocatedEmployeeResponse> employeeInfos = authService.getUnAllocatedEmployeeInfos(allocatedUserIds);
         List<UnAllocatedVehicleResponse> vehicleInfos = vehicleService.getAllUnAllocatedVehicleInfos(allocatedVehicleIds);
 
         return new ReservationPreInfoResponse(employeeInfos, vehicleInfos);
@@ -154,7 +154,7 @@ public class ReservationService {
 
     public ReservationContext getReservationContextById(Long reservationId) {
         Reservation reservation = getById(reservationId);
-        User user = userService.getById(reservation.getUserId());
+        User user = authService.getById(reservation.getUserId());
         Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
 
         return new ReservationContext(reservation, user.getInfo(), vehicle.getInfo());
@@ -189,7 +189,7 @@ public class ReservationService {
                 .distinct()
                 .toList();
 
-        List<User> users = userService.getAllByIds(userIds);
+        List<User> users = authService.getAllByIds(userIds);
 
         return users.stream()
                 .collect(Collectors.toMap(User::getId, User::getInfo));
@@ -214,6 +214,16 @@ public class ReservationService {
     public List<SearchAbleVehiclesResponse> getAbleVehicles() {
         //운행 가능한 상태의 차면서 예약 상태가 아닌 것
         List<Vehicle> availableVehicles = reservationRepository.findAvailableVehicles(VehicleStatus.OPERABLE,
+                ReservationStatus.RESERVED);
+
+        return availableVehicles.stream()
+                .map(SearchAbleVehiclesResponse::from)
+                .toList();
+    }
+
+    public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
+        //운행 가능한 상태의 차면서 예약 상태인 것
+        List<Vehicle> availableVehicles = reservationRepository.findAssignedVehicles(VehicleStatus.OPERABLE,
                 ReservationStatus.RESERVED);
 
         return availableVehicles.stream()

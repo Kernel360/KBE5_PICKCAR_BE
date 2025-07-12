@@ -32,13 +32,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final PathPatternParser patternParser = new PathPatternParser();
 
+    //FIX: 변수명 수정 및 주소 관리 방법 수정
+//    public static final String TOKEN_REFRESH_URI = "/api/v1/token/refresh";
+    private static final List<String> EXCLUDE_URLS_REFRESH = List.of(
+            "/api/v1/token/refresh",
+            "/api/v1/token/refresh-expired"
+    );
     private static final List<String> EXCLUDE_URLS = List.of(
-            "/api/v1/auth/**",
+            "/api/v1/auth/sign-up",
+            "/api/v1/auth/login",
+            "/api/v1/auth/logout",
             "/api/v1/history/**",
             "/api/v1/cycle/**",
             "/api/v1/event/**",
-            "/api/v1/token/refresh"
+            "/api/v1/sse/**"
     );
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -50,68 +59,76 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (EXCLUDE_URLS_REFRESH.stream()
+                .map(patternParser::parse)
+                .anyMatch(pathPattern -> pathPattern.matches(PathContainer.parsePath(request.getRequestURI())))) {
+            String refreshToken = extractRefreshTokenFromCookie(request);
+
+            TokenStatus refreshTokenStatus = jwtProvider.validateToken(refreshToken);
+            log.info("refreshTokenStatus: {}", refreshTokenStatus);
+
+            if (refreshTokenStatus == TokenStatus.VALID) {
+                // RefreshToken을 request에 저장
+                request.setAttribute("refreshToken", refreshToken);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            sendUnauthorizedResponse(response, refreshTokenStatus);
+            return;
+        }
+
         // AccessToken 추출
         String accessToken = extractAccessToken(request);
 
-        if (accessToken != null) {
-            TokenStatus status = jwtProvider.validateToken(accessToken);
-            log.info("TokenStatus : {}", status);
+        TokenStatus accessTokenStatus = jwtProvider.validateToken(accessToken);
+        log.info("accessTokenStatus : {}", accessTokenStatus);
 
-            switch (status) {
-                case VALID -> {
-                    Claims claims = jwtProvider.parseToken(accessToken).getBody();
-                    Long id = Long.valueOf(claims.getSubject());
-                    String name = jwtProvider.validateAndGetClaim(claims, "name",
-                            String.class); //TODO: 값이 없을 경우의 예외처리 하기
-                    String role = jwtProvider.validateAndGetClaim(claims, "role", String.class);
+        if(accessTokenStatus == TokenStatus.VALID){
+            Claims claims = jwtProvider.parseToken(accessToken).getBody();
+            Long id = Long.valueOf(claims.getSubject());
+            String name = jwtProvider.validateAndGetClaim(claims,"name",String.class); //TODO: 값이 없을 경우의 예외처리 하기
+            String role = jwtProvider.validateAndGetClaim(claims,"role",String.class);
 
-                    JwtUserDetails userDetails = new JwtUserDetails(id, name, role);
+            JwtUserDetails userDetails = new JwtUserDetails(id, name, role);
 
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-                case EXPIRED -> {
-                    // 클라이언트에 토큰 만료 안내 -> 클라이언트 측에서 AccessToken 재발급 요청 처리
-                    sendUnauthorizedResponse(response, "ACCESS_TOKEN_EXPIRED");
-                    return;
-                }
-                case INVALID_SIGNATURE, MALFORMED, INVALID -> {
-                    // 위변조, 형식 오류, 기타 오류는 모두 인증 실패로 처리 -> 재로그인 요청
-                    // TODO: 저장된 Access Token, Refresh Token 쿠키 및 메모리에서 모두 삭제
-                    sendUnauthorizedResponse(response, "INVALID_ACCESS_TOKEN");
-                    return;
-                }
-                default -> {
-                    // 재로그인 요청
-                    log.info("status : Unknown token error");
-                    sendUnauthorizedResponse(response, "UNKNOWN_TOKEN_ERROR");
-                    return;
-                }
-            }
-        } else {
-            // RefreshToken 추출
-            String refreshToken = extractRefreshTokenFromCookie(request);
-
-            if (refreshToken != null && !refreshToken.isBlank()) {
-                sendUnauthorizedResponse(response, "ACCESS_TOKEN_EXPIRED");
-                return;
-            } else {
-                log.info("No token provided in request.");
-                sendUnauthorizedResponse(response, "TOKEN_MISSING");
-                return;
-            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
+            return;
         }
+        sendUnauthorizedResponse(response,accessTokenStatus);
     }
 
-    private void sendUnauthorizedResponse(HttpServletResponse response, String message) {
+    private void sendUnauthorizedResponse(HttpServletResponse response, TokenStatus status) {
         try {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(status.getHttpStatus().value());
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"error\":\"" + message + "\"}");
+
+            String timeStamp = java.time.ZonedDateTime.now().toString();
+
+            String json = String.format("""
+                {
+                  "responseInfo": {
+                    "isSuccess": false,
+                    "statusCode": %d,
+                    "timeStamp": "%s"
+                  },
+                  "errorReason": {
+                    "errorCode": "%s",
+                    "reason": "%s"
+                  }
+                }
+                """,
+                    status.getHttpStatus().value(),
+                    timeStamp,
+                    status.getErrorCode(),
+                    status.getDescription()
+            );
+
+            response.getWriter().write(json);
             response.getWriter().flush();
         } catch (IOException e) {
             System.err.println("Failed to write unauthorized response: " + e.getMessage());
@@ -119,28 +136,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractAccessToken(HttpServletRequest request) {
-
-        String accessToken = request.getHeader("Authorization");
-
-        if (accessToken != null && !accessToken .isBlank() && accessToken.startsWith("Bearer ")) {
-            return accessToken.substring(7);
-        }
-
-        return null;
+        String auth = request.getHeader("Authorization");
+        // Bearer 제거한 실제 토큰 값만 반환, 아니면 null 반환
+        return (auth != null && auth.startsWith("Bearer ")) ? auth.substring(7) : null;
     }
 
     public String extractRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return null;
-        }
-
-        for (Cookie cookie : cookies) {
-            if ("refreshToken".equals(cookie.getName())) {
-                return cookie.getValue();
+        if (cookies != null){
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
             }
         }
-
         return null;
     }
 }

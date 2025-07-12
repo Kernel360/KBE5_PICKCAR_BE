@@ -35,4 +35,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Long countByStatusIn(List<ReservationStatus> reservationstatuses);
     Long countByStatus(ReservationStatus reservationStatus);
     Long countByStatusAndDueDateBetween(ReservationStatus reservationStatus, LocalDate from, LocalDate to);
+
+    @Query("SELECT v FROM Vehicle v " +
+            "WHERE v.status = :vehicleStatus " +
+            "AND EXISTS (SELECT r FROM Reservation r " +
+            "WHERE r.vehicleId = v.id AND r.status = :reservationStatus)")
+    List<Vehicle> findAssignedVehicles(VehicleStatus vehicleStatus, ReservationStatus reservationStatus);
 }

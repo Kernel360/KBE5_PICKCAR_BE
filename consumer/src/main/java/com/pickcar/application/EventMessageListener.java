@@ -51,7 +51,6 @@ public class EventMessageListener {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new RuntimeException(e.getMessage());
         } finally {
             MDC.clear();
         }
