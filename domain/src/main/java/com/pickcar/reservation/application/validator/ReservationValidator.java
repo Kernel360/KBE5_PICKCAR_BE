@@ -1,6 +1,5 @@
 package com.pickcar.reservation.application.validator;
 
-import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
 import com.pickcar.reservation.exception.ReservationException;
@@ -29,9 +28,10 @@ public class ReservationValidator {
 
     private void isVehicleAlreadyReserved(Long vehicleId) {
         boolean exists = reservationRepository
-                .existsByVehicleIdAndStatusIn(vehicleId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+                .existsByVehicleIdAndStatusIn(vehicleId,
+                        List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
-        if(exists) {
+        if (exists) {
             throw new ReservationException(ReservationErrorCode.VEHICLE_ALREADY_RESERVED);
         }
     }
@@ -40,7 +40,7 @@ public class ReservationValidator {
         boolean exists = reservationRepository
                 .existsByUserIdAndStatusIn(employeeId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
-        if(exists) {
+        if (exists) {
             throw new ReservationException(ReservationErrorCode.EMPLOYEE_ALREADY_RESERVED);
         }
     }

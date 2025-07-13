@@ -10,7 +10,7 @@ public record SearchAbleVehiclesResponse(
         VehicleStatus status
 ) {
 
-    public static SearchAbleVehiclesResponse from(Vehicle vehicle){
+    public static SearchAbleVehiclesResponse from(Vehicle vehicle) {
         return new SearchAbleVehiclesResponse(
                 vehicle.getId(),
                 vehicle.getInfo().getLicensePlate(),

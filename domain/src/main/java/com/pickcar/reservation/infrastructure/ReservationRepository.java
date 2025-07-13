@@ -60,18 +60,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                                                           LocalDateTime from, LocalDateTime now);
 
     @Query("""
-    SELECT new com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection(
-        r.id,
-        u.info.name,
-        u.info.phoneNumber,
-        v.info,
-        r.dueDate,
-        r.rentedAt
-    )
-    FROM Reservation r
-    JOIN User u ON r.userId = u.id
-    JOIN Vehicle v ON r.vehicleId = v.id
-    WHERE r.id = :reservationId
-    """)
+            SELECT new com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection(
+                r.id,
+                u.info.name,
+                u.info.phoneNumber,
+                v.info,
+                r.dueDate,
+                r.rentedAt
+            )
+            FROM Reservation r
+            JOIN User u ON r.userId = u.id
+            JOIN Vehicle v ON r.vehicleId = v.id
+            WHERE r.id = :reservationId
+            """)
     Optional<ReservationDetailProjection> findReservationDetailById(Long reservationId);
 }
