@@ -4,6 +4,7 @@ import com.pickcar.auth.domain.UserRole;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
+import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import java.time.LocalDate;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     Boolean existsByVehicleIdAndStatusIn(Long vehicleId, List<ReservationStatus> statuses);
@@ -58,4 +58,20 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Optional<Long> findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(Long vehicleId, Long userId,
                                                                           ReservationStatus returnStatus,
                                                                           LocalDateTime from, LocalDateTime now);
+
+    @Query("""
+    SELECT new com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection(
+        r.id,
+        u.info.name,
+        u.info.phoneNumber,
+        v.info,
+        r.dueDate,
+        r.rentedAt
+    )
+    FROM Reservation r
+    JOIN User u ON r.userId = u.id
+    JOIN Vehicle v ON r.vehicleId = v.id
+    WHERE r.id = :reservationId
+    """)
+    Optional<ReservationDetailProjection> findReservationDetailById(Long reservationId);
 }

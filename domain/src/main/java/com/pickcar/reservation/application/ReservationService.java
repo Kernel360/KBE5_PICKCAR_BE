@@ -11,7 +11,9 @@ import com.pickcar.reservation.exception.ReservationErrorCode;
 import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
 import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
+import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.application.VehicleService;
@@ -70,18 +72,35 @@ public class ReservationService {
         return responseMapper.toPreInfoResponse(projections);
     }
 
-    private Reservation getReservationForReturn(Long userId, Long vehicleId) {
-        return reservationRepository.findByUserIdAndVehicleIdAndStatusIn(userId, vehicleId,
-                        List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED))
-                .orElseThrow(() -> new ReservationException(ReservationErrorCode.UNAUTHORIZED_FOR_RETURN));
-    }
-
     public Long getActiveReservationId(DriveHistoryWriteCommand command) {
         try {
             return getActiveReservationByVehicleIdAndUserId(command.vehicleId(), command.userId());
         } catch (ReservationException e) {
             return getLatestValidReservation(command.vehicleId(), command.userId());
         }
+    }
+
+    public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
+        //운행 가능한 상태의 차면서 예약 상태인 것
+        List<Vehicle> availableVehicles = reservationRepository.findAssignedVehicles(VehicleStatus.OPERABLE,
+                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+
+        return availableVehicles.stream()
+                .map(SearchAbleVehiclesResponse::from)
+                .toList();
+    }
+
+    public ReservationDetailResponse getDetailResponse(Long reservationId) {
+        ReservationDetailProjection projection = reservationRepository.findReservationDetailById(reservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_BY_ID));
+
+        return responseMapper.toDetailResponse(projection);
+    }
+
+    private Reservation getReservationForReturn(Long userId, Long vehicleId) {
+        return reservationRepository.findByUserIdAndVehicleIdAndStatusIn(userId, vehicleId,
+                        List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED))
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.UNAUTHORIZED_FOR_RETURN));
     }
 
     private Long getActiveReservationByVehicleIdAndUserId(Long vehicleId, Long userId) {
@@ -99,15 +118,5 @@ public class ReservationService {
         return reservationRepository.findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
                         vehicleId, userId, ReservationStatus.RETURNED, coolDownMinutesAgo, now)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION));
-    }
-
-    public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
-        //운행 가능한 상태의 차면서 예약 상태인 것
-        List<Vehicle> availableVehicles = reservationRepository.findAssignedVehicles(VehicleStatus.OPERABLE,
-                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
-
-        return availableVehicles.stream()
-                .map(SearchAbleVehiclesResponse::from)
-                .toList();
     }
 }
