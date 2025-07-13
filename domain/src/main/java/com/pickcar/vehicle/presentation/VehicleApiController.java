@@ -1,5 +1,6 @@
 package com.pickcar.vehicle.presentation;
 
+import com.pickcar.vehicle.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.presentation.dto.request.ChangeVehicleStatusRequest;
 import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
@@ -49,5 +50,11 @@ public class VehicleApiController implements VehicleApiDocs{
     @GetMapping("/allocation/{userId}")
     public Long findAllocation(@PathVariable Long userId) {
         return vehicleService.getIdByUserIdFromReservation(userId);
+    }
+
+    @GetMapping("/assignment-completed")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SearchAbleVehiclesResponse> searchAssignedVehicles() {
+        return vehicleService.getAssignedVehicles();
     }
 }

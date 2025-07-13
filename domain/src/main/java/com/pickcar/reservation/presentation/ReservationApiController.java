@@ -4,8 +4,6 @@ import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
 import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
-import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,13 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationApiController {
 
     private final ReservationService reservationService;
-
-    //FIXME: 이것보단 ON되어 있는 차량들만 가져오는 걸로 바꾸는 게 좋을 듯(임시)
-    @GetMapping("/vehicles/assignment-completed")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SearchAbleVehiclesResponse> searchAssignedVehicles() {
-        return reservationService.getAssignedVehicles();
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

@@ -15,7 +15,7 @@ import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
 import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
-import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
+import com.pickcar.vehicle.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleStatus;
@@ -78,16 +78,6 @@ public class ReservationService {
         } catch (ReservationException e) {
             return getLatestValidReservation(command.vehicleId(), command.userId());
         }
-    }
-
-    public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
-        //운행 가능한 상태의 차면서 예약 상태인 것
-        List<Vehicle> availableVehicles = reservationRepository.findAssignedVehicles(VehicleStatus.OPERABLE,
-                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
-
-        return availableVehicles.stream()
-                .map(SearchAbleVehiclesResponse::from)
-                .toList();
     }
 
     public ReservationDetailResponse getDetailResponse(Long reservationId) {

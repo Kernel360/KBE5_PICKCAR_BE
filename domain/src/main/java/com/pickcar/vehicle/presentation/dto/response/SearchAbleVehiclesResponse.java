@@ -1,4 +1,4 @@
-package com.pickcar.reservation.presentation.dto.response;
+package com.pickcar.vehicle.presentation.dto.response;
 
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleStatus;
