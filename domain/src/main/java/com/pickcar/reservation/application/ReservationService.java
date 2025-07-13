@@ -13,15 +13,12 @@ import com.pickcar.reservation.infrastructure.ReservationRepository;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
-import com.pickcar.security.jwt.JwtProvider;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +36,6 @@ public class ReservationService {
 
     private final AuthService authService;
     private final VehicleService vehicleService;
-    private final JwtProvider jwtProvider;
     private final ReservationValidator validator;
     private final ReservationRepository reservationRepository;
 
@@ -60,9 +56,9 @@ public class ReservationService {
     }
 
     @Transactional
-    public void submitReturn(ReservationReturnCommand command) {
-        Reservation reservation = getReturnTarget(command.employeeId(), command.vehicleId());
-        reservation.submitReturn();
+    public void processReturn(ReservationReturnCommand command) {
+        Reservation reservation = getReservationForReturn(command.employeeId(), command.vehicleId());
+        reservation.markAsReturned();
     }
 
     public ReservationPreInfoResponse getReservationPreInfos() {
@@ -81,15 +77,10 @@ public class ReservationService {
         return new ReservationPreInfoResponse(employeeInfos, vehicleInfos);
     }
 
-    private Reservation getReturnTarget(Long userId, Long vehicleId) {
-        Optional<Reservation> maybeReservation = reservationRepository.findByUserIdAndVehicleIdAndStatusIn(userId,
-                vehicleId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
-
-        if (maybeReservation.isEmpty()) {
-            throw new ReservationException(ReservationErrorCode.UNAUTHORIZED_FOR_RETURN);
-        }
-
-        return maybeReservation.get();
+    private Reservation getReservationForReturn(Long userId, Long vehicleId) {
+        return reservationRepository.findByUserIdAndVehicleIdAndStatusIn(userId, vehicleId,
+                        List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED))
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.UNAUTHORIZED_FOR_RETURN));
     }
 
     public Long getActiveReservationId(DriveHistoryWriteCommand command) {

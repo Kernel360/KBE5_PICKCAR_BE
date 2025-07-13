@@ -62,7 +62,7 @@ public class DomainCommandListener {
         ReservationReturnCommand command = objectMapper.convertValue(rawCommand, ReservationReturnCommand.class);
 
         log.info("차량 반납 커맨드 시작. command = {}", command.toString());
-        reservationService.submitReturn(command);
+        reservationService.processReturn(command);
     }
 
 }
