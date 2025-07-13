@@ -78,27 +78,6 @@ public class VehicleService {
         //FIXME: 차량의 상태 <-> 예약의 상태 사용하는 구간 / 정의 / 예시 똑바로 설정
     }
 
-    public List<Vehicle> getAllByIds(List<Long> vehicleIds) {
-        return vehicleRepository.findAllById(vehicleIds);
-    }
-
-    public List<UnAllocatedVehicleResponse> getAllUnAllocatedVehicleInfos(List<Long> allocatedVehicleIds) {
-        List<Vehicle> unAllocatedVehicles = vehicleRepository.findAllByIdNotInAndStatus(allocatedVehicleIds,
-                VehicleStatus.OPERABLE);
-        List<UnAllocatedVehicleResponse> responses = new ArrayList<>();
-
-        unAllocatedVehicles.forEach(vehicle -> {
-            responses.add(UnAllocatedVehicleResponse.from(vehicle));
-        });
-
-        return responses;
-    }
-
-    // TODO : 보안처리
-    public Long getIdByUserIdFromReservation(Long userId) {
-        return vehicleRepository.findVehicleIdByUserId(userId);
-    }
-
     public void processRented(Long vehicleId) {
         Vehicle vehicle = getById(vehicleId);
         if (!vehicle.tryMarkAsRented()) {

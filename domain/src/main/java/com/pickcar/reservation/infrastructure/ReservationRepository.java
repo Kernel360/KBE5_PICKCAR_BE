@@ -3,10 +3,9 @@ package com.pickcar.reservation.infrastructure;
 import com.pickcar.auth.domain.UserRole;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
+import com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection;
 import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
 import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
-import com.pickcar.vehicle.domain.Vehicle;
-import com.pickcar.vehicle.domain.VehicleStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,4 +67,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             WHERE r.id = :reservationId
             """)
     Optional<ReservationDetailProjection> findReservationDetailById(Long reservationId);
+
+    @Query("""
+            SELECT new com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection(
+            r.vehicleId,
+            r.rentedAt,
+            r.dueDate,
+            r.status
+            ) FROM Reservation r
+            WHERE r.userId = :userId AND r.status IN :statuses
+            """)
+    AllocatedReservationInfoProjection findAllocatedReservationInfo(Long userId, List<ReservationStatus> statuses);
 }

@@ -10,9 +10,11 @@ import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
 import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
+import com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection;
 import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
 import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.AllocatedReservationInfo;
 import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.vehicle.presentation.dto.response.SearchAbleVehiclesResponse;
@@ -108,5 +110,12 @@ public class ReservationService {
         return reservationRepository.findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
                         vehicleId, userId, ReservationStatus.RETURNED, coolDownMinutesAgo, now)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION));
+    }
+
+    public AllocatedReservationInfo getIdByUserIdFromReservation(Long userId) {
+        AllocatedReservationInfoProjection projection = reservationRepository.findAllocatedReservationInfo(
+                userId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+
+        return responseMapper.toAllocatedReservationInfo(projection);
     }
 }

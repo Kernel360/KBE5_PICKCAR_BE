@@ -47,11 +47,6 @@ public class VehicleApiController implements VehicleApiDocs{
         vehicleService.changeStatus(request);
     }
 
-    @GetMapping("/allocation/{userId}")
-    public Long findAllocation(@PathVariable Long userId) {
-        return vehicleService.getIdByUserIdFromReservation(userId);
-    }
-
     @GetMapping("/assignment-completed")
     @ResponseStatus(HttpStatus.OK)
     public List<SearchAbleVehiclesResponse> searchAssignedVehicles() {
