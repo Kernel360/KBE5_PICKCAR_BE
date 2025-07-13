@@ -31,8 +31,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT v FROM Vehicle v " +
             "WHERE v.status = :vehicleStatus " +
             "AND EXISTS (SELECT r FROM Reservation r " +
-            "WHERE r.vehicleId = v.id AND r.status = :reservationStatus)")
-    List<Vehicle> findAssignedVehicles(VehicleStatus vehicleStatus, ReservationStatus reservationStatus);
+            "WHERE r.vehicleId = v.id AND r.status IN :reservationStatuses)")
+    List<Vehicle> findAssignedVehicles(VehicleStatus vehicleStatus, List<ReservationStatus> reservationStatuses);
 
     @Query("SELECT r.id FROM Reservation r WHERE r.vehicleId = :vehicleId " +
             "AND r.userId = :userId AND r.status IN :statuses")

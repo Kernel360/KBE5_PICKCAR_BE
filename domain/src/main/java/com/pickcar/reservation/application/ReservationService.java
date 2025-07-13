@@ -133,7 +133,7 @@ public class ReservationService {
     public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
         //운행 가능한 상태의 차면서 예약 상태인 것
         List<Vehicle> availableVehicles = reservationRepository.findAssignedVehicles(VehicleStatus.OPERABLE,
-                ReservationStatus.RESERVED);
+                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
         return availableVehicles.stream()
                 .map(SearchAbleVehiclesResponse::from)
