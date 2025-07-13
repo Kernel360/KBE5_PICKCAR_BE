@@ -1,22 +1,22 @@
 package com.pickcar.reservation.application;
 
-import com.pickcar.auth.application.AuthService;
-import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
+import com.pickcar.auth.domain.UserRole;
 import com.pickcar.dto.command.DriveHistoryWriteCommand;
 import com.pickcar.dto.command.ReservationReturnCommand;
+import com.pickcar.reservation.application.mapper.ReservationResponseMapper;
 import com.pickcar.reservation.application.validator.ReservationValidator;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
 import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
+import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleStatus;
-import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +34,9 @@ public class ReservationService {
     @Value(value = "${custom.reservation.cool-down-minutes}")
     private Integer coolDownMinutes;
 
-    private final AuthService authService;
     private final VehicleService vehicleService;
     private final ReservationValidator validator;
+    private final ReservationResponseMapper responseMapper;
     private final ReservationRepository reservationRepository;
 
     @Transactional
@@ -64,19 +64,10 @@ public class ReservationService {
     }
 
     public ReservationPreInfoResponse getReservationPreInfos() {
-        //FIXME: ID 리스트와 VEHICLE 리스트를 한 번에 가져오도록.
-        // 여기에 더해 사실장 이 response를 한 번에 가져올 수 있도록 변경 필요
-        List<Long> allocatedUserIds = reservationRepository.findUserIdsByStatusIn(
-                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+        List<EmployeeReservationProjection> projections = reservationRepository.findEmployeesWithReservationPreInfo(
+                UserRole.EMPLOYEE, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
-        List<Long> allocatedVehicleIds = reservationRepository.findVehicleIdsByStatusIn(
-                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
-
-        List<UnAllocatedEmployeeResponse> employeeInfos = authService.getUnAllocatedEmployeeInfos(allocatedUserIds);
-        List<UnAllocatedVehicleResponse> vehicleInfos = vehicleService.getAllUnAllocatedVehicleInfos(
-                allocatedVehicleIds);
-
-        return new ReservationPreInfoResponse(employeeInfos, vehicleInfos);
+        return responseMapper.toPreInfoResponse(projections);
     }
 
     private Reservation getReservationForReturn(Long userId, Long vehicleId) {

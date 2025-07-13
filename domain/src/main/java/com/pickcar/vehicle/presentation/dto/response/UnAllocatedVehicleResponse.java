@@ -9,7 +9,6 @@ public record UnAllocatedVehicleResponse(
         String model,
         VehicleStatus status
 ) {
-
     public static UnAllocatedVehicleResponse from(Vehicle vehicle) {
         return new UnAllocatedVehicleResponse(
                 vehicle.getId(),
