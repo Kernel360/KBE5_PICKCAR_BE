@@ -13,9 +13,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    Optional<Reservation> findByVehicleIdAndStatus(Long vehicleId, ReservationStatus status);
+    Boolean existsByVehicleIdAndStatusIn(Long vehicleId, List<ReservationStatus> statuses);
 
-    Optional<Reservation> findByUserIdAndStatus(Long userId, ReservationStatus status);
+    Boolean existsByUserIdAndStatusIn(Long userId, List<ReservationStatus> statuses);
 
     Optional<Reservation> findByUserIdAndVehicleIdAndStatusIn(Long userId, Long vehicleId,
                                                               List<ReservationStatus> statuses);

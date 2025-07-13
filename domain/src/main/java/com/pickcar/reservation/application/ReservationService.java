@@ -3,6 +3,7 @@ package com.pickcar.reservation.application;
 import com.pickcar.auth.application.AuthService;
 import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
+import com.pickcar.reservation.application.validator.ReservationValidator;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
@@ -36,28 +37,15 @@ public class ReservationService {
     @Value(value = "${custom.reservation.cool-down-minutes}")
     private Integer coolDownMinutes;
 
-    @Value(value = "${custom.reservation.maximum-due-date}")
-    private Integer maximumDueDate;
-
     private final AuthService authService;
     private final VehicleService vehicleService;
     private final JwtProvider jwtProvider;
+    private final ReservationValidator validator;
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public void reservation(ReservationRequest request) {
-
-        //이미 할당된 차량이 있는 회원에 대해
-        if (hasAlreadyReservation(request.employeeId())) {
-            throw new ReservationException(ReservationErrorCode.EMPLOYEE_ALREADY_RESERVED);
-        }
-
-        //이미 할당처리가 된 차량에 대해
-        if (isAlreadyReserved(request.vehicleId())) {
-            throw new ReservationException(ReservationErrorCode.VEHICLE_ALREADY_RESERVED);
-        }
-
-        validateDueDate(request.dueDate());
+    public void reserving(ReservationRequest request) {
+        validator.validateReservationRequest(request);
 
         Reservation reservation = Reservation.builder()
                 .userId(request.employeeId())
@@ -138,23 +126,5 @@ public class ReservationService {
         return availableVehicles.stream()
                 .map(SearchAbleVehiclesResponse::from)
                 .toList();
-    }
-
-    private boolean isAlreadyReserved(Long vehicleId) {
-        return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).isPresent();
-    }
-
-    private boolean hasAlreadyReservation(Long employeeId) {
-        return reservationRepository.findByUserIdAndStatus(employeeId, ReservationStatus.RESERVED).isPresent();
-    }
-
-    private void validateDueDate(LocalDate dueDate) {
-        if (dueDate.isBefore(LocalDate.now())) {
-            throw new ReservationException(ReservationErrorCode.DUE_DATE_CANNOT_BE_FUTURE);
-        }
-
-        if (dueDate.isAfter(LocalDate.now().plusDays(maximumDueDate))) {
-            throw new ReservationException(ReservationErrorCode.DUE_DATE_OVER_MAXIMUM);
-        }
     }
 }

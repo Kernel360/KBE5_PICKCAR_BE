@@ -37,7 +37,7 @@ public class ReservationApiController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void reservation(@RequestBody ReservationRequest request) {
-        reservationService.reservation(request);
+        reservationService.reserving(request);
     }
 
     @PatchMapping("/return/{vehicleId}")
