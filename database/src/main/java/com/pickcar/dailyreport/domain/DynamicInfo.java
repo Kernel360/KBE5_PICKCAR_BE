@@ -1,6 +1,11 @@
 package com.pickcar.dailyreport.domain;
 
+import com.pickcar.dailyreport.converter.DestinationCountStatsConverter;
+import com.pickcar.dailyreport.converter.DriverAndDistanceConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +13,13 @@ import lombok.Setter;
 @Setter
 @Embeddable
 public class DynamicInfo {
-    //어제자 기준 모든 운행의 총 운행 KM 수 계산
     private Double totalMovedDistance;
+
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = DriverAndDistanceConverter.class)
+    private List<DriverAndDistanceContext> top3Drivers;
+
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = DestinationCountStatsConverter.class)
+    private List<DestinationCountStat> destinationStats;
 }
