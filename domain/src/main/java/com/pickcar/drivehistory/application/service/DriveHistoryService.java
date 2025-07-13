@@ -9,7 +9,6 @@ import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
 import com.pickcar.drivehistory.presentation.dto.api.KakaoReverseGeocodeResponse;
-import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
@@ -134,9 +133,5 @@ public class DriveHistoryService {
         LocalDateTime to = localDate.atTime(23, 59, 59);
 
         return driveHistoryRepository.findAllByDrivingEndedAtBetween(from, to);
-    }
-
-    public List<Top3DriverDistanceContext> getTop3MovementInfo(LocalDate yesetday) {
-        return driveHistoryRepository.findTop3EmployeeNameAndTotalDistance(yesetday);
     }
 }

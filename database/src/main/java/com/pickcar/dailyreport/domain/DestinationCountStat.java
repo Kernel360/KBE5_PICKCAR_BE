@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DestinationCountStat {
+    private Integer rank;
     private Region1Depth destination;
     private Long visitCount;
 }

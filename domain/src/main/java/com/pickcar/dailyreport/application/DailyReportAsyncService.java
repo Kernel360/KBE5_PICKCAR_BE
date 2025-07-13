@@ -1,5 +1,6 @@
 package com.pickcar.dailyreport.application;
 
+import com.pickcar.dailyreport.domain.DynamicInfo;
 import com.pickcar.dailyreport.domain.VehicleReservationStat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,7 +15,7 @@ public class DailyReportAsyncService {
     @Scheduled(cron = "1 0 0 * * *")
     public void collectInfos() {
         VehicleReservationStat vehicleReservationStat = dailyReportService.collectVehicleReservationStat();
-        dailyReportService.collectNonStaticInfos();           // TODO: 기능 구현 필요
+        DynamicInfo dynamicInfo = dailyReportService.collectDynamicInfos();
         dailyReportService.save(vehicleReservationStat);
     }
 }

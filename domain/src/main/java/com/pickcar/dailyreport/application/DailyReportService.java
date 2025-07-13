@@ -2,21 +2,21 @@ package com.pickcar.dailyreport.application;
 
 import com.pickcar.dailyreport.application.mapper.DailyReportResponseMapper;
 import com.pickcar.dailyreport.domain.DailyReport;
+import com.pickcar.dailyreport.domain.DestinationCountStat;
+import com.pickcar.dailyreport.domain.DriverAndDistanceContext;
+import com.pickcar.dailyreport.domain.DynamicInfo;
 import com.pickcar.dailyreport.domain.VehicleReservationStat;
 import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
 import com.pickcar.dailyreport.infrastructure.dto.DestinationStatProjection;
+import com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection;
 import com.pickcar.dailyreport.infrastructure.dto.PastVehicleReservationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection;
-import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
 import com.pickcar.dailyreport.presentation.dto.response.VehicleReservationStatResponse;
 import com.pickcar.drivehistory.application.service.DriveHistoryService;
 import com.pickcar.drivehistory.domain.DriveHistory;
-import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,8 +32,8 @@ public class DailyReportService {
     private final DailyReportRepository dailyReportRepository;
 
     @Transactional
-    public void save(VehicleReservationStat vehicleReservationStat) {
-        dailyReportRepository.save(new DailyReport(LocalDate.now(), vehicleReservationStat));
+    public void save(VehicleReservationStat vehicleReservationStat, DynamicInfo dynamicInfo) {
+        dailyReportRepository.save(new DailyReport(LocalDate.now(), vehicleReservationStat, dynamicInfo));
     }
 
     public void getPreInfo() {
@@ -64,24 +64,32 @@ public class DailyReportService {
         );
     }
 
-    public void collectNonStaticInfos() {
-        //TODO: 정적 데이터 수집
-    }
-
-    public void getStaticAnalytics(Long vehicleId) {
-        return;
-    }
-
-    public void saveDummy(GenerateDummyReportRequest request) {
-        dailyReportRepository.save(new DailyReport(request.reportDate(), request.vehicleReservationStat()));
-
-        setUpDynamicInfos();
-    }
-
-    public void setUpDynamicInfos() {
+    public DynamicInfo collectDynamicInfos() {
         Double totalMovedDistance = calcTotalMovedDistance();
-        List<Top3DriverDistanceContext> yesterdayTop3MovementContext = getYesterdayTop3MovementContext();
+        List<DriverAndDistanceProjection> yesterdayTop3MovementContext = getYesterdayTop3MovementContext();
         List<DestinationStatProjection> yesterdayDestinationCounts = findYesterdayDestinationCounts();
+
+        List<DriverAndDistanceContext> driverContexts = convertToDriverContexts(yesterdayTop3MovementContext);
+        List<DestinationCountStat> destinationStats = convertToDestinationStats(yesterdayDestinationCounts);
+
+        return new DynamicInfo(totalMovedDistance, driverContexts, destinationStats);
+    }
+
+    private Double calcTotalMovedDistance() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        List<DriveHistory> yesterdayHistories = driveHistoryService.getAllByDate(yesterday);
+
+        return yesterdayHistories.stream()
+                .mapToDouble(DriveHistory::getTotalDistance)
+                .sum();
+    }
+
+    private List<DriverAndDistanceProjection> getYesterdayTop3MovementContext() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        return dailyReportRepository.findTop3EmployeeNameAndTotalDistance(yesterday)
+                .stream()
+                .limit(3)
+                .toList();
     }
 
     private List<DestinationStatProjection> findYesterdayDestinationCounts() {
@@ -89,20 +97,23 @@ public class DailyReportService {
         return dailyReportRepository.findYesterDayDestinationStats(yesterday);
     }
 
-    private Double calcTotalMovedDistance() {
-        Double movedDistance = 0.0D;
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        List<DriveHistory> yesterdayHistory = driveHistoryService.getAllByDate(yesterday);
-
-        for (DriveHistory history : yesterdayHistory) {
-            movedDistance += history.getTotalDistance();
-        }
-
-        return movedDistance;
+    private List<DriverAndDistanceContext> convertToDriverContexts(List<DriverAndDistanceProjection> projections) {
+        return projections.stream()
+                .map(projection -> new DriverAndDistanceContext(
+                        projection.driverName(),
+                        projection.totalDistance()
+                ))
+                .toList();
     }
 
-    private List<Top3DriverDistanceContext> getYesterdayTop3MovementContext() {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        return driveHistoryService.getTop3MovementInfo(yesterday);
+    private List<DestinationCountStat> convertToDestinationStats(List<DestinationStatProjection> projections) {
+        AtomicInteger rank = new AtomicInteger(1);
+        return projections.stream()
+                .map(projection -> new DestinationCountStat(
+                        rank.getAndIncrement(), // 순위 자동 부여
+                        projection.destination(),
+                        projection.visitCount()
+                ))
+                .toList();
     }
 }
