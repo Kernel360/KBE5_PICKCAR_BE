@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
-    Optional<Vehicle> findByInfo_LicensePlate(String licensePlate);
+    boolean existsByInfo_LicensePlate(String licensePlate);
 
     @Query("""
             SELECT new com.pickcar.vehicle.infrastructure.dto.AssignedVehiclesProjection(

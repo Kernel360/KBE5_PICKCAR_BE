@@ -2,6 +2,7 @@ package com.pickcar.vehicle.application;
 
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.vehicle.application.mapper.VehicleResponseMapper;
+import com.pickcar.vehicle.application.validator.VehicleValidator;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
@@ -27,13 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class VehicleService {
 
+    private final VehicleValidator validator;
     private final VehicleResponseMapper responseMapper;
     private final VehicleRepository vehicleRepository;
 
     @Transactional
     public void register(VehicleRegisterRequest request) {
-        //FIXME: 분리 필요, 케이스 추가
-        hasLicensePlateAlready(request.vehicleInfo().getLicensePlate());
+        validator.validateRegisterRequest(request);
+
 
         Vehicle vehicle = new Vehicle(request.vehicleInfo(), request.hasGps());
         vehicleRepository.save(vehicle);
@@ -43,12 +45,6 @@ public class VehicleService {
     public Vehicle getById(Long id) {
         return vehicleRepository.findById(id)
                 .orElseThrow(() -> new VehicleException(VehicleErrorCode.NOT_FOUND_BY_ID));
-    }
-
-    private void hasLicensePlateAlready(String licensePlate) {
-        if (vehicleRepository.findByInfo_LicensePlate(licensePlate).isPresent()) {
-            throw new VehicleException(VehicleErrorCode.LICENSE_PLATE_DUPLICATED);
-        }
     }
 
     @Transactional(readOnly = true)
