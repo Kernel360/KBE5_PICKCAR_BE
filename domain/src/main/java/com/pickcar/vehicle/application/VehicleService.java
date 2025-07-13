@@ -78,7 +78,8 @@ public class VehicleService {
     }
 
     public List<UnAllocatedVehicleResponse> getAllUnAllocatedVehicleInfos(List<Long> allocatedVehicleIds) {
-        List<Vehicle> unAllocatedVehicles = vehicleRepository.findAllByIdNotInAndStatus(allocatedVehicleIds, VehicleStatus.OPERABLE);
+        List<Vehicle> unAllocatedVehicles = vehicleRepository.findAllByIdNotInAndStatus(allocatedVehicleIds,
+                VehicleStatus.OPERABLE);
         List<UnAllocatedVehicleResponse> responses = new ArrayList<>();
 
         unAllocatedVehicles.forEach(vehicle -> {
@@ -91,5 +92,19 @@ public class VehicleService {
     // TODO : 보안처리
     public Long getIdByUserIdFromReservation(Long userId) {
         return vehicleRepository.findVehicleIdByUserId(userId);
+    }
+
+    public void processRented(Long vehicleId) {
+        Vehicle vehicle = getById(vehicleId);
+        if (!vehicle.tryMarkAsRented()) {
+            throw new VehicleException(VehicleErrorCode.ALREADY_RENTED_OR_RETURNED);
+        }
+    }
+
+    public void processReturned(Long vehicleId) {
+        Vehicle vehicle = getById(vehicleId);
+        if (!vehicle.tryMarkAsReturned()) {
+            throw new VehicleException(VehicleErrorCode.ALREADY_RENTED_OR_RETURNED);
+        }
     }
 }

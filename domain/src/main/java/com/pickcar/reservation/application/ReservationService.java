@@ -52,12 +52,14 @@ public class ReservationService {
                 .status(ReservationStatus.RESERVED)
                 .build();
 
+        vehicleService.processRented(request.vehicleId());
         reservationRepository.save(reservation);
     }
 
     @Transactional
     public void processReturn(ReservationReturnCommand command) {
         Reservation reservation = getReservationForReturn(command.employeeId(), command.vehicleId());
+        vehicleService.processReturned(command.vehicleId());
         reservation.markAsReturned();
     }
 
