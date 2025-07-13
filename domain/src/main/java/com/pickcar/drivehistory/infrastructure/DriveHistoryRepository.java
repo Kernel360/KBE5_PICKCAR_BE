@@ -4,7 +4,6 @@ import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +54,4 @@ public interface DriveHistoryRepository extends JpaRepository<DriveHistory, Long
             WHERE dh.id = :id
             """)
     Optional<DriveHistoryDetailProjection> findDetailProjectionById(Long id);
-
-    List<DriveHistory> findAllByDrivingEndedAtBetween(LocalDateTime from, LocalDateTime to);
 }

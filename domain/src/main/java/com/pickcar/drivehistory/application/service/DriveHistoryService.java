@@ -17,8 +17,6 @@ import com.pickcar.emulator.application.CycleQueryService;
 import com.pickcar.emulator.infrastructure.dto.CycleProjection.TotalCycleData;
 import com.pickcar.emulator.infrastructure.dto.PathContext;
 import com.pickcar.reservation.application.ReservationService;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -125,13 +123,5 @@ public class DriveHistoryService {
         }
 
         return "조회_불가";
-    }
-
-    //FIXME: DriveHistory 객체 반환이 아닌 진짜 사용할 내용으로만 적절한 context 개념으로 반환 필요
-    public List<DriveHistory> getAllByDate(LocalDate localDate) {
-        LocalDateTime from = localDate.atStartOfDay();
-        LocalDateTime to = localDate.atTime(23, 59, 59);
-
-        return driveHistoryRepository.findAllByDrivingEndedAtBetween(from, to);
     }
 }

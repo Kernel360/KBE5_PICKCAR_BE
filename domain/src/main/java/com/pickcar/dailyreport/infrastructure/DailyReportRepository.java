@@ -3,9 +3,9 @@ package com.pickcar.dailyreport.infrastructure;
 import com.pickcar.dailyreport.domain.DailyReport;
 import com.pickcar.dailyreport.infrastructure.dto.DestinationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection;
-import com.pickcar.dailyreport.infrastructure.dto.PastVehicleReservationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,17 +22,9 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
                  WHERE r.status = 'RESERVED'
                  AND r.dueDate BETWEEN :today AND :after3Days)
             )
+            FROM Reservation reservation
             """)
-    VehicleReservationStatProjection findStaticInfo(LocalDate today, LocalDate after3Days);
-
-    @Query("""
-            SELECT new com.pickcar.dailyreport.infrastructure.dto.PastVehicleReservationStatProjection(
-                dr.vehicleReservationStat
-            )
-            FROM DailyReport dr
-            WHERE dr.reportDate = :date
-            """)
-    PastVehicleReservationStatProjection findStatByDate(LocalDate date);
+    VehicleReservationStatProjection findVehicleReservationStat(LocalDate today, LocalDate after3Days);
 
     @Query("""
             SELECT new com.pickcar.dailyreport.infrastructure.dto.DestinationStatProjection(
@@ -46,7 +38,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             GROUP BY dh.destination
             ORDER BY COUNT(dh.destination) DESC
             """)
-    List<DestinationStatProjection> findYesterDayDestinationStats(LocalDate yesterday);
+    List<DestinationStatProjection> findYesterdayDestinationStats(LocalDate yesterday);
 
     @Query("""
             SELECT new com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection(
@@ -61,6 +53,14 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             ORDER BY SUM(dh.totalDistance) DESC
             """)
     List<DriverAndDistanceProjection> findTop3EmployeeNameAndTotalDistance(LocalDate yesterday);
+
+
+    @Query("""
+            SELECT COALESCE(SUM(dh.totalDistance), 0.0)
+            FROM DriveHistory dh
+            WHERE dh.drivingEndedAt >= :startOfDay AND dh.drivingStartedAt <= :endOfDay
+            """)
+    Double sumTotalDistanceByDate(LocalDateTime startOfDay, LocalDateTime endOfDay);
 
     Optional<DailyReport> findByReportDate(LocalDate date);
 }

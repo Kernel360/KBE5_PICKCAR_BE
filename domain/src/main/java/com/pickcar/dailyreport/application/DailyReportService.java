@@ -12,9 +12,8 @@ import com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection;
 import com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection;
 import com.pickcar.dailyreport.presentation.dto.response.DailyReportPreInfoResponse;
 import com.pickcar.dailyreport.presentation.dto.response.VehicleReservationStatResponse;
-import com.pickcar.drivehistory.application.service.DriveHistoryService;
-import com.pickcar.drivehistory.domain.DriveHistory;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class DailyReportService {
 
     private final DailyReportResponseMapper responseMapper;
-    private final DriveHistoryService driveHistoryService;
     private final DailyReportRepository dailyReportRepository;
 
     @Transactional
@@ -59,7 +57,7 @@ public class DailyReportService {
     private VehicleReservationStatProjection getVehicleReservationStat() {
         LocalDate today = LocalDate.now();
         LocalDate after3Days = today.plusDays(3);
-        return dailyReportRepository.findStaticInfo(today, after3Days);
+        return dailyReportRepository.findVehicleReservationStat(today, after3Days);
     }
 
     public VehicleReservationStat collectVehicleReservationStat() {
@@ -86,11 +84,10 @@ public class DailyReportService {
 
     private Double calcTotalMovedDistance() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        List<DriveHistory> yesterdayHistories = driveHistoryService.getAllByDate(yesterday);
+        LocalDateTime startOfDay = yesterday.atStartOfDay();
+        LocalDateTime endOfDay = yesterday.atTime(23, 59, 59);
 
-        return yesterdayHistories.stream()
-                .mapToDouble(DriveHistory::getTotalDistance)
-                .sum();
+        return dailyReportRepository.sumTotalDistanceByDate(startOfDay, endOfDay);
     }
 
     private List<DriverAndDistanceProjection> getYesterdayTop3MovementContext() {
@@ -103,7 +100,7 @@ public class DailyReportService {
 
     private List<DestinationStatProjection> findYesterdayDestinationCounts() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        return dailyReportRepository.findYesterDayDestinationStats(yesterday);
+        return dailyReportRepository.findYesterdayDestinationStats(yesterday);
     }
 
     private List<DriverAndDistanceContext> convertToDriverContexts(List<DriverAndDistanceProjection> projections) {
