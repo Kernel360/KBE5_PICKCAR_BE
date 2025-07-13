@@ -1,7 +1,6 @@
 package com.pickcar.emulator.infrastructure.dto;
 
 import com.pickcar.dto.CycleInfoPayload;
-import com.pickcar.emulator.presentation.dto.context.PathContext;
 import java.util.List;
 
 public record CycleInfoProjection(

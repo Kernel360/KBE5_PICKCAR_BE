@@ -1,32 +1,26 @@
 package com.pickcar.reservation.application;
 
 import com.pickcar.auth.application.AuthService;
-import com.pickcar.auth.domain.User;
-import com.pickcar.auth.domain.UserInfo;
 import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
+import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
 import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
-import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.security.jwt.JwtProvider;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.domain.Vehicle;
-import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +47,6 @@ public class ReservationService {
     @Transactional
     public void reservation(ReservationRequest request) {
 
-        //FIXME: 권한 분리 및 유효성검사 통합 메서드 필요
         //이미 할당된 차량이 있는 회원에 대해
         if (hasAlreadyReservation(request.employeeId())) {
             throw new ReservationException(ReservationErrorCode.EMPLOYEE_ALREADY_RESERVED);
@@ -112,29 +105,20 @@ public class ReservationService {
         return maybeReservation.get();
     }
 
-    public Reservation getById(Long id) {
-        return reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("[ERROR] Reservation Not Found By Id " + id));
-    }
-
-    public Long getActiveReservationId(Long vehicleId, Long userId) {
+    public Long getActiveReservationId(DriveHistoryPayload payload) {
         try {
-            return getActiveReservationByVehicleIdAndUserId(vehicleId, userId);
+            return getActiveReservationByVehicleIdAndUserId(payload.getVehicleId(), payload.getUserId());
         } catch (ReservationException e) {
-            return getLatestValidReservation(vehicleId, userId);
+            return getLatestValidReservation(payload.getVehicleId(), payload.getUserId());
         }
     }
 
     private Long getActiveReservationByVehicleIdAndUserId(Long vehicleId, Long userId) {
         List<ReservationStatus> validateStatuses = List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED);
-        Optional<Long> maybeReservationId = reservationRepository.findIdByVehicleIdAndUserIdAndStatusIn(vehicleId,
-                userId, validateStatuses);
 
-        if (maybeReservationId.isPresent()) {
-            return maybeReservationId.get();
-        }
-
-        throw new ReservationException(ReservationErrorCode.NOT_FOUND_ACTIVE_RESERVATION_BY_VEHICLE_ID);
+        return reservationRepository.findIdByVehicleIdAndUserIdAndStatusIn(vehicleId, userId, validateStatuses)
+                .orElseThrow(() -> new ReservationException(
+                        ReservationErrorCode.NOT_FOUND_ACTIVE_RESERVATION_BY_VEHICLE_ID));
     }
 
     private Long getLatestValidReservation(Long vehicleId, Long userId) {
@@ -144,65 +128,6 @@ public class ReservationService {
         return reservationRepository.findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
                         vehicleId, userId, ReservationStatus.RETURNED, coolDownMinutesAgo, now)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION));
-    }
-
-    public ReservationContext getReservationContextById(Long reservationId) {
-        Reservation reservation = getById(reservationId);
-        User user = authService.getById(reservation.getUserId());
-        Vehicle vehicle = vehicleService.getById(reservation.getVehicleId());
-
-        return new ReservationContext(reservation, user.getInfo(), vehicle.getInfo());
-    }
-
-    private List<ReservationContext> getContextsByIds(List<Reservation> reservations, Map<Long, UserInfo> userInfoMap,
-                                                      Map<Long, VehicleInfo> vehicleInfoMap) {
-        return reservations.stream()
-                .map(reservation -> {
-                    UserInfo userInfo = userInfoMap.get(reservation.getUserId());
-                    VehicleInfo vehicleInfo = vehicleInfoMap.get(reservation.getVehicleId());
-                    return new ReservationContext(reservation, userInfo, vehicleInfo);
-                }).toList();
-    }
-
-    public Map<Long, ReservationContext> getContextMapByIds(List<Long> reservationIds) {
-        List<Reservation> reservations = getAllByIds(reservationIds);
-        Map<Long, UserInfo> userInfoMap = extractUserInfoMap(reservations);
-        Map<Long, VehicleInfo> vehicleInfoMap = extractVehicleInfoMap(reservations);
-        List<ReservationContext> contexts = getContextsByIds(reservations, userInfoMap, vehicleInfoMap);
-
-        return contexts.stream()
-                .collect(Collectors.toMap(
-                        ReservationContext::getReservationId,
-                        Function.identity()
-                ));
-    }
-
-    private Map<Long, UserInfo> extractUserInfoMap(List<Reservation> reservations) {
-        List<Long> userIds = reservations.stream()
-                .map(Reservation::getUserId)
-                .distinct()
-                .toList();
-
-        List<User> users = authService.getAllByIds(userIds);
-
-        return users.stream()
-                .collect(Collectors.toMap(User::getId, User::getInfo));
-    }
-
-    private Map<Long, VehicleInfo> extractVehicleInfoMap(List<Reservation> reservations) {
-        List<Long> vehicleIds = reservations.stream()
-                .map(Reservation::getVehicleId)
-                .distinct()
-                .toList();
-
-        List<Vehicle> vehicles = vehicleService.getAllByIds(vehicleIds);
-
-        return vehicles.stream()
-                .collect(Collectors.toMap(Vehicle::getId, Vehicle::getInfo));
-    }
-
-    private List<Reservation> getAllByIds(List<Long> reservationIds) {
-        return reservationRepository.findAllById(reservationIds);
     }
 
     public List<SearchAbleVehiclesResponse> getAbleVehicles() {

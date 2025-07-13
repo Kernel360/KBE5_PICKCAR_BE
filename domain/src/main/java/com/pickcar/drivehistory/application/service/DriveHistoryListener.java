@@ -1,8 +1,7 @@
-package com.pickcar.drivehistory.application.listener;
+package com.pickcar.drivehistory.application.service;
 
 import com.pickcar.constants.GlobalStatic.MDCConstants;
-import com.pickcar.drivehistory.application.DriveHistoryService;
-import com.pickcar.drivehistory.presentation.dto.payload.DriveHistoryPayload;
+import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;

@@ -1,5 +1,6 @@
 package com.pickcar.emulator.infrastructure.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,10 @@ public record CycleProjection (
         public TotalCycleData(List<CycleProjection> cycleProjections) {
             this.cycleIds = extractIds(cycleProjections);
             this.totalDistance = calcTotalDistance(cycleProjections);
+        }
+
+        public static TotalCycleData empty() {
+            return new TotalCycleData(new ArrayList<>(), 0.0D);
         }
     }
 }

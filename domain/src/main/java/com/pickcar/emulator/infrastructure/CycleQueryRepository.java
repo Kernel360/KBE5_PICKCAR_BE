@@ -5,13 +5,11 @@ import com.pickcar.emulator.infrastructure.dto.CycleInfoProjection;
 import com.pickcar.emulator.infrastructure.dto.CycleProjection;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface CycleQueryRepository extends JpaRepository<Cycle, Long> {
-
 
     @Query("""
             SELECT new com.pickcar.emulator.infrastructure.dto.CycleProjection(

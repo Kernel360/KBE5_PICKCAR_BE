@@ -1,24 +1,22 @@
-package com.pickcar.drivehistory.application;
+package com.pickcar.drivehistory.application.service;
 
 import com.pickcar.drivehistory.application.mapper.DriveHistoryResponseMapper;
-import com.pickcar.drivehistory.application.query.CycleInfoQuery;
-import com.pickcar.drivehistory.application.query.ReservationQuery;
+import com.pickcar.drivehistory.application.validator.DriveHistoryValidator;
+import com.pickcar.emulator.application.CycleQueryService;
+import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
 import com.pickcar.drivehistory.exception.DriveHistoryException;
-import com.pickcar.drivehistory.infrastructure.DriveHistoryQueryRepository;
 import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
 import com.pickcar.drivehistory.presentation.dto.api.KakaoReverseGeocodeResponse;
-import com.pickcar.drivehistory.presentation.dto.payload.DriveHistoryPayload;
+import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
 import com.pickcar.emulator.infrastructure.dto.CycleProjection.TotalCycleData;
-import com.pickcar.emulator.presentation.dto.context.PathContext;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import com.pickcar.emulator.infrastructure.dto.PathContext;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,41 +37,50 @@ import org.springframework.web.client.RestTemplate;
 @Transactional(readOnly = true)
 public class DriveHistoryService {
 
-    @Value("${custom.driveHistory.maximum-inquiry-days}")
-    private Integer maximumInquiryDays;
-
+    // Util
     @Value("${kakao.map.rest-api-key}")
     private String kakaoMapRestApiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
-
-    private final ReservationQuery reservationQuery;
-    private final CycleInfoQuery cycleInfoQuery;
     private final DriveHistoryResponseMapper responseMapper;
+    private final DriveHistoryValidator validator;
 
-    private final DriveHistoryQueryRepository queryRepository;
+    // Service
+    private final ReservationService reservationService;
+    private final CycleQueryService cycleQueryService;
+
+    // Repository
     private final DriveHistoryRepository driveHistoryRepository;
 
     @Transactional
     public void write(DriveHistoryPayload payload) {
-        Long reservationId = reservationQuery.findActiveReservation(payload);
-        TotalCycleData cycleData = cycleInfoQuery.findCycleInfo(payload);
+        validator.validatePayload(payload);
+        Long reservationId = reservationService.getActiveReservationId(payload);
+        TotalCycleData cycleData = cycleQueryService.getCyclesBetweenOnOffTime(payload);
+        String destination = reverseGeocoding(payload.getDestLon(), payload.getDestLat()); // NOTE: 외부 API 호출 및 비동기 Update 처리 고려 가능
 
-        // NOTE: 외부 API 호출 비동기 Update 처리 고려 가능
-        String destination = reverseGeocoding(payload.getDestLon(), payload.getDestLat());
+        DriveHistory driveHistory = new DriveHistory(
+                reservationId,
+                payload.getEngineOnTime(),
+                payload.getEngineOffTime(),
+                cycleData.getCycleIds(),
+                cycleData.getTotalDistance(),
+                destination
+        );
 
-        DriveHistory driveHistory =
-                new DriveHistory(reservationId, payload.getEngineOnTime(), payload.getEngineOffTime(),
-                        cycleData.getCycleIds(), cycleData.getTotalDistance() , destination);
-        
         driveHistoryRepository.save(driveHistory);
     }
 
     public Page<DriveHistoryListResponse> getFilteredListResponses(DriveHistoryFilterRequest filterRequest,
                                                                    Pageable pageable) {
-        checkFilterRequestDate(filterRequest.getFrom(), filterRequest.getTo());
+        validator.checkFilterRequestDate(filterRequest.getFrom(), filterRequest.getTo());
 
-        Page<DriveHistoryListProjection> projectionPage = queryRepository.findFilteredList(filterRequest, pageable);
+        Page<DriveHistoryListProjection> projectionPage = driveHistoryRepository.findFilteredListProjection(
+                filterRequest.getDriverName(),
+                filterRequest.getFrom(),
+                filterRequest.getTo(),
+                pageable
+        );;
 
         return responseMapper.toResponsePage(projectionPage);
     }
@@ -83,25 +90,12 @@ public class DriveHistoryService {
                 .findDetailProjectionById(historyId)
                 .orElseThrow(() -> new DriveHistoryException(DriveHistoryErrorCode.NOT_FOUND_BY_ID));
 
-        List<PathContext> pathContexts = cycleInfoQuery.findPathsByCycleIds(detailProjection.cycleIds());
+        List<PathContext> pathContexts = cycleQueryService.extractPathContexts(detailProjection.cycleIds());
 
         return responseMapper.toResponseDetail(detailProjection, pathContexts);
     }
 
-    //NOTE: Validator 클래스 분리 가능
-    private void checkFilterRequestDate(LocalDateTime from, LocalDateTime to) {
-        LocalDate today = LocalDate.now();
-        LocalDateTime inquiryLimitDate = today.atStartOfDay().minusDays(maximumInquiryDays);
-
-        if (from.isAfter(to)) {
-            throw new DriveHistoryException(DriveHistoryErrorCode.FROM_DATE_CANT_BE_BEFORE_TO_DATE);
-        }
-
-        if (from.isBefore(inquiryLimitDate)) {
-            throw new DriveHistoryException(DriveHistoryErrorCode.MAXIMUM_INQUIRY_LIMIT_EXCEEDED);
-        }
-    }
-
+    //NOTE: 별도 공통 외부 Service로 분리 가능 (ex. LocationService)
     private String reverseGeocoding(Double lon, Double lat) {
 
         String apiUrl = "https://dapi.kakao.com/v2/local/geo/coord2regioncode?x=%f&y=%f".formatted(lon, lat);

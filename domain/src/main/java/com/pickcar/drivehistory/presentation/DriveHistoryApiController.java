@@ -1,6 +1,6 @@
 package com.pickcar.drivehistory.presentation;
 
-import com.pickcar.drivehistory.application.DriveHistoryService;
+import com.pickcar.drivehistory.application.service.DriveHistoryService;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-//TODO: Controller를 Domain이 아닌 다른 모듈로 분리하는 것은 어떨까?
 @Slf4j
 @RestController
 @RequiredArgsConstructor
