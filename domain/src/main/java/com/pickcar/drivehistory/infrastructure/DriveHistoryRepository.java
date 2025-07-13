@@ -1,41 +1,57 @@
 package com.pickcar.drivehistory.infrastructure;
 
 import com.pickcar.drivehistory.domain.DriveHistory;
-import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
-import java.time.LocalDate;
+import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection;
+import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface DriveHistoryRepository extends JpaRepository<DriveHistory, Long> {
     @Query("""
-            SELECT dh
+            SELECT new com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection(
+                dh.id,
+                dh.drivingStartedAt,
+                dh.drivingEndedAt,
+                dh.totalDistance,
+                dh.totalDrivingTime,
+                dh.destination,
+                r.id,
+                u.info.name,
+                v.info.licensePlate
+            )
             FROM DriveHistory dh
             JOIN Reservation r ON dh.reservationId = r.id
             JOIN User u ON r.userId = u.id
+            JOIN Vehicle v ON r.vehicleId = v.id
             WHERE (:driverName IS NULL OR :driverName = '' OR u.info.name = :driverName)
-                        AND dh.drivingStartedAt between :from AND :to
+            AND dh.drivingStartedAt BETWEEN :from AND :to
             ORDER BY dh.drivingStartedAt ASC
             """)
-    Page<DriveHistory> findAllFilteredListByDriverNameAndDuration(String driverName, LocalDateTime from,
-                                                                  LocalDateTime to, Pageable pageable);
+    Page<DriveHistoryListProjection> findFilteredListProjection(String driverName, LocalDateTime from,
+                                                                LocalDateTime to, Pageable pageable);
 
-    List<DriveHistory> findAllByDrivingEndedAtBetween(LocalDateTime from, LocalDateTime to);
-
-
-    @Query(value = """
-             SELECT u.name as driverName, SUM(dh.total_distance) as totalDistance
-             FROM drive_histories as dh
-             JOIN reservations as r ON dh.reservation_id = r.id
-             JOIN users as u ON r.user_id = u.id
-             WHERE DATE(dh.driving_ended_at) = :yesterday
-             GROUP BY r.user_id, u.name
-             ORDER BY SUM(dh.total_distance) DESC
-             LIMIT 3
-            """, nativeQuery = true)
-    List<Top3DriverDistanceContext> findTop3EmployeeNameAndTotalDistance(@Param("yesterday") LocalDate yesterday);
+    @Query("""
+            SELECT new com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection(
+                dh.drivingStartedAt,
+                dh.totalDrivingTime,
+                dh.totalDistance,
+                dh.destination,
+                r.status,
+                u.info.name,
+                v.info.licensePlate,
+                v.info.model,
+                v.info.carAge,
+                dh.cycleIds
+            )
+            FROM DriveHistory dh
+            JOIN Reservation r ON dh.reservationId = r.id
+            JOIN User u ON r.userId = u.id
+            JOIN Vehicle v ON r.vehicleId = v.id
+            WHERE dh.id = :id
+            """)
+    Optional<DriveHistoryDetailProjection> findDetailProjectionById(Long id);
 }

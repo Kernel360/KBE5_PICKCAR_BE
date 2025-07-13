@@ -1,17 +1,16 @@
 package com.pickcar.reservation.presentation;
 
 import com.pickcar.reservation.application.ReservationService;
-import com.pickcar.reservation.presentation.dto.context.ReservationContext;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.AllocatedReservationInfo;
+import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
-import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
+import com.pickcar.security.principal.JwtUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,35 +26,27 @@ public class ReservationApiController {
 
     private final ReservationService reservationService;
 
-    //FIXME: 로직도 그렇고 사실 VEHICLE이 맞는듯 근데 일단 진행
-    @GetMapping("/vehicles")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SearchAbleVehiclesResponse> searchAbleVehicles() {
-        return reservationService.getAbleVehicles();
-    }
-
-    //FIXME: 이것보단 ON되어 있는 차량들만 가져오는 걸로 바꾸는 게 좋을 듯(임시)
-    @GetMapping("/vehicles/assignment-completed")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SearchAbleVehiclesResponse> searchAssignedVehicles() {
-        return reservationService.getAssignedVehicles();
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void reservation(@RequestBody ReservationRequest request) {
-        reservationService.reservation(request);
-    }
-
-    @PatchMapping("/return/{vehicleId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void submitReturn(HttpServletRequest servletRequest, @PathVariable Long vehicleId) {
-        reservationService.submitReturn(servletRequest, vehicleId);
+        reservationService.reserving(request);
     }
 
     @GetMapping("/pre-info")
     @ResponseStatus(HttpStatus.OK)
     public ReservationPreInfoResponse preInfo() {
         return reservationService.getReservationPreInfos();
+    }
+
+    @GetMapping("/{reservationId}/detail")
+    @ResponseStatus(HttpStatus.OK)
+    public ReservationDetailResponse detail(@PathVariable Long reservationId) {
+        return reservationService.getDetailResponse(reservationId);
+    }
+
+    @GetMapping("/allocation")
+    @ResponseStatus(HttpStatus.OK)
+    public AllocatedReservationInfo findAllocation(@AuthenticationPrincipal JwtUserDetails userDetails) {
+        return reservationService.getIdByUserIdFromReservation(userDetails.getId());
     }
 }

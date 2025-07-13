@@ -5,20 +5,6 @@ spring:
     active: local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-  rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: guest
-    password: guest
-    template:
-      retry:
-        enabled: true
-        initial-interval: 1000
-        max-attempts: 5
-        multiplier: 2.0
-    listener:
-      simple:
-        default-requeue-rejected: false # 실패 메시지 재큐 금지(무한 반복 방지)
 
 mq:
   cycle:
@@ -29,9 +15,13 @@ mq:
     queue: event-queue
     exchange: exchange-event
     routing-key: event.key
+  domain-command:
+    queue: domain-command-queue
+    exchange: exchange-domain-command
+    routing-key: domaincommand.key
 
 logging:
   module-name: consumer
   sensitive-field-rules:
     - path: "none"
-      fields: ["none"]
+      fields: [ "none" ]

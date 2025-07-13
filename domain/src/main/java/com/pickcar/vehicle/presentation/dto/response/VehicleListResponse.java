@@ -1,5 +1,7 @@
 package com.pickcar.vehicle.presentation.dto.response;
 
+import com.pickcar.vehicle.domain.Vehicle;
+import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import java.time.LocalDate;
 
@@ -12,4 +14,9 @@ public record VehicleListResponse(
         String rentedCompany,
         LocalDate rentedAt
 ) {
+    public static VehicleListResponse from(Vehicle vehicle) {
+        VehicleInfo info = vehicle.getInfo();
+        return new VehicleListResponse(vehicle.getId(), info.getLicensePlate(), info.getModel(),
+                info.getColor(), vehicle.getStatus(), "빌린 회사명", LocalDate.now());
+    }
 }

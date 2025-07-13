@@ -15,6 +15,9 @@ dependencies {
     // 웹
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // 메세징
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
     // 모듈 의존
     implementation project(':database')
     implementation project(':common')
