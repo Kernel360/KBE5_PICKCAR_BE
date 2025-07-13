@@ -3,6 +3,7 @@ package com.pickcar.vehicle.infrastructure;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleStatus;
+import com.pickcar.vehicle.infrastructure.dto.AssignedVehiclesProjection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,9 +19,16 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     List<Vehicle> findAllByIdNotInAndStatus(List<Long> allocatedVehicleIds, VehicleStatus status);
 
-    @Query("SELECT v FROM Vehicle v " +
-            "WHERE v.status = :vehicleStatus " +
-            "AND EXISTS (SELECT r FROM Reservation r " +
-            "WHERE r.vehicleId = v.id AND r.status IN :reservationStatuses)")
-    List<Vehicle> findAssignedVehicles(VehicleStatus vehicleStatus, List<ReservationStatus> reservationStatuses);
+    @Query("""
+            SELECT new com.pickcar.vehicle.infrastructure.dto.AssignedVehiclesProjection(
+            v.id,
+            v.info,
+            v.status
+            )
+            FROM Vehicle v
+            WHERE v.isRented = true
+            AND v.status = :status
+            ORDER BY v.info.licensePlate
+            """)
+    List<AssignedVehiclesProjection> findAssignedVehicles(VehicleStatus status);
 }
