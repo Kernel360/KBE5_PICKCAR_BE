@@ -40,12 +40,6 @@ public class ReservationApiController {
         reservationService.reserving(request);
     }
 
-    @PatchMapping("/return/{vehicleId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void submitReturn(HttpServletRequest servletRequest, @PathVariable Long vehicleId) {
-        reservationService.submitReturn(servletRequest, vehicleId);
-    }
-
     @GetMapping("/pre-info")
     @ResponseStatus(HttpStatus.OK)
     public ReservationPreInfoResponse preInfo() {

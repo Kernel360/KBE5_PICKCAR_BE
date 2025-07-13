@@ -2,7 +2,8 @@ package com.pickcar.reservation.application;
 
 import com.pickcar.auth.application.AuthService;
 import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
-import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
+import com.pickcar.dto.command.DriveHistoryWriteCommand;
+import com.pickcar.dto.command.ReservationReturnCommand;
 import com.pickcar.reservation.application.validator.ReservationValidator;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
@@ -18,7 +19,6 @@ import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -60,9 +60,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public void submitReturn(HttpServletRequest servletRequest, Long vehicleId) {
-        Long userId = jwtProvider.extractUserId(servletRequest);
-        Reservation reservation = getReturnTarget(userId, vehicleId);
+    public void submitReturn(ReservationReturnCommand command) {
+        Reservation reservation = getReturnTarget(command.employeeId(), command.vehicleId());
         reservation.submitReturn();
     }
 
@@ -93,11 +92,11 @@ public class ReservationService {
         return maybeReservation.get();
     }
 
-    public Long getActiveReservationId(DriveHistoryPayload payload) {
+    public Long getActiveReservationId(DriveHistoryWriteCommand command) {
         try {
-            return getActiveReservationByVehicleIdAndUserId(payload.getVehicleId(), payload.getUserId());
+            return getActiveReservationByVehicleIdAndUserId(command.vehicleId(), command.userId());
         } catch (ReservationException e) {
-            return getLatestValidReservation(payload.getVehicleId(), payload.getUserId());
+            return getLatestValidReservation(command.vehicleId(), command.userId());
         }
     }
 

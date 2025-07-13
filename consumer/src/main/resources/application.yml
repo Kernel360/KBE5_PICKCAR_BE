@@ -15,10 +15,10 @@ mq:
     queue: event-queue
     exchange: exchange-event
     routing-key: event.key
-  drive-history:
-    queue: drive-history-queue
-    exchange: exchange-drive-history
-    routing-key: drivehistory.key
+  domain-command:
+    queue: domain-command-queue
+    exchange: exchange-domain-command
+    routing-key: domaincommand.key
 
 logging:
   module-name: consumer
