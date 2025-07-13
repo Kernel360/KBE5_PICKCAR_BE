@@ -1,5 +1,6 @@
 package com.pickcar.vehicle.presentation;
 
+import com.pickcar.vehicle.presentation.dto.response.AvailableVehicleListResponse;
 import com.pickcar.vehicle.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.application.VehicleService;
 import com.pickcar.vehicle.presentation.dto.request.ChangeVehicleStatusRequest;
@@ -28,7 +29,7 @@ public class VehicleApiController implements VehicleApiDocs{
 
     @Override
     @PostMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     public void register(@RequestBody VehicleRegisterRequest vehicleRegisterRequest) {
         vehicleService.register(vehicleRegisterRequest);
     }
@@ -51,5 +52,11 @@ public class VehicleApiController implements VehicleApiDocs{
     @ResponseStatus(HttpStatus.OK)
     public List<SearchAbleVehiclesResponse> searchAssignedVehicles() {
         return vehicleService.getAssignedVehicles();
+    }
+
+    @GetMapping("/available")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AvailableVehicleListResponse> getAvailableVehicles() {
+        return vehicleService.getAvailableVehicles();
     }
 }

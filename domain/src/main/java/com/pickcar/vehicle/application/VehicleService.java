@@ -9,8 +9,10 @@ import com.pickcar.vehicle.exception.VehicleErrorCode;
 import com.pickcar.vehicle.exception.VehicleException;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
 import com.pickcar.vehicle.infrastructure.dto.AssignedVehiclesProjection;
+import com.pickcar.vehicle.infrastructure.dto.AvailableVehicleProjection;
 import com.pickcar.vehicle.presentation.dto.request.ChangeVehicleStatusRequest;
 import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
+import com.pickcar.vehicle.presentation.dto.response.AvailableVehicleListResponse;
 import com.pickcar.vehicle.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
 import com.pickcar.vehicle.presentation.dto.response.VehicleListResponse;
@@ -96,5 +98,10 @@ public class VehicleService {
         List<AssignedVehiclesProjection> projections = vehicleRepository.findAssignedVehicles(VehicleStatus.OPERABLE);
 
         return responseMapper.toAssignedVehiclesResponse(projections);
+    }
+
+    public List<AvailableVehicleListResponse> getAvailableVehicles() {
+        List<AvailableVehicleProjection> projections = vehicleRepository.findAvailableVehicles(VehicleStatus.OPERABLE);
+        return responseMapper.toAvailableVehicleListResponse(projections);
     }
 }
