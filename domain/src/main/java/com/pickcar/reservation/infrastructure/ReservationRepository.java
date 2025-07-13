@@ -78,4 +78,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             WHERE r.userId = :userId AND r.status IN :statuses
             """)
     AllocatedReservationInfoProjection findAllocatedReservationInfo(Long userId, List<ReservationStatus> statuses);
+
+    Long countByStatusIn(List<ReservationStatus> reservationstatuses);
+    Long countByStatus(ReservationStatus reservationStatus);
+    Long countByStatusAndDueDateBetween(ReservationStatus reservationStatus, LocalDate from, LocalDate to);
 }

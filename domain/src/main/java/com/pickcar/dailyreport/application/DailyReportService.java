@@ -4,7 +4,7 @@ import com.pickcar.dailyreport.domain.DailyReport;
 import com.pickcar.dailyreport.domain.StaticInfo;
 import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
 import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
-import com.pickcar.drivehistory.application.DriveHistoryService;
+import com.pickcar.drivehistory.application.service.DriveHistoryService;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
 import com.pickcar.reservation.application.ReservationService;
@@ -83,7 +83,6 @@ public class DailyReportService {
         List<Top3DriverDistanceContext> yesterdayTop3MovementContext = getYesterdayTop3MovementContext();
 
         //전일 기준 지역별 차량 분포 (reverse geocoding)
-        reverseGeoCoding(123.123D, 37.123D);
 
         log.info("Total moved distance: {}", movedDistance);
         log.info("yesterdayTop3MovementContext: {}", yesterdayTop3MovementContext);
@@ -105,24 +104,4 @@ public class DailyReportService {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         return driveHistoryService.getTop3MovementInfo(yesterday);
     }
-
-    private void reverseGeoCoding(Double lat, Double lon) {
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        String apiUrl = "https://dapi.kakao.com/v2/local/geo/coord2regioncode?x=%f&y=%f".formatted(lat, lon);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + kakaoMapSecretKey);
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        try {
-            Object response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, Object.class);
-            log.info("response : {} ", response);
-        } catch (Exception e) {
-            log.warn("카카오 API 호출 오류", e);
-        }
-    }
-
 }
