@@ -27,13 +27,6 @@ public class ReservationApiController {
 
     private final ReservationService reservationService;
 
-    //FIXME: 로직도 그렇고 사실 VEHICLE이 맞는듯 근데 일단 진행
-    @GetMapping("/vehicles")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SearchAbleVehiclesResponse> searchAbleVehicles() {
-        return reservationService.getAbleVehicles();
-    }
-
     //FIXME: 이것보단 ON되어 있는 차량들만 가져오는 걸로 바꾸는 게 좋을 듯(임시)
     @GetMapping("/vehicles/assignment-completed")
     @ResponseStatus(HttpStatus.OK)
