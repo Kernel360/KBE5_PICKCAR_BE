@@ -1,6 +1,6 @@
 package com.pickcar.dailyreport.infrastructure.dto;
 
-public record StaticInfoProjection(
+public record VehicleReservationStatProjection(
         Integer totalVehicleCount,
         Integer reservedVehiclesCount,
         Integer delayedCount,

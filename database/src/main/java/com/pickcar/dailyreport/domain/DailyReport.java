@@ -24,21 +24,16 @@ public class DailyReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
     private LocalDate reportDate;
 
-    // FIXME: 현재 StaticInfo와 NonStaticInfo의 정의가 반대로 되어있는 것 같음.
-    //  마지막에 네이밍 변경과 정의 수정 필요
     @Embedded
-    private StaticInfo staticInfo;
+    private VehicleReservationStat vehicleReservationStat;
 
     @Embedded
     private DynamicInfo dynamicInfo;
 
-    public DailyReport(LocalDate reportDate, StaticInfo staticInfo) {
+    public DailyReport(LocalDate reportDate, VehicleReservationStat vehicleReservationStat) {
         this.reportDate = reportDate;
-        this.staticInfo = staticInfo;
+        this.vehicleReservationStat = vehicleReservationStat;
     }
 }

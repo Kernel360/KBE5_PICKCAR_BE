@@ -1,8 +1,8 @@
 package com.pickcar.dailyreport.presentation;
 
 import com.pickcar.dailyreport.application.DailyReportService;
-import com.pickcar.dailyreport.domain.DailyReport;
 import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
+import com.pickcar.dailyreport.presentation.dto.response.VehicleReservationStatResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +25,12 @@ public class DailyReportApiController {
     @ResponseStatus(HttpStatus.OK)
     public void getAnalytics() {
 //        return dailyReportService.getStaticAnalytics(0L);
+    }
+
+    @GetMapping("/stat")
+    @ResponseStatus(HttpStatus.OK)
+    public VehicleReservationStatResponse vehicleReservationStat() {
+        return dailyReportService.getVehicleReservationStatResponse();
     }
 
     @PostMapping("/dummy")

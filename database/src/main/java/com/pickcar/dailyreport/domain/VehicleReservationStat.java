@@ -13,7 +13,7 @@ import lombok.Setter;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class StaticInfo {
+public class VehicleReservationStat {
 
     private Integer totalVehicleCount;
 

@@ -1,15 +1,19 @@
 package com.pickcar.dailyreport.application;
 
+import com.pickcar.dailyreport.application.mapper.DailyReportResponseMapper;
 import com.pickcar.dailyreport.domain.DailyReport;
-import com.pickcar.dailyreport.domain.StaticInfo;
+import com.pickcar.dailyreport.domain.VehicleReservationStat;
 import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
-import com.pickcar.dailyreport.infrastructure.dto.StaticInfoProjection;
+import com.pickcar.dailyreport.infrastructure.dto.PastVehicleReservationStatProjection;
+import com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection;
 import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
+import com.pickcar.dailyreport.presentation.dto.response.VehicleReservationStatResponse;
 import com.pickcar.drivehistory.application.service.DriveHistoryService;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,21 +24,35 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class DailyReportService {
 
+    private final DailyReportResponseMapper responseMapper;
     private final DriveHistoryService driveHistoryService;
     private final DailyReportRepository dailyReportRepository;
 
     @Transactional
-    public void save(StaticInfo staticInfo) {
-        dailyReportRepository.save(new DailyReport(LocalDate.now(), staticInfo));
+    public void save(VehicleReservationStat vehicleReservationStat) {
+        dailyReportRepository.save(new DailyReport(LocalDate.now(), vehicleReservationStat));
     }
 
-    public StaticInfo collectStaticInfos() {
-        //FIXME: 각 서비스를 호출하며 JPA 조회를 하지 않고 JPA 없이 Analytics 레포지토리를 만들어서 context를 한 번에 조회하도록
+    public void getPreInfo() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        VehicleReservationStatProjection projection = getVehicleReservationStat();
+        PastVehicleReservationStatProjection yesterdayProjection = dailyReportRepository.findStatByDate(yesterday);
+    }
+
+    public VehicleReservationStatResponse getVehicleReservationStatResponse() {
+        VehicleReservationStatProjection projection = getVehicleReservationStat();
+        responseMapper.toStatResponse(projection);
+    }
+
+    private VehicleReservationStatProjection getVehicleReservationStat() {
         LocalDate today = LocalDate.now();
         LocalDate after3Days = today.plusDays(3);
-        StaticInfoProjection projection = dailyReportRepository.findStaticInfo(today, after3Days);
+        return dailyReportRepository.findStaticInfo(today, after3Days);
+    }
 
-        return new StaticInfo(
+    public VehicleReservationStat collectVehicleReservationStat() {
+        VehicleReservationStatProjection projection = getVehicleReservationStat();
+        return new VehicleReservationStat(
                 projection.totalVehicleCount(),
                 projection.reservedVehiclesCount(),
                 projection.totalVehicleCount() - projection.reservedVehiclesCount(),
@@ -52,7 +70,7 @@ public class DailyReportService {
     }
 
     public void saveDummy(GenerateDummyReportRequest request) {
-        dailyReportRepository.save(new DailyReport(request.reportDate(), request.staticInfo()));
+        dailyReportRepository.save(new DailyReport(request.reportDate(), request.vehicleReservationStat()));
 
         setUpDynamicInfos();
     }
