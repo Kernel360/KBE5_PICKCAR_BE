@@ -80,6 +80,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     AllocatedReservationInfoProjection findAllocatedReservationInfo(Long userId, List<ReservationStatus> statuses);
 
     Long countByStatusIn(List<ReservationStatus> reservationstatuses);
+
     Long countByStatus(ReservationStatus reservationStatus);
+
     Long countByStatusAndDueDateBetween(ReservationStatus reservationStatus, LocalDate from, LocalDate to);
 }

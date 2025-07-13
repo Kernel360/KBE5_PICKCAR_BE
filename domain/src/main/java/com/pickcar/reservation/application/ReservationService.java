@@ -18,7 +18,6 @@ import com.pickcar.reservation.presentation.dto.response.AllocatedReservationInf
 import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import com.pickcar.vehicle.application.VehicleService;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

@@ -9,8 +9,8 @@ import com.pickcar.dailyreport.domain.VehicleReservationStat;
 import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
 import com.pickcar.dailyreport.infrastructure.dto.DestinationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection;
-import com.pickcar.dailyreport.infrastructure.dto.PastVehicleReservationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection;
+import com.pickcar.dailyreport.presentation.dto.response.DailyReportPreInfoResponse;
 import com.pickcar.dailyreport.presentation.dto.response.VehicleReservationStatResponse;
 import com.pickcar.drivehistory.application.service.DriveHistoryService;
 import com.pickcar.drivehistory.domain.DriveHistory;
@@ -36,10 +36,19 @@ public class DailyReportService {
         dailyReportRepository.save(new DailyReport(LocalDate.now(), vehicleReservationStat, dynamicInfo));
     }
 
-    public void getPreInfo() {
+    public DailyReportPreInfoResponse getPreInfo() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        VehicleReservationStatProjection projection = getVehicleReservationStat();
-        PastVehicleReservationStatProjection yesterdayProjection = dailyReportRepository.findStatByDate(yesterday);
+        DailyReport dailyReport = getByReportDate(yesterday);
+        VehicleReservationStat currentStat = collectVehicleReservationStat();
+        VehicleReservationStat yesterdayStat = dailyReport.getVehicleReservationStat();
+        DynamicInfo yesterdayDynamicInfo = dailyReport.getDynamicInfo();
+
+        return responseMapper.toPreInfoResponse(currentStat, yesterdayStat, yesterdayDynamicInfo);
+    }
+
+    private DailyReport getByReportDate(LocalDate yesterday) {
+        return dailyReportRepository.findByReportDate(yesterday)
+                .orElseThrow(() -> new IllegalArgumentException("해당 일자 통계 데이터를 찾을 수 없습니다."));
     }
 
     public VehicleReservationStatResponse getVehicleReservationStatResponse() {

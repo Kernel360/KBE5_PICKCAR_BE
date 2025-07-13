@@ -1,10 +1,8 @@
 package com.pickcar.drivehistory.infrastructure;
 
-import com.pickcar.dailyreport.domain.DriverAndDistanceContext;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

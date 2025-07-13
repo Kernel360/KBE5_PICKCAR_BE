@@ -1,7 +1,6 @@
 package com.pickcar.dailyreport.infrastructure;
 
 import com.pickcar.dailyreport.domain.DailyReport;
-import com.pickcar.dailyreport.domain.DriverAndDistanceContext;
 import com.pickcar.dailyreport.infrastructure.dto.DestinationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection;
 import com.pickcar.dailyreport.infrastructure.dto.PastVehicleReservationStatProjection;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface DailyReportRepository extends JpaRepository<DailyReport, Long> {
 
@@ -51,17 +49,17 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     List<DestinationStatProjection> findYesterDayDestinationStats(LocalDate yesterday);
 
     @Query("""
-        SELECT new com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection(
-            u.info.name,
-            SUM(dh.totalDistance)
-        )
-        FROM DriveHistory dh
-        JOIN Reservation r ON dh.reservationId = r.id
-        JOIN User u ON r.userId = u.id
-        WHERE FUNCTION('DATE', dh.drivingEndedAt) = :yesterday
-        GROUP BY r.userId, u.info.name
-        ORDER BY SUM(dh.totalDistance) DESC
-        """)
+            SELECT new com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection(
+                u.info.name,
+                SUM(dh.totalDistance)
+            )
+            FROM DriveHistory dh
+            JOIN Reservation r ON dh.reservationId = r.id
+            JOIN User u ON r.userId = u.id
+            WHERE FUNCTION('DATE', dh.drivingEndedAt) = :yesterday
+            GROUP BY r.userId, u.info.name
+            ORDER BY SUM(dh.totalDistance) DESC
+            """)
     List<DriverAndDistanceProjection> findTop3EmployeeNameAndTotalDistance(LocalDate yesterday);
 
     Optional<DailyReport> findByReportDate(LocalDate date);

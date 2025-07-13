@@ -1,6 +1,7 @@
 package com.pickcar.dailyreport.presentation;
 
 import com.pickcar.dailyreport.application.DailyReportService;
+import com.pickcar.dailyreport.presentation.dto.response.DailyReportPreInfoResponse;
 import com.pickcar.dailyreport.presentation.dto.response.VehicleReservationStatResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,5 +23,11 @@ public class DailyReportApiController {
     @ResponseStatus(HttpStatus.OK)
     public VehicleReservationStatResponse vehicleReservationStat() {
         return dailyReportService.getVehicleReservationStatResponse();
+    }
+
+    @GetMapping("/pre-info")
+    @ResponseStatus(HttpStatus.OK)
+    public DailyReportPreInfoResponse preInfo() {
+        return dailyReportService.getPreInfo();
     }
 }
