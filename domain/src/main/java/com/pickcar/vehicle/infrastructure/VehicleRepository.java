@@ -5,7 +5,6 @@ import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.infrastructure.dto.AssignedVehiclesProjection;
 import com.pickcar.vehicle.infrastructure.dto.AvailableVehicleProjection;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

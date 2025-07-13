@@ -1,9 +1,11 @@
 package com.pickcar.vehicle.application.validator;
 
+import com.pickcar.vehicle.domain.Vehicle;
 import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.exception.VehicleErrorCode;
 import com.pickcar.vehicle.exception.VehicleException;
 import com.pickcar.vehicle.infrastructure.VehicleRepository;
+import com.pickcar.vehicle.presentation.dto.request.ChangeVehicleStatusRequest;
 import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +36,11 @@ public class VehicleValidator {
                 throw new VehicleException(VehicleErrorCode.REGISTER_REQUEST_FORMAT_INVALID);
             }
         });
+    }
+
+    public void validateChangeStatusRequest(ChangeVehicleStatusRequest request, Vehicle vehicle) {
+        if (vehicle.getStatus().equals(request.vehicleStatus())) {
+            throw new VehicleException(VehicleErrorCode.ALREADY_SET_UP_STATUS);
+        }
     }
 }

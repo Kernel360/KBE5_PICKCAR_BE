@@ -1,14 +1,11 @@
 package com.pickcar.vehicle.application.mapper;
 
 import com.pickcar.vehicle.domain.Vehicle;
-import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.infrastructure.dto.AssignedVehiclesProjection;
 import com.pickcar.vehicle.infrastructure.dto.AvailableVehicleProjection;
 import com.pickcar.vehicle.presentation.dto.response.AvailableVehicleListResponse;
 import com.pickcar.vehicle.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.presentation.dto.response.VehicleListResponse;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +18,8 @@ public class VehicleResponseMapper {
                 .toList();
     }
 
-    public List<AvailableVehicleListResponse> toAvailableVehicleListResponse(List<AvailableVehicleProjection> projections) {
+    public List<AvailableVehicleListResponse> toAvailableVehicleListResponse(
+            List<AvailableVehicleProjection> projections) {
         return projections.stream()
                 .map(AvailableVehicleListResponse::from)
                 .toList();

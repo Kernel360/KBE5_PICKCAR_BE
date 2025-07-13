@@ -1,10 +1,8 @@
 package com.pickcar.vehicle.application;
 
-import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.vehicle.application.mapper.VehicleResponseMapper;
 import com.pickcar.vehicle.application.validator.VehicleValidator;
 import com.pickcar.vehicle.domain.Vehicle;
-import com.pickcar.vehicle.domain.VehicleInfo;
 import com.pickcar.vehicle.domain.VehicleStatus;
 import com.pickcar.vehicle.exception.VehicleErrorCode;
 import com.pickcar.vehicle.exception.VehicleException;
@@ -15,10 +13,7 @@ import com.pickcar.vehicle.presentation.dto.request.ChangeVehicleStatusRequest;
 import com.pickcar.vehicle.presentation.dto.request.VehicleRegisterRequest;
 import com.pickcar.vehicle.presentation.dto.response.AvailableVehicleListResponse;
 import com.pickcar.vehicle.presentation.dto.response.SearchAbleVehiclesResponse;
-import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
 import com.pickcar.vehicle.presentation.dto.response.VehicleListResponse;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,16 +48,12 @@ public class VehicleService {
 
     @Transactional
     public void changeStatus(ChangeVehicleStatusRequest request) {
-        Vehicle vehicle = getById(request.vehicleId());
-
-        if (vehicle.getStatus().equals(request.vehicleStatus())) {
-            throw new VehicleException(VehicleErrorCode.ALREADY_SET_UP_STATUS);
-        }
-
-        vehicle.changeStatus(request.vehicleStatus());
-        //FIXME: 차량의 상태 <-> 예약의 상태 사용하는 구간 / 정의 / 예시 똑바로 설정
+        Vehicle targetVehicle = getById(request.vehicleId());
+        validator.validateChangeStatusRequest(request, targetVehicle);
+        targetVehicle.changeStatus(request.vehicleStatus());
     }
 
+    @Transactional
     public void processRented(Long vehicleId) {
         Vehicle vehicle = getById(vehicleId);
         if (!vehicle.tryMarkAsRented()) {
@@ -70,6 +61,7 @@ public class VehicleService {
         }
     }
 
+    @Transactional
     public void processReturned(Long vehicleId) {
         Vehicle vehicle = getById(vehicleId);
         if (!vehicle.tryMarkAsReturned()) {
@@ -79,7 +71,6 @@ public class VehicleService {
 
     public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
         List<AssignedVehiclesProjection> projections = vehicleRepository.findAssignedVehicles(VehicleStatus.OPERABLE);
-
         return responseMapper.toAssignedVehiclesResponse(projections);
     }
 
