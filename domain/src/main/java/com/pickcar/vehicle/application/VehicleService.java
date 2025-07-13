@@ -35,8 +35,6 @@ public class VehicleService {
     @Transactional
     public void register(VehicleRegisterRequest request) {
         validator.validateRegisterRequest(request);
-
-
         Vehicle vehicle = new Vehicle(request.vehicleInfo(), request.hasGps());
         vehicleRepository.save(vehicle);
     }
@@ -49,19 +47,8 @@ public class VehicleService {
 
     @Transactional(readOnly = true)
     public List<VehicleListResponse> getAllList() {
-        List<VehicleListResponse> responses = new ArrayList<>();
-
-        //FIXME: findAll이 아닌 뭔가 조건이 있어야 함 (계약중인 같은)
-        for (Vehicle v : vehicleRepository.findAll()) {
-            VehicleInfo info = v.getInfo();
-            VehicleListResponse response = new VehicleListResponse(v.getId(), info.getLicensePlate(), info.getModel(),
-                    info.getColor(), v.getStatus(), "빌린 회사명", LocalDate.now());
-            //FIXME: 빌린 회사 명, 빌린 시각 수정 필요, status도 rental관련 status 여야함
-
-            responses.add(response);
-        }
-
-        return responses;
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+        return responseMapper.toListResponses(vehicles);
     }
 
     @Transactional
