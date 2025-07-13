@@ -4,6 +4,7 @@ import com.pickcar.dailyreport.application.mapper.DailyReportResponseMapper;
 import com.pickcar.dailyreport.domain.DailyReport;
 import com.pickcar.dailyreport.domain.VehicleReservationStat;
 import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
+import com.pickcar.dailyreport.infrastructure.dto.DestinationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.PastVehicleReservationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection;
 import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
@@ -12,7 +13,9 @@ import com.pickcar.drivehistory.application.service.DriveHistoryService;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +44,7 @@ public class DailyReportService {
 
     public VehicleReservationStatResponse getVehicleReservationStatResponse() {
         VehicleReservationStatProjection projection = getVehicleReservationStat();
-        responseMapper.toStatResponse(projection);
+        return responseMapper.toStatResponse(projection);
     }
 
     private VehicleReservationStatProjection getVehicleReservationStat() {
@@ -76,23 +79,14 @@ public class DailyReportService {
     }
 
     public void setUpDynamicInfos() {
-        /*
-            TODO:
-                1. 최근 일주일 간 모든 운행의 총 운행 KM 수를 각각 점 그래프로 - totalMovedDistance
-                2. 어제자 기준 가장 이용량이 많은 사원 TOP 3 - 총 이동 거리
-                3. 전일 기준 지역별 차량 분포 (권역/구역별 차량 배치 현황)
-         */
-
-        //어제자 총 운행 km 수
-        Double movedDistance = calcTotalMovedDistance();
-
-        //어제자 기준 가장 이요량이 많은 사원 TOP3 + 총 이동 거리
+        Double totalMovedDistance = calcTotalMovedDistance();
         List<Top3DriverDistanceContext> yesterdayTop3MovementContext = getYesterdayTop3MovementContext();
+        List<DestinationStatProjection> yesterdayDestinationCounts = findYesterdayDestinationCounts();
+    }
 
-        //전일 기준 지역별 차량 분포 (reverse geocoding)
-
-        log.info("Total moved distance: {}", movedDistance);
-        log.info("yesterdayTop3MovementContext: {}", yesterdayTop3MovementContext);
+    private List<DestinationStatProjection> findYesterdayDestinationCounts() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        return dailyReportRepository.findYesterDayDestinationStats(yesterday);
     }
 
     private Double calcTotalMovedDistance() {
