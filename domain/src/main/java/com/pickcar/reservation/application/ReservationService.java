@@ -116,24 +116,4 @@ public class ReservationService {
 
         return responseMapper.toAllocatedReservationInfo(projection);
     }
-
-    public Long getReservedVehiclesCount() {
-        return reservationRepository.countByStatusIn(List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
-    }
-
-    //FIXME: getDelayedCount와 getExpectedReturnCount 통합 가능
-    public Long getExpectedReturnCount() {
-        LocalDate today = LocalDate.now();
-        LocalDate after3Days = today.plusDays(3);
-
-        // FIXME: 조회 성능 개선 필요 (2번 요청 X)
-        Long delayedCount = reservationRepository.countByStatus(ReservationStatus.DELAYED);
-        Long expectedReturnCount = reservationRepository.countByStatusAndDueDateBetween(ReservationStatus.RESERVED, today, after3Days);
-
-        return delayedCount + expectedReturnCount;
-    }
-
-    public Long getDelayedCount() {
-        return reservationRepository.countByStatus(ReservationStatus.DELAYED);
-    }
 }

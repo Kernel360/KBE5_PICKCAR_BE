@@ -15,14 +15,14 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StaticInfo {
 
-    private Long totalVehicleCount;
+    private Integer totalVehicleCount;
 
-    private Long reservedVehicleCount;
+    private Integer reservedVehicleCount;
 
-    private Long notOperableVehicleCount;
+    private Integer notOperableVehicleCount;
 
-    private Long expectedReturnCount;
+    private Integer expectedReturnCount;
 
-    private Long delayedCount;
+    private Integer delayedCount;
 
 }

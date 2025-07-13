@@ -78,8 +78,4 @@ public class VehicleService {
         List<AvailableVehicleProjection> projections = vehicleRepository.findAvailableVehicles(VehicleStatus.OPERABLE);
         return responseMapper.toAvailableVehicleListResponse(projections);
     }
-
-    public Long getAllCount() {
-        return vehicleRepository.count();
-    }
 }

@@ -3,34 +3,23 @@ package com.pickcar.dailyreport.application;
 import com.pickcar.dailyreport.domain.DailyReport;
 import com.pickcar.dailyreport.domain.StaticInfo;
 import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
+import com.pickcar.dailyreport.infrastructure.dto.StaticInfoProjection;
 import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
 import com.pickcar.drivehistory.application.service.DriveHistoryService;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.presentation.dto.context.Top3DriverDistanceContext;
-import com.pickcar.reservation.application.ReservationService;
-import com.pickcar.vehicle.application.VehicleService;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DailyReportService {
 
-    @Value("${kakao.map.rest-api-key}")
-    private String kakaoMapSecretKey;
-
-    private final VehicleService vehicleService;
-    private final ReservationService reservationService;
     private final DriveHistoryService driveHistoryService;
     private final DailyReportRepository dailyReportRepository;
 
@@ -41,17 +30,17 @@ public class DailyReportService {
 
     public StaticInfo collectStaticInfos() {
         //FIXME: 각 서비스를 호출하며 JPA 조회를 하지 않고 JPA 없이 Analytics 레포지토리를 만들어서 context를 한 번에 조회하도록
-        Long totalVehicleCount = vehicleService.getAllCount();
-        Long reservedVehiclesCount = reservationService.getReservedVehiclesCount();
-        Long expectedReturnCount = reservationService.getExpectedReturnCount();
-        Long delayedCount = reservationService.getDelayedCount();
+        LocalDate today = LocalDate.now();
+        LocalDate after3Days = today.plusDays(3);
+        StaticInfoProjection projection = dailyReportRepository.findStaticInfo(today, after3Days);
 
         return new StaticInfo(
-                totalVehicleCount,
-                reservedVehiclesCount,
-                (totalVehicleCount - reservedVehiclesCount),
-                expectedReturnCount,
-                delayedCount);
+                projection.totalVehicleCount(),
+                projection.reservedVehiclesCount(),
+                projection.totalVehicleCount() - projection.reservedVehiclesCount(),
+                projection.expectedReturnInNext3Days(),
+                projection.delayedCount()
+        );
     }
 
     public void collectNonStaticInfos() {
