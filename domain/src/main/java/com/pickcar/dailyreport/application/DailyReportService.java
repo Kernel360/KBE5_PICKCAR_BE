@@ -9,6 +9,7 @@ import com.pickcar.dailyreport.domain.VehicleReservationStat;
 import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
 import com.pickcar.dailyreport.infrastructure.dto.DestinationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection;
+import com.pickcar.dailyreport.infrastructure.dto.MovedDistanceHistoryProjection;
 import com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection;
 import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
 import com.pickcar.dailyreport.presentation.dto.response.DailyReportPreInfoResponse;
@@ -42,8 +43,9 @@ public class DailyReportService {
         VehicleReservationStat currentStat = collectVehicleReservationStat();
         VehicleReservationStat yesterdayStat = dailyReport.getVehicleReservationStat();
         DynamicInfo yesterdayDynamicInfo = dailyReport.getDynamicInfo();
+        List<MovedDistanceHistoryProjection> distanceProjections = getMovedDistanceHistories();
 
-        return responseMapper.toPreInfoResponse(currentStat, yesterdayStat, yesterdayDynamicInfo);
+        return responseMapper.toPreInfoResponse(currentStat, yesterdayStat, yesterdayDynamicInfo, distanceProjections);
     }
 
     private DailyReport getByReportDate(LocalDate yesterday) {
@@ -128,5 +130,11 @@ public class DailyReportService {
                         projection.visitCount()
                 ))
                 .toList();
+    }
+
+    private List<MovedDistanceHistoryProjection> getMovedDistanceHistories() {
+        LocalDate startDate = LocalDate.now().minusDays(7);
+        LocalDate endDate = LocalDate.now().minusDays(1);
+        return dailyReportRepository.findLast7DaysDistance(startDate, endDate);
     }
 }
