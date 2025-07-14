@@ -14,16 +14,15 @@ import org.springframework.data.jpa.repository.Query;
 public interface DailyReportRepository extends JpaRepository<DailyReport, Long> {
 
     @Query("""
-            SELECT new com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection(
-                (SELECT COUNT(v) FROM Vehicle v),
-                (SELECT COUNT(r) FROM Reservation r WHERE r.status IN ('RESERVED', 'DELAYED')),
-                (SELECT COUNT(r) FROM Reservation r WHERE r.status = 'DELAYED'),
-                (SELECT COUNT(r) FROM Reservation r
-                 WHERE r.status = 'RESERVED'
-                 AND r.dueDate BETWEEN :today AND :after3Days)
-            )
-            FROM Reservation reservation
-            """)
+        SELECT new com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection(
+            CAST((SELECT COUNT(v) FROM Vehicle v) AS int),
+            CAST((SELECT COUNT(r) FROM Reservation r WHERE r.status IN ('RESERVED', 'DELAYED')) AS int),
+            CAST((SELECT COUNT(r) FROM Reservation r WHERE r.status = 'DELAYED') AS int),
+            CAST((SELECT COUNT(r) FROM Reservation r
+             WHERE r.status = 'RESERVED'
+             AND r.dueDate BETWEEN :today AND :after3Days) AS int)
+        )
+        """)
     VehicleReservationStatProjection findVehicleReservationStat(LocalDate today, LocalDate after3Days);
 
     @Query("""
