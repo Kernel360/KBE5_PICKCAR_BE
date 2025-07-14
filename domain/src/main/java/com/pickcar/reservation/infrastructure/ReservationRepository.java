@@ -25,6 +25,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("""
             SELECT new com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection(
+                r.id,
                 u.id,
                 u.info.name,
                 u.info.email,
