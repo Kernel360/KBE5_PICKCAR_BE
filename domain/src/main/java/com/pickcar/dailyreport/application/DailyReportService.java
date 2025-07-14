@@ -31,7 +31,8 @@ public class DailyReportService {
 
     @Transactional
     public void save(VehicleReservationStat vehicleReservationStat, DynamicInfo dynamicInfo) {
-        dailyReportRepository.save(new DailyReport(LocalDate.now(), vehicleReservationStat, dynamicInfo));
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        dailyReportRepository.save(new DailyReport(yesterday, vehicleReservationStat, dynamicInfo));
     }
 
     public DailyReportPreInfoResponse getPreInfo() {
