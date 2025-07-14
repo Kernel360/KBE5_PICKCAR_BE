@@ -10,6 +10,7 @@ import com.pickcar.dailyreport.infrastructure.DailyReportRepository;
 import com.pickcar.dailyreport.infrastructure.dto.DestinationStatProjection;
 import com.pickcar.dailyreport.infrastructure.dto.DriverAndDistanceProjection;
 import com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection;
+import com.pickcar.dailyreport.presentation.dto.request.GenerateDummyReportRequest;
 import com.pickcar.dailyreport.presentation.dto.response.DailyReportPreInfoResponse;
 import com.pickcar.dailyreport.presentation.dto.response.VehicleReservationStatResponse;
 import java.time.LocalDate;
@@ -81,6 +82,11 @@ public class DailyReportService {
         List<DestinationCountStat> destinationStats = convertToDestinationStats(yesterdayDestinationCounts);
 
         return new DynamicInfo(totalMovedDistance, driverContexts, destinationStats);
+    }
+
+    public void generateDummy(GenerateDummyReportRequest request) {
+        dailyReportRepository.save(new DailyReport(request.reportDate(),
+                request.vehicleReservationStat(), request.dynamicInfo()));
     }
 
     private Double calcTotalMovedDistance() {
