@@ -1,9 +1,10 @@
 name: Build and Deploy Domain Service
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - dev
 
 jobs:
   build_and_deploy:
@@ -18,6 +19,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+
+      #gradlew 스크립트에 실행 권한을 줘서 Gradle 빌드 가능하도록 설정
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
 
       - name: Build domain JAR
         working-directory: ./domain
