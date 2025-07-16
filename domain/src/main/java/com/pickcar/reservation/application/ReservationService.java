@@ -1,6 +1,8 @@
 package com.pickcar.reservation.application;
 
 import com.pickcar.auth.domain.UserRole;
+import com.pickcar.drivehistory.application.service.DriveHistoryService;
+import com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection;
 import com.pickcar.dto.command.DriveHistoryWriteCommand;
 import com.pickcar.dto.command.ReservationReturnCommand;
 import com.pickcar.reservation.application.mapper.ReservationResponseMapper;
@@ -83,7 +85,14 @@ public class ReservationService {
         ReservationDetailProjection projection = reservationRepository.findReservationDetailById(reservationId)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_BY_ID));
 
-        return responseMapper.toDetailResponse(projection);
+        List<ReservationRelatedProjection> relatedHistoryProjections = getHistoriesById(projection.reservationId());
+
+        return responseMapper.toDetailResponse(projection, relatedHistoryProjections);
+    }
+
+
+    public List<ReservationRelatedProjection> getHistoriesById(Long reservationId) {
+        return reservationRepository.findAllRelatedReservationId(reservationId);
     }
 
     private Reservation getReservationForReturn(Long userId, Long vehicleId) {
