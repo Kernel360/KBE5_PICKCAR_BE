@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  pickcar-producer-test:
+    container_name: pickcar-producer-test
+    image: openjdk:21-jdk
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_RABBITMQ_HOST=${RABBITMQ_HOST}
+      - SPRING_RABBITMQ_PORT=${RABBITMQ_PORT}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - PINPOINT_AGENT_ID=${PINPOINT_AGENT_ID_PRODUCER}
+      - PINPOINT_APPLICATION_NAME=${PINPOINT_APPLICATION_NAME_PRODUCER}
+    ports:
+      - "8087:8080"
+    volumes:
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/producer-0.0.1-SNAPSHOT.jar:/app/app.jar
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/logs:/app/logs
+      - /pinpoint:/pinpoint
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/application-prod-producer.yml:/app/application-prod-producer.yml
+    working_dir: /app
+    command: >
+      java
+      -javaagent:/pinpoint/pinpoint-agent-2.5.4/pinpoint-bootstrap-2.5.4.jar
+      -Dpinpoint.agentId=${PINPOINT_AGENT_ID_PRODUCER}
+      -Dpinpoint.applicationName=${PINPOINT_APPLICATION_NAME_PRODUCER}
+      -Dpinpoint.config=/pinpoint/pinpoint-agent-2.5.4/pinpoint-root.config
+      -Duser.timezone=Asia/Seoul
+      -Dfile.encoding=UTF-8
+      -jar app.jar --spring.profiles.active=prod --spring.config.location=file:./application-prod-producer.yml
+    networks:
+      - pickcar-net-test
+
+  pickcar-consumer-test:
+    container_name: pickcar-consumer-test
+    image: openjdk:21-jdk
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_RABBITMQ_HOST=${RABBITMQ_HOST}
+      - SPRING_RABBITMQ_PORT=${RABBITMQ_PORT}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - PINPOINT_AGENT_ID=${PINPOINT_AGENT_ID_CONSUMER}
+      - PINPOINT_APPLICATION_NAME=${PINPOINT_APPLICATION_NAME_CONSUMER}
+    ports:
+      - "8088:8080"
+    volumes:
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/consumer-0.0.1-SNAPSHOT.jar:/app/app.jar
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/logs:/app/logs
+      - /pinpoint:/pinpoint
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/application-prod-consumer.yml:/app/application-prod-consumer.yml
+    working_dir: /app
+    command: >
+      java
+      -javaagent:/pinpoint/pinpoint-agent-2.5.4/pinpoint-bootstrap-2.5.4.jar
+      -Dpinpoint.agentId=${PINPOINT_AGENT_ID_CONSUMER}
+      -Dpinpoint.applicationName=${PINPOINT_APPLICATION_NAME_CONSUMER}
+      -Dpinpoint.config=/pinpoint/pinpoint-agent-2.5.4/pinpoint-root.config
+      -Duser.timezone=Asia/Seoul
+      -Dfile.encoding=UTF-8
+      -jar app.jar --spring.profiles.active=prod --spring.config.location=file:./application-prod-consumer.yml
+    networks:
+      - pickcar-net-test
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail-test
+    ports:
+      - "9089:9080"
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/promtail-config.yml:/etc/promtail/config.yml
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/logs:/app/logs
+      - /home/${EC2_USERNAME}/pickcar-pubsub-test/promtail:/var/log/promtail
+    environment:
+      - HOSTNAME=${HOSTNAME:-$(hostname)}
+      - EC2_INSTANCE_ID=${EC2_INSTANCE_ID:-unknown}
+    networks:
+      - pickcar-net-test
+    restart: unless-stopped
+    depends_on:
+      - pickcar-producer-test
+      - pickcar-consumer-test
+
+volumes:
+  mysql-data:
+    name: mysql-data
+
+networks:
+  pickcar-net-test:
+    name: pickcar-net-test

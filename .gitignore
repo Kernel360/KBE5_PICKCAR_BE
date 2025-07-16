@@ -199,9 +199,6 @@ logs/.promtail-positions.yml
 # AWS
 *.pem
 *.pub
-/docker/docker-compose.domain.yml
-/docker/docker-compose.pubsub.yml
-/docker/docker-compose.sse.yml
 **/application-docker.yml
 Dockerfile
 docker/produce/**
