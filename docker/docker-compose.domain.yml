@@ -28,6 +28,7 @@ services:
     working_dir: /app
     command: >
       java
+      -Ddebug
       -javaagent:/pinpoint/pinpoint-agent-2.5.4/pinpoint-bootstrap-2.5.4.jar
       -Dpinpoint.agentId=${PINPOINT_AGENT_ID}
       -Dpinpoint.applicationName=${PINPOINT_APPLICATION_NAME}
