@@ -37,6 +37,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             LEFT JOIN Reservation r ON u.id = r.userId AND r.status IN :statuses
             LEFT JOIN Vehicle v ON r.vehicleId = v.id
             WHERE u.role = :role
+            ORDER BY u.info.name
             """)
     List<EmployeeReservationProjection> findEmployeesWithReservationPreInfo(UserRole role,
                                                                             List<ReservationStatus> statuses);
