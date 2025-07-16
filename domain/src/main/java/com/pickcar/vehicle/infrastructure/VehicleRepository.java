@@ -36,5 +36,5 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
             """)
     List<AvailableVehicleProjection> findAvailableVehicles(VehicleStatus status);
 
-    List<Vehicle> findAllOrderByCreatedAtDesc();
+    List<Vehicle> findAllByOrderByCreatedAtDesc();
 }

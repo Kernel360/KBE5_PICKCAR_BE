@@ -42,7 +42,7 @@ public class VehicleService {
 
     @Transactional(readOnly = true)
     public List<VehicleListResponse> getAllList() {
-        List<Vehicle> vehicles = vehicleRepository.findAllOrderByCreatedAtDesc();
+        List<Vehicle> vehicles = vehicleRepository.findAllByOrderByCreatedAtDesc();
         return responseMapper.toListResponses(vehicles);
     }
 
