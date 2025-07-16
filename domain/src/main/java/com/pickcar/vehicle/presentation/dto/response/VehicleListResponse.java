@@ -11,12 +11,12 @@ public record VehicleListResponse(
         String model,
         String color,
         VehicleStatus vehicleStatus,
-        String rentedCompany,
-        LocalDate rentedAt
+        Boolean isRented,
+        LocalDate createdAt
 ) {
     public static VehicleListResponse from(Vehicle vehicle) {
         VehicleInfo info = vehicle.getInfo();
         return new VehicleListResponse(vehicle.getId(), info.getLicensePlate(), info.getModel(),
-                info.getColor(), vehicle.getStatus(), "빌린 회사명", LocalDate.now());
+                info.getColor(), vehicle.getStatus(), vehicle.getIsRented(), vehicle.getCreatedAt().toLocalDate());
     }
 }
