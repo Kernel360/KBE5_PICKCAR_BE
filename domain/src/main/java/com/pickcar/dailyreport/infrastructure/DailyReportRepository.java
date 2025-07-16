@@ -18,6 +18,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             SELECT new com.pickcar.dailyreport.infrastructure.dto.VehicleReservationStatProjection(
                 CAST((SELECT COUNT(v) FROM Vehicle v) AS int),
                 CAST((SELECT COUNT(r) FROM Reservation r WHERE r.status IN ('RESERVED', 'DELAYED')) AS int),
+                CAST((SELECT COUNT(v) FROM Vehicle v WHERE v.status IN ('DAMAGED', 'UNDER_INSPECTION')) AS int),
                 CAST((SELECT COUNT(r) FROM Reservation r WHERE r.status = 'DELAYED') AS int),
                 CAST((SELECT COUNT(r) FROM Reservation r
                  WHERE r.status = 'RESERVED'
