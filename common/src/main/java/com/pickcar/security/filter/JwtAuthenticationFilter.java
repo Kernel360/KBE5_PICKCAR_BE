@@ -41,7 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final List<String> EXCLUDE_URLS = List.of(
             "/api/v1/auth/sign-up",
             "/api/v1/auth/login",
-            "/api/v1/auth/logout"
+            "/api/v1/auth/logout",
+            "/api/v1/sse/**"
     );
 
 
