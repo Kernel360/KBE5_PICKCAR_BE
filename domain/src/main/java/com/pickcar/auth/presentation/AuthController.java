@@ -10,6 +10,7 @@ import com.pickcar.auth.presentation.dto.response.EmployeeListResponse;
 import com.pickcar.auth.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@RequestBody UserInfoRequest request) {
+    public void register(@Valid @RequestBody UserInfoRequest request) {
         authService.create(request);
     }
 
