@@ -29,7 +29,7 @@ public interface DriveHistoryRepository extends JpaRepository<DriveHistory, Long
             JOIN Vehicle v ON r.vehicleId = v.id
             WHERE (:driverName IS NULL OR :driverName = '' OR u.info.name = :driverName)
             AND dh.drivingStartedAt BETWEEN :from AND :to
-            ORDER BY dh.drivingStartedAt ASC
+            ORDER BY dh.drivingEndedAt DESC
             """)
     Page<DriveHistoryListProjection> findFilteredListProjection(String driverName, LocalDateTime from,
                                                                 LocalDateTime to, Pageable pageable);

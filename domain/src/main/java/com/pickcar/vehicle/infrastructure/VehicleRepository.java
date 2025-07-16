@@ -35,4 +35,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
             ORDER BY v.info.licensePlate
             """)
     List<AvailableVehicleProjection> findAvailableVehicles(VehicleStatus status);
+
+    List<Vehicle> findAllOrderByCreatedAtDesc();
 }
