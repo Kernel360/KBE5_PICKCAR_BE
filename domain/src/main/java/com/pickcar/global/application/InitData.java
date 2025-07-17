@@ -76,7 +76,7 @@ public class InitData implements CommandLineRunner {
     private void initDummyUsers() {
         userRepository.saveAll(
                 LongStream.iterate(1L, i -> i + 1)
-                        .limit(5L)
+                        .limit(10L)
                         .mapToObj(i -> new User(
                                 i,
                                 new UserInfo("user" + i + "@kernel.com", passwordEncoder.encode("1234"), "user" + i,
@@ -90,10 +90,22 @@ public class InitData implements CommandLineRunner {
     private void initDummyVehicles() {
         vehicleRepository.saveAll(
                 IntStream.iterate(1, i -> i + 1)
+                        .limit(5)
+                        .mapToObj(i -> new Vehicle(
+                                new VehicleInfo("model" + i, "color" + i, "가나다" + i,
+                                        "2020", "Brand", FuelType.DIESEL),
+                                VehicleStatus.OPERABLE,
+                                true,
+                                true
+                        ))
+                        .toList());
+
+        vehicleRepository.saveAll(
+                IntStream.iterate(6, i -> i + 1)
                         .limit(10)
                         .mapToObj(i -> new Vehicle(
                                 new VehicleInfo("model" + i, "color" + i, "가나다" + i,
-                                        "200", "Brand", FuelType.DIESEL),
+                                        "2020", "Brand", FuelType.DIESEL),
                                 VehicleStatus.OPERABLE,
                                 true,
                                 false

@@ -1,6 +1,6 @@
 package com.pickcar.emulator.application;
 
-import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
+import com.pickcar.dto.command.DriveHistoryWriteCommand;
 import com.pickcar.emulator.infrastructure.CycleQueryRepository;
 import com.pickcar.emulator.infrastructure.dto.CycleInfoProjection;
 import com.pickcar.emulator.infrastructure.dto.CycleProjection.TotalCycleData;
@@ -17,12 +17,11 @@ public class CycleQueryService {
 
     private final CycleQueryRepository cycleQueryRepository;
 
-    public TotalCycleData getCyclesBetweenOnOffTime(DriveHistoryPayload payload) {
+    public TotalCycleData getCyclesBetweenOnOffTime(DriveHistoryWriteCommand command) {
         List<CycleProjection> cycleProjections = cycleQueryRepository.findAllByVehicleIdAndOccurredAtBetween(
-                payload.getVehicleId(),
-                payload.getEngineOnTime(), payload.getEngineOffTime());
+                command.vehicleId(), command.engineOnTime(), command.engineOffTime());
 
-        if(cycleProjections.isEmpty()) {
+        if (cycleProjections.isEmpty()) {
             return TotalCycleData.empty();
         }
 

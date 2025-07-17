@@ -2,8 +2,6 @@ package com.pickcar.drivehistory.application.service;
 
 import com.pickcar.drivehistory.application.mapper.DriveHistoryResponseMapper;
 import com.pickcar.drivehistory.application.validator.DriveHistoryValidator;
-import com.pickcar.emulator.application.CycleQueryService;
-import com.pickcar.reservation.application.ReservationService;
 import com.pickcar.drivehistory.domain.DriveHistory;
 import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
 import com.pickcar.drivehistory.exception.DriveHistoryException;
@@ -11,12 +9,14 @@ import com.pickcar.drivehistory.infrastructure.DriveHistoryRepository;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryDetailProjection;
 import com.pickcar.drivehistory.infrastructure.dto.DriveHistoryListProjection;
 import com.pickcar.drivehistory.presentation.dto.api.KakaoReverseGeocodeResponse;
-import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
 import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryFilterRequest;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryDetailResponse;
 import com.pickcar.drivehistory.presentation.dto.response.DriveHistoryListResponse;
+import com.pickcar.dto.command.DriveHistoryWriteCommand;
+import com.pickcar.emulator.application.CycleQueryService;
 import com.pickcar.emulator.infrastructure.dto.CycleProjection.TotalCycleData;
 import com.pickcar.emulator.infrastructure.dto.PathContext;
+import com.pickcar.reservation.application.ReservationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,18 +53,19 @@ public class DriveHistoryService {
     private final DriveHistoryRepository driveHistoryRepository;
 
     @Transactional
-    public void write(DriveHistoryPayload payload) {
-        validator.validatePayload(payload);
-        Long reservationId = reservationService.getActiveReservationId(payload);
-        TotalCycleData cycleData = cycleQueryService.getCyclesBetweenOnOffTime(payload);
-        String destination = reverseGeocoding(payload.getDestLon(), payload.getDestLat()); // NOTE: 외부 API 호출 및 비동기 Update 처리 고려 가능
+    public void write(DriveHistoryWriteCommand command) {
+        validator.validatePayload(command);
+        Long reservationId = reservationService.getActiveReservationId(command);
+        TotalCycleData cycleData = cycleQueryService.getCyclesBetweenOnOffTime(command);
+        String destination = reverseGeocoding(command.destLon(),
+                command.destLat()); // NOTE: 외부 API 호출 및 비동기 Update 처리 고려 가능
 
         DriveHistory driveHistory = new DriveHistory(
                 reservationId,
-                payload.getEngineOnTime(),
-                payload.getEngineOffTime(),
+                command.engineOnTime(),
+                command.engineOffTime(),
                 cycleData.getCycleIds(),
-                cycleData.getTotalDistance(),
+                cycleData.getTotalDistance() / 1000,
                 destination
         );
 
@@ -80,7 +81,8 @@ public class DriveHistoryService {
                 filterRequest.getFrom(),
                 filterRequest.getTo(),
                 pageable
-        );;
+        );
+        ;
 
         return responseMapper.toResponsePage(projectionPage);
     }

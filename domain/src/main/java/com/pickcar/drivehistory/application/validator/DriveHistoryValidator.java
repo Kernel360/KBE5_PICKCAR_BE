@@ -2,7 +2,7 @@ package com.pickcar.drivehistory.application.validator;
 
 import com.pickcar.drivehistory.exception.DriveHistoryErrorCode;
 import com.pickcar.drivehistory.exception.DriveHistoryException;
-import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
+import com.pickcar.dto.command.DriveHistoryWriteCommand;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,11 +27,11 @@ public class DriveHistoryValidator {
         }
     }
 
-    public void validatePayload(DriveHistoryPayload payload) {
-        if (payload.getEngineOffTime().isBefore(payload.getEngineOnTime())) {
+    public void validatePayload(DriveHistoryWriteCommand command) {
+        if (command.engineOffTime().isBefore(command.engineOnTime())) {
             throw new DriveHistoryException(DriveHistoryErrorCode.END_TIME_BEFORE_START_TIME);
         }
-        if (payload.getVehicleId() == null || payload.getUserId() == null) {
+        if (command.vehicleId() == null || command.userId() == null) {
             throw new DriveHistoryException(DriveHistoryErrorCode.REQUIRED_FIELDS_MISSING);
         }
     }

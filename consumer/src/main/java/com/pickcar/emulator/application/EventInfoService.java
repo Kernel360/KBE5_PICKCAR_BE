@@ -1,6 +1,6 @@
 package com.pickcar.emulator.application;
 
-import com.pickcar.drivehistory.application.DriveHistoryPublisher;
+import com.pickcar.common.application.DomainCommandPublisher;
 import com.pickcar.emulator.dto.EventPayload;
 import com.pickcar.emulator.domain.EventInfo;
 import com.pickcar.emulator.infrastructure.EventInfoRepository;
@@ -27,7 +27,7 @@ public class EventInfoService {
 
     private final EventInfoRepository eventInfoRepository;
     private final RestTemplate restTemplate;
-    private final DriveHistoryPublisher driveHistoryPublisher;
+    private final DomainCommandPublisher domainCommandPublisher;
 
     public void on(EventPayload request) {
         saveEventInfo(request);
@@ -36,13 +36,13 @@ public class EventInfoService {
     public void off(EventPayload request, Long userId) {
         Optional<EventInfo> offEventInfo = saveEventInfo(request);
         offEventInfo.ifPresent(eventInfo -> {
-            driveHistoryPublisher.publishDriveHistory(eventInfo, userId);
+            domainCommandPublisher.publishDriveHistory(eventInfo, userId);
         });
     }
 
     public void returned(EventPayload request, Long userId) {
         EventInfo eventInfo = saveEventInfo(request).get();
-        submitReturn(userId, eventInfo.getVehicleId());
+        domainCommandPublisher.publishReservationReturn(userId, eventInfo.getVehicleId());
     }
 
     private void submitReturn(Long userId, Long vehicleId) {

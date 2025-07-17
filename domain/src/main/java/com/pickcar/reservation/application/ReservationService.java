@@ -1,26 +1,27 @@
 package com.pickcar.reservation.application;
 
-import com.pickcar.auth.application.AuthService;
-import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
-import com.pickcar.drivehistory.presentation.dto.request.DriveHistoryPayload;
+import com.pickcar.auth.domain.UserRole;
+import com.pickcar.drivehistory.application.service.DriveHistoryService;
+import com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection;
+import com.pickcar.dto.command.DriveHistoryWriteCommand;
+import com.pickcar.dto.command.ReservationReturnCommand;
+import com.pickcar.reservation.application.mapper.ReservationResponseMapper;
+import com.pickcar.reservation.application.validator.ReservationValidator;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
 import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
+import com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection;
+import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
+import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.AllocatedReservationInfo;
+import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
-import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
-import com.pickcar.security.jwt.JwtProvider;
 import com.pickcar.vehicle.application.VehicleService;
-import com.pickcar.vehicle.domain.Vehicle;
-import com.pickcar.vehicle.domain.VehicleStatus;
-import com.pickcar.vehicle.presentation.dto.response.UnAllocatedVehicleResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,28 +37,14 @@ public class ReservationService {
     @Value(value = "${custom.reservation.cool-down-minutes}")
     private Integer coolDownMinutes;
 
-    @Value(value = "${custom.reservation.maximum-due-date}")
-    private Integer maximumDueDate;
-
-    private final AuthService authService;
     private final VehicleService vehicleService;
-    private final JwtProvider jwtProvider;
+    private final ReservationValidator validator;
+    private final ReservationResponseMapper responseMapper;
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public void reservation(ReservationRequest request) {
-
-        //이미 할당된 차량이 있는 회원에 대해
-        if (hasAlreadyReservation(request.employeeId())) {
-            throw new ReservationException(ReservationErrorCode.EMPLOYEE_ALREADY_RESERVED);
-        }
-
-        //이미 할당처리가 된 차량에 대해
-        if (isAlreadyReserved(request.vehicleId())) {
-            throw new ReservationException(ReservationErrorCode.VEHICLE_ALREADY_RESERVED);
-        }
-
-        validateDueDate(request.dueDate());
+    public void reserving(ReservationRequest request) {
+        validator.validateReservationRequest(request);
 
         Reservation reservation = Reservation.builder()
                 .userId(request.employeeId())
@@ -68,49 +55,50 @@ public class ReservationService {
                 .status(ReservationStatus.RESERVED)
                 .build();
 
+        vehicleService.processRented(request.vehicleId());
         reservationRepository.save(reservation);
     }
 
     @Transactional
-    public void submitReturn(HttpServletRequest servletRequest, Long vehicleId) {
-        Long userId = jwtProvider.extractUserId(servletRequest);
-        Reservation reservation = getReturnTarget(userId, vehicleId);
-        reservation.submitReturn();
+    public void processReturn(ReservationReturnCommand command) {
+        Reservation reservation = getReservationForReturn(command.employeeId(), command.vehicleId());
+        vehicleService.processReturned(command.vehicleId());
+        reservation.markAsReturned();
     }
 
     public ReservationPreInfoResponse getReservationPreInfos() {
-        //FIXME: ID 리스트와 VEHICLE 리스트를 한 번에 가져오도록.
-        // 여기에 더해 사실장 이 response를 한 번에 가져올 수 있도록 변경 필요
-        List<Long> allocatedUserIds = reservationRepository.findUserIdsByStatusIn(
-                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+        List<EmployeeReservationProjection> projections = reservationRepository.findEmployeesWithReservationPreInfo(
+                UserRole.EMPLOYEE, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
-        List<Long> allocatedVehicleIds = reservationRepository.findVehicleIdsByStatusIn(
-                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
-
-        List<UnAllocatedEmployeeResponse> employeeInfos = authService.getUnAllocatedEmployeeInfos(allocatedUserIds);
-        List<UnAllocatedVehicleResponse> vehicleInfos = vehicleService.getAllUnAllocatedVehicleInfos(
-                allocatedVehicleIds);
-
-        return new ReservationPreInfoResponse(employeeInfos, vehicleInfos);
+        return responseMapper.toPreInfoResponse(projections);
     }
 
-    private Reservation getReturnTarget(Long userId, Long vehicleId) {
-        Optional<Reservation> maybeReservation = reservationRepository.findByUserIdAndVehicleIdAndStatusIn(userId,
-                vehicleId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
-
-        if (maybeReservation.isEmpty()) {
-            throw new ReservationException(ReservationErrorCode.UNAUTHORIZED_FOR_RETURN);
-        }
-
-        return maybeReservation.get();
-    }
-
-    public Long getActiveReservationId(DriveHistoryPayload payload) {
+    public Long getActiveReservationId(DriveHistoryWriteCommand command) {
         try {
-            return getActiveReservationByVehicleIdAndUserId(payload.getVehicleId(), payload.getUserId());
+            return getActiveReservationByVehicleIdAndUserId(command.vehicleId(), command.userId());
         } catch (ReservationException e) {
-            return getLatestValidReservation(payload.getVehicleId(), payload.getUserId());
+            return getLatestValidReservation(command.vehicleId(), command.userId());
         }
+    }
+
+    public ReservationDetailResponse getDetailResponse(Long reservationId) {
+        ReservationDetailProjection projection = reservationRepository.findReservationDetailById(reservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_BY_ID));
+
+        List<ReservationRelatedProjection> relatedHistoryProjections = getHistoriesById(projection.reservationId());
+
+        return responseMapper.toDetailResponse(projection, relatedHistoryProjections);
+    }
+
+
+    public List<ReservationRelatedProjection> getHistoriesById(Long reservationId) {
+        return reservationRepository.findAllRelatedReservationId(reservationId);
+    }
+
+    private Reservation getReservationForReturn(Long userId, Long vehicleId) {
+        return reservationRepository.findByUserIdAndVehicleIdAndStatusIn(userId, vehicleId,
+                        List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED))
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.UNAUTHORIZED_FOR_RETURN));
     }
 
     private Long getActiveReservationByVehicleIdAndUserId(Long vehicleId, Long userId) {
@@ -130,41 +118,10 @@ public class ReservationService {
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION));
     }
 
-    public List<SearchAbleVehiclesResponse> getAbleVehicles() {
-        //운행 가능한 상태의 차면서 예약 상태가 아닌 것
-        List<Vehicle> availableVehicles = reservationRepository.findAvailableVehicles(VehicleStatus.OPERABLE,
-                ReservationStatus.RESERVED);
+    public AllocatedReservationInfo getIdByUserIdFromReservation(Long userId) {
+        AllocatedReservationInfoProjection projection = reservationRepository.findAllocatedReservationInfo(
+                userId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
 
-        return availableVehicles.stream()
-                .map(SearchAbleVehiclesResponse::from)
-                .toList();
-    }
-
-    public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
-        //운행 가능한 상태의 차면서 예약 상태인 것
-        List<Vehicle> availableVehicles = reservationRepository.findAssignedVehicles(VehicleStatus.OPERABLE,
-                ReservationStatus.RESERVED);
-
-        return availableVehicles.stream()
-                .map(SearchAbleVehiclesResponse::from)
-                .toList();
-    }
-
-    private boolean isAlreadyReserved(Long vehicleId) {
-        return reservationRepository.findByVehicleIdAndStatus(vehicleId, ReservationStatus.RESERVED).isPresent();
-    }
-
-    private boolean hasAlreadyReservation(Long employeeId) {
-        return reservationRepository.findByUserIdAndStatus(employeeId, ReservationStatus.RESERVED).isPresent();
-    }
-
-    private void validateDueDate(LocalDate dueDate) {
-        if (dueDate.isBefore(LocalDate.now())) {
-            throw new ReservationException(ReservationErrorCode.DUE_DATE_CANNOT_BE_FUTURE);
-        }
-
-        if (dueDate.isAfter(LocalDate.now().plusDays(maximumDueDate))) {
-            throw new ReservationException(ReservationErrorCode.DUE_DATE_OVER_MAXIMUM);
-        }
+        return responseMapper.toAllocatedReservationInfo(projection);
     }
 }

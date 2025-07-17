@@ -33,5 +33,4 @@ public class User extends BaseEntity {//TODO: companyId 제거하기
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status;
-
 }

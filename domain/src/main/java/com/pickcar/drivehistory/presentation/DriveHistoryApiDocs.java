@@ -24,8 +24,8 @@ public interface DriveHistoryApiDocs {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = DriveHistoryListResponse.class))
             })
     Page<DriveHistoryListResponse> list(@ModelAttribute DriveHistoryFilterRequest filterRequest,
-                                               @PageableDefault(size = 10, sort = "drivingStartedAt", direction = Sort.Direction.DESC)
-                                               Pageable pageable);
+                                        @PageableDefault(size = 10, sort = "drivingStartedAt", direction = Sort.Direction.DESC)
+                                        Pageable pageable);
 
     @Operation(summary = "운행일지 디테일 조회", description = "운행일지 ID 기반으로 상세 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "운행일지 ID 기반으로 상세 정보를 성공적으로 불러왔음을 의미합니다.",
