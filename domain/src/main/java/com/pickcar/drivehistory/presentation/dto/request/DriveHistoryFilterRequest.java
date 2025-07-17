@@ -1,7 +1,6 @@
 package com.pickcar.drivehistory.presentation.dto.request;
 
 import java.time.LocalDateTime;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,13 +1,17 @@
 package com.pickcar.drivehistory.domain;
 
-import com.pickcar.emulator.domain.EventInfo;
+import com.pickcar.emulator.infrastructure.CycleIdsConverter;
 import com.pickcar.global.domain.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,12 +37,22 @@ public class DriveHistory extends BaseEntity {
 
     private LocalTime totalDrivingTime;
 
-    public DriveHistory(Long reservationId, EventInfo offEventInfo, Double totalDistance) {
+    @Column(columnDefinition = "text")
+    @Convert(converter = CycleIdsConverter.class)
+    List<Long> cycleIds;
+
+    @Enumerated(EnumType.STRING)
+    private Region1Depth destination;
+
+    public DriveHistory(Long reservationId, LocalDateTime engineOnTime, LocalDateTime engineOffTime,
+                        List<Long> cycleIds, Double totalDistance, String destination) {
         this.reservationId = reservationId;
-        this.drivingStartedAt = offEventInfo.getEngineOnTime();
-        this.drivingEndedAt = offEventInfo.getEngineOffTime();
-        this.totalDistance = totalDistance != null ? totalDistance / 1000 : 0.0;        //FIXME: 임시 위치
-        this.totalDrivingTime = calcTotalDrivingTime(offEventInfo.getEngineOnTime(), offEventInfo.getEngineOffTime());
+        this.drivingStartedAt = engineOnTime;
+        this.drivingEndedAt = engineOffTime;
+        this.totalDistance = totalDistance;
+        this.totalDrivingTime = calcTotalDrivingTime(engineOnTime, engineOffTime);
+        this.cycleIds = cycleIds;
+        this.destination = Region1Depth.valueOf(destination);
     }
 
     private LocalTime calcTotalDrivingTime(LocalDateTime engineOnTime, LocalDateTime engineOffTime) {

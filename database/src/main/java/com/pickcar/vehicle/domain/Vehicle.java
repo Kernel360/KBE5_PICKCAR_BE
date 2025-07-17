@@ -41,6 +41,22 @@ public class Vehicle extends BaseEntity {
         this.isRented = false;
     }
 
+    public boolean tryMarkAsRented() {
+        if (this.isRented) {
+            return false;
+        }
+        this.isRented = true;
+        return true;
+    }
+
+    public boolean tryMarkAsReturned() {
+        if (!this.isRented) {
+            return false;
+        }
+        this.isRented = false;
+        return true;
+    }
+
     public void changeStatus(VehicleStatus status) {
         this.status = status;
     }
