@@ -3,10 +3,10 @@ package com.pickcar.reservation.infrastructure;
 import com.pickcar.auth.domain.UserRole;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
+import com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection;
 import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
 import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
-import com.pickcar.vehicle.domain.Vehicle;
-import com.pickcar.vehicle.domain.VehicleStatus;
+import com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +26,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("""
             SELECT new com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection(
+                r.id,
                 u.id,
                 u.info.name,
                 u.info.email,
@@ -37,15 +38,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             LEFT JOIN Reservation r ON u.id = r.userId AND r.status IN :statuses
             LEFT JOIN Vehicle v ON r.vehicleId = v.id
             WHERE u.role = :role
+            ORDER BY u.info.name
             """)
     List<EmployeeReservationProjection> findEmployeesWithReservationPreInfo(UserRole role,
                                                                             List<ReservationStatus> statuses);
-
-    @Query("SELECT v FROM Vehicle v " +
-            "WHERE v.status = :vehicleStatus " +
-            "AND EXISTS (SELECT r FROM Reservation r " +
-            "WHERE r.vehicleId = v.id AND r.status IN :reservationStatuses)")
-    List<Vehicle> findAssignedVehicles(VehicleStatus vehicleStatus, List<ReservationStatus> reservationStatuses);
 
     @Query("SELECT r.id FROM Reservation r WHERE r.vehicleId = :vehicleId " +
             "AND r.userId = :userId AND r.status IN :statuses")
@@ -74,4 +70,26 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             WHERE r.id = :reservationId
             """)
     Optional<ReservationDetailProjection> findReservationDetailById(Long reservationId);
+
+    @Query("""
+            SELECT new com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection(
+            r.vehicleId,
+            r.rentedAt,
+            r.dueDate,
+            r.status
+            ) FROM Reservation r
+            WHERE r.userId = :userId AND r.status IN :statuses
+            """)
+    AllocatedReservationInfoProjection findAllocatedReservationInfo(Long userId, List<ReservationStatus> statuses);
+
+    @Query("""
+            SELECT new com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection(
+                dh.id,
+                dh.drivingEndedAt
+            )
+            FROM DriveHistory dh
+            WHERE dh.reservationId = :reservationId
+            ORDER BY dh.drivingEndedAt DESC
+            """)
+    List<ReservationRelatedProjection> findAllRelatedReservationId(Long reservationId);
 }

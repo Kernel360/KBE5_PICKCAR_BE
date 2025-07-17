@@ -1,7 +1,11 @@
 package com.pickcar.reservation.application.mapper;
 
+import com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection;
+import com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection;
 import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
 import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
+import com.pickcar.reservation.presentation.dto.context.RelatedHistoryContext;
+import com.pickcar.reservation.presentation.dto.response.AllocatedReservationInfo;
 import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
 import java.util.List;
@@ -15,14 +19,26 @@ public class ReservationResponseMapper {
         return new ReservationPreInfoResponse(projections);
     }
 
-    public ReservationDetailResponse toDetailResponse(ReservationDetailProjection projection) {
+    public ReservationDetailResponse toDetailResponse(ReservationDetailProjection projection,
+                                                      List<ReservationRelatedProjection> historyProjections) {
+        List<RelatedHistoryContext> contexts = RelatedHistoryContext.toContextList(historyProjections);
         return new ReservationDetailResponse(
                 projection.reservationId(),
                 projection.employeeName(),
                 projection.employeePhoneNumber(),
                 projection.vehicleInfo(),
                 projection.dueDate(),
-                projection.rentedAt()
+                projection.rentedAt(),
+                contexts
+        );
+    }
+
+    public AllocatedReservationInfo toAllocatedReservationInfo(AllocatedReservationInfoProjection projection) {
+        return new AllocatedReservationInfo(
+                projection.vehicleId(),
+                projection.rentedAt(),
+                projection.dueDate(),
+                projection.status()
         );
     }
 }

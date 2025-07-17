@@ -1,6 +1,8 @@
 package com.pickcar.reservation.application;
 
 import com.pickcar.auth.domain.UserRole;
+import com.pickcar.drivehistory.application.service.DriveHistoryService;
+import com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection;
 import com.pickcar.dto.command.DriveHistoryWriteCommand;
 import com.pickcar.dto.command.ReservationReturnCommand;
 import com.pickcar.reservation.application.mapper.ReservationResponseMapper;
@@ -10,15 +12,14 @@ import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.exception.ReservationErrorCode;
 import com.pickcar.reservation.exception.ReservationException;
 import com.pickcar.reservation.infrastructure.ReservationRepository;
+import com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection;
 import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
 import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
 import com.pickcar.reservation.presentation.dto.request.ReservationRequest;
+import com.pickcar.reservation.presentation.dto.response.AllocatedReservationInfo;
 import com.pickcar.reservation.presentation.dto.response.ReservationDetailResponse;
 import com.pickcar.reservation.presentation.dto.response.ReservationPreInfoResponse;
-import com.pickcar.reservation.presentation.dto.response.SearchAbleVehiclesResponse;
 import com.pickcar.vehicle.application.VehicleService;
-import com.pickcar.vehicle.domain.Vehicle;
-import com.pickcar.vehicle.domain.VehicleStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -80,21 +81,18 @@ public class ReservationService {
         }
     }
 
-    public List<SearchAbleVehiclesResponse> getAssignedVehicles() {
-        //운행 가능한 상태의 차면서 예약 상태인 것
-        List<Vehicle> availableVehicles = reservationRepository.findAssignedVehicles(VehicleStatus.OPERABLE,
-                List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
-
-        return availableVehicles.stream()
-                .map(SearchAbleVehiclesResponse::from)
-                .toList();
-    }
-
     public ReservationDetailResponse getDetailResponse(Long reservationId) {
         ReservationDetailProjection projection = reservationRepository.findReservationDetailById(reservationId)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_BY_ID));
 
-        return responseMapper.toDetailResponse(projection);
+        List<ReservationRelatedProjection> relatedHistoryProjections = getHistoriesById(projection.reservationId());
+
+        return responseMapper.toDetailResponse(projection, relatedHistoryProjections);
+    }
+
+
+    public List<ReservationRelatedProjection> getHistoriesById(Long reservationId) {
+        return reservationRepository.findAllRelatedReservationId(reservationId);
     }
 
     private Reservation getReservationForReturn(Long userId, Long vehicleId) {
@@ -118,5 +116,12 @@ public class ReservationService {
         return reservationRepository.findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(
                         vehicleId, userId, ReservationStatus.RETURNED, coolDownMinutesAgo, now)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_FOUND_LATEST_UPDATED_RESERVATION));
+    }
+
+    public AllocatedReservationInfo getIdByUserIdFromReservation(Long userId) {
+        AllocatedReservationInfoProjection projection = reservationRepository.findAllocatedReservationInfo(
+                userId, List.of(ReservationStatus.RESERVED, ReservationStatus.DELAYED));
+
+        return responseMapper.toAllocatedReservationInfo(projection);
     }
 }
