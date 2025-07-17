@@ -29,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@Valid @RequestBody UserInfoRequest request) {
+    public void register(@RequestBody UserInfoRequest request) {
         authService.create(request);
     }
 
