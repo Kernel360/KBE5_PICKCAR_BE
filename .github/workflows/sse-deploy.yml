@@ -1,9 +1,9 @@
 name: Build and Deploy SSE Service
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_dispatch:
+#    branches:
+#      - dev
 
 jobs:
   build_and_deploy:
@@ -58,6 +58,7 @@ jobs:
           script: |
             cd /home/${{ secrets.EC2_USERNAME }}/pickcar-sse-test      
             cat > .env <<EOF
+            SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }}
             EC2_USERNAME=${{ secrets.EC2_USERNAME }}
             
             DB_HOST=${{ secrets.DB_HOST }}
@@ -80,7 +81,7 @@ jobs:
             PINPOINT_APPLICATION_NAME=${{ secrets.PINPOINT_APPLICATION_NAME_SSE }}
             EOF
             
-            echo "${{ secrets.PROD_APPLICATION_YML_SSE }}" | base64 -d > /home/${{ secrets.EC2_USERNAME }}/pickcar-sse-test/application-prod.yml
+            echo "${{ secrets.PROD_APPLICATION_YML_SSE }}" | base64 -d > /home/${{ secrets.EC2_USERNAME }}/pickcar-sse-test/config/application-prod.yml
             
             docker compose -f docker-compose.sse.yml down
             docker compose -f docker-compose.sse.yml up -d
