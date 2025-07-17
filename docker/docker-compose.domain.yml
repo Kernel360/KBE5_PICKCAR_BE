@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  pickcar-domain-test:
+    container_name: pickcar-domain-test
+    image: eclipse-temurin:21-jdk
+    #    build:
+    #        context: ../domain
+    #        dockerfile: Dockerfile.prod
+    environment:
+      - TZ=Asia/Seoul
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_RABBITMQ_HOST=${RABBITMQ_HOST}
+      - SPRING_RABBITMQ_PORT=${RABBITMQ_PORT}
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - PINPOINT_AGENT_ID=${PINPOINT_AGENT_ID}
+      - PINPOINT_APPLICATION_NAME=${PINPOINT_APPLICATION_NAME}
+    ports:
+      - "8087:8080"
+    volumes:
+      - /home/${EC2_USERNAME}/pickcar-domain-test/domain-0.0.1-SNAPSHOT.jar:/app/app.jar
+      - /home/${EC2_USERNAME}/pickcar-domain-test/logs:/app/logs
+      - /pinpoint:/pinpoint
+    working_dir: /app
+    command: >
+      java
+      -Ddebug
+      -javaagent:/pinpoint/pinpoint-agent-2.5.4/pinpoint-bootstrap-2.5.4.jar
+      -Dpinpoint.agentId=${PINPOINT_AGENT_ID}
+      -Dpinpoint.applicationName=${PINPOINT_APPLICATION_NAME}
+      -Dpinpoint.config=/pinpoint/pinpoint-agent-2.5.4/pinpoint-root.config
+      -Duser.timezone=Asia/Seoul
+      -Dfile.encoding=UTF-8
+      -Dsun.jnu.encoding=UTF-8
+      -Duser.language=ko
+      -Duser.country=KR
+      -Dclient.encoding.override=UTF-8
+      -jar app.jar --spring.profiles.active=prod
+    networks:
+      - pickcar-net-test
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail-test
+    ports:
+      - "9087:9080"
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - /home/${EC2_USERNAME}/pickcar-domain-test/promtail-config.yml:/etc/promtail/config.yml
+      - /home/${EC2_USERNAME}/pickcar-domain-test/logs:/app/logs
+      - /home/${EC2_USERNAME}/pickcar-domain-test/promtail:/var/log/promtail
+    environment:
+      - HOSTNAME=${HOSTNAME:-$(hostname)}
+      - EC2_INSTANCE_ID=${EC2_INSTANCE_ID:-unknown}
+    networks:
+      - pickcar-net-test
+    restart: unless-stopped
+    depends_on:
+      - pickcar-domain-test
+
+volumes:
+  mysql-data:
+    name: mysql-data
+
+networks:
+  pickcar-net-test:
+    name: pickcar-net-test
