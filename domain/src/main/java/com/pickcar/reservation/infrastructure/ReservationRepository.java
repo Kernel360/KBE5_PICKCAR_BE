@@ -6,6 +6,7 @@ import com.pickcar.reservation.domain.ReservationStatus;
 import com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection;
 import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
 import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
+import com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("""
             SELECT new com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection(
+                r.id,
                 u.id,
                 u.info.name,
                 u.info.email,
@@ -36,6 +38,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             LEFT JOIN Reservation r ON u.id = r.userId AND r.status IN :statuses
             LEFT JOIN Vehicle v ON r.vehicleId = v.id
             WHERE u.role = :role
+            ORDER BY u.info.name
             """)
     List<EmployeeReservationProjection> findEmployeesWithReservationPreInfo(UserRole role,
                                                                             List<ReservationStatus> statuses);
@@ -78,4 +81,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             WHERE r.userId = :userId AND r.status IN :statuses
             """)
     AllocatedReservationInfoProjection findAllocatedReservationInfo(Long userId, List<ReservationStatus> statuses);
+
+    @Query("""
+            SELECT new com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection(
+                dh.id,
+                dh.drivingEndedAt
+            )
+            FROM DriveHistory dh
+            WHERE dh.reservationId = :reservationId
+            ORDER BY dh.drivingEndedAt DESC
+            """)
+    List<ReservationRelatedProjection> findAllRelatedReservationId(Long reservationId);
 }

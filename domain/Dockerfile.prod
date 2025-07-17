@@ -1,0 +1,10 @@
+# base image
+FROM eclipse-temurin:21-jdk
+
+# set working directory
+WORKDIR /app
+
+COPY domain-0.0.1-SNAPSHOT.jar app.jar
+
+# 기본 명령 설정 (docker-compose에서 override 가능)
+CMD ["java", "-jar", "app.jar"]

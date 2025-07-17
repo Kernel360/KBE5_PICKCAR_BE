@@ -65,7 +65,7 @@ public class DriveHistoryService {
                 command.engineOnTime(),
                 command.engineOffTime(),
                 cycleData.getCycleIds(),
-                cycleData.getTotalDistance(),
+                cycleData.getTotalDistance() / 1000,
                 destination
         );
 
