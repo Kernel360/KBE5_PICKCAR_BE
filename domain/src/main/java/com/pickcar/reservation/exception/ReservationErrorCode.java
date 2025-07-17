@@ -21,7 +21,8 @@ public enum ReservationErrorCode implements BaseErrorCode {
 
     //404(NOT_FOUND)
     NOT_FOUND_ACTIVE_RESERVATION_BY_VEHICLE_ID(HttpStatus.NOT_FOUND, "RS_404_1", "해당 자동차의 예약 기록을 찾을 수 없습니다."),
-    NOT_FOUND_LATEST_UPDATED_RESERVATION(HttpStatus.NOT_FOUND, "RS_404_2", "해당 자동차의 최근 수정된 예약 기록을 찾을 수 없습니다.");
+    NOT_FOUND_LATEST_UPDATED_RESERVATION(HttpStatus.NOT_FOUND, "RS_404_2", "해당 자동차의 최근 수정된 예약 기록을 찾을 수 없습니다."),
+    NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "RS_404_3", "주어진 예약 번호로 예약을 찾을 수 없습니다.");
 
     private HttpStatus httpStatus;
     private String errorCode;

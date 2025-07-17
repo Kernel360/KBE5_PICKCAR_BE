@@ -1,40 +1,95 @@
 package com.pickcar.reservation.infrastructure;
 
+import com.pickcar.auth.domain.UserRole;
 import com.pickcar.reservation.domain.Reservation;
 import com.pickcar.reservation.domain.ReservationStatus;
-import com.pickcar.vehicle.domain.Vehicle;
-import com.pickcar.vehicle.domain.VehicleStatus;
+import com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection;
+import com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection;
+import com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection;
+import com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    Optional<Reservation> findByVehicleIdAndStatus(Long vehicleId, ReservationStatus status);
-    Optional<Reservation> findByUserIdAndStatus(Long userId, ReservationStatus status);
-    Optional<Reservation> findByVehicleIdAndUpdatedAtBetween(Long vehicleId, LocalDateTime from, LocalDateTime to);
+    Boolean existsByVehicleIdAndStatusIn(Long vehicleId, List<ReservationStatus> statuses);
 
-    @Query("SELECT v FROM Vehicle v " +
-            "WHERE v.status = :vehicleStatus " +
-            "AND NOT EXISTS (SELECT r FROM Reservation r " +
-            "WHERE r.vehicleId = v.id AND r.status = :reservationStatus)")
-    List<Vehicle> findAvailableVehicles(VehicleStatus vehicleStatus, ReservationStatus reservationStatus);
+    Boolean existsByUserIdAndStatusIn(Long userId, List<ReservationStatus> statuses);
 
-    Optional<Reservation> findByUserIdAndVehicleIdAndStatusIn(Long userId, Long vehicleId, List<ReservationStatus> statuses);
+    Optional<Reservation> findByUserIdAndVehicleIdAndStatusIn(Long userId, Long vehicleId,
+                                                              List<ReservationStatus> statuses);
+
     List<Reservation> findAllByDueDate(LocalDate dueDate);
 
-    @Query("SELECT DISTINCT r.userId FROM Reservation r WHERE r.status IN :statuses")
-    List<Long> findUserIdsByStatusIn(@Param("statuses") List<ReservationStatus> statuses);
+    @Query("""
+            SELECT new com.pickcar.reservation.infrastructure.dto.EmployeeReservationProjection(
+                r.id,
+                u.id,
+                u.info.name,
+                u.info.email,
+                u.role,
+                CASE WHEN r.id IS NOT NULL THEN true ELSE false END,
+                v.info.licensePlate
+            )
+            FROM User u
+            LEFT JOIN Reservation r ON u.id = r.userId AND r.status IN :statuses
+            LEFT JOIN Vehicle v ON r.vehicleId = v.id
+            WHERE u.role = :role
+            ORDER BY u.info.name
+            """)
+    List<EmployeeReservationProjection> findEmployeesWithReservationPreInfo(UserRole role,
+                                                                            List<ReservationStatus> statuses);
 
-    @Query("SELECT DISTINCT r.vehicleId FROM Reservation r WHERE r.status IN :statuses")
-    List<Long> findVehicleIdsByStatusIn(@Param("statuses") List<ReservationStatus> statuses);
+    @Query("SELECT r.id FROM Reservation r WHERE r.vehicleId = :vehicleId " +
+            "AND r.userId = :userId AND r.status IN :statuses")
+    Optional<Long> findIdByVehicleIdAndUserIdAndStatusIn(Long vehicleId, Long userId,
+                                                         List<ReservationStatus> statuses);
 
-    @Query("SELECT v FROM Vehicle v " +
-            "WHERE v.status = :vehicleStatus " +
-            "AND EXISTS (SELECT r FROM Reservation r " +
-            "WHERE r.vehicleId = v.id AND r.status = :reservationStatus)")
-    List<Vehicle> findAssignedVehicles(VehicleStatus vehicleStatus, ReservationStatus reservationStatus);
+    @Query("SELECT r.id FROM Reservation r WHERE r.vehicleId = :vehicleId " +
+            "AND r.userId = :userId AND r.status = :status " +
+            "AND r.updatedAt BETWEEN :from AND :to")
+    Optional<Long> findIdByVehicleIdAndUserIdAndStatusAndUpdatedAtBetween(Long vehicleId, Long userId,
+                                                                          ReservationStatus returnStatus,
+                                                                          LocalDateTime from, LocalDateTime now);
+
+    @Query("""
+            SELECT new com.pickcar.reservation.infrastructure.dto.ReservationDetailProjection(
+                r.id,
+                u.info.name,
+                u.info.phoneNumber,
+                v.info,
+                r.dueDate,
+                r.rentedAt
+            )
+            FROM Reservation r
+            JOIN User u ON r.userId = u.id
+            JOIN Vehicle v ON r.vehicleId = v.id
+            WHERE r.id = :reservationId
+            """)
+    Optional<ReservationDetailProjection> findReservationDetailById(Long reservationId);
+
+    @Query("""
+            SELECT new com.pickcar.reservation.infrastructure.dto.AllocatedReservationInfoProjection(
+            r.vehicleId,
+            r.rentedAt,
+            r.dueDate,
+            r.status
+            ) FROM Reservation r
+            WHERE r.userId = :userId AND r.status IN :statuses
+            """)
+    AllocatedReservationInfoProjection findAllocatedReservationInfo(Long userId, List<ReservationStatus> statuses);
+
+    @Query("""
+            SELECT new com.pickcar.reservation.infrastructure.dto.ReservationRelatedProjection(
+                dh.id,
+                dh.drivingEndedAt
+            )
+            FROM DriveHistory dh
+            WHERE dh.reservationId = :reservationId
+            ORDER BY dh.drivingEndedAt DESC
+            """)
+    List<ReservationRelatedProjection> findAllRelatedReservationId(Long reservationId);
 }

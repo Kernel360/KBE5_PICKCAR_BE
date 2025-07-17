@@ -105,5 +105,8 @@ public class AuthService {
         return responses;
     }
 
+    public List<User> getAllByRole(UserRole userRole) {
+        return userRepository.findAllByRole(userRole);
+    }
 }
 

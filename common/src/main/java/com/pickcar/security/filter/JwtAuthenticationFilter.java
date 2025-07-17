@@ -42,12 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/auth/sign-up",
             "/api/v1/auth/login",
             "/api/v1/auth/logout",
-            "/api/v1/history/**",
-            "/api/v1/cycle/**",
-            "/api/v1/event/**",
-            "/api/v1/sse/**"
+            "/api/v1/sse/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/actuator/**"
     );
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -65,7 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String refreshToken = extractRefreshTokenFromCookie(request);
 
             TokenStatus refreshTokenStatus = jwtProvider.validateToken(refreshToken);
-            log.info("refreshTokenStatus: {}", refreshTokenStatus);
 
             if (refreshTokenStatus == TokenStatus.VALID) {
                 // RefreshToken을 request에 저장
@@ -82,7 +83,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = extractAccessToken(request);
 
         TokenStatus accessTokenStatus = jwtProvider.validateToken(accessToken);
-        log.info("accessTokenStatus : {}", accessTokenStatus);
 
         if(accessTokenStatus == TokenStatus.VALID){
             Claims claims = jwtProvider.parseToken(accessToken).getBody();

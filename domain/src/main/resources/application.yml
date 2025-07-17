@@ -14,6 +14,12 @@ custom:
   driveHistory:
     maximum-inquiry-days: 30
 
+mq:
+  domain-command:
+    queue: domain-command-queue
+    exchange: exchange-domain-command
+    routing-key: domaincommand.key
+
 logging:
   module-name: domain
   sensitive-field-rules:
