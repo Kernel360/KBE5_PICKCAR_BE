@@ -11,7 +11,7 @@ mq:
     queue: cycle-queue-sse
 
 logging:
-  module-name: consumer
+  module-name: emulator
   sensitive-field-rules:
     - path: "none"
       fields: ["none"]
