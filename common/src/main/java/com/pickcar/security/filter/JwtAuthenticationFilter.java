@@ -42,9 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/auth/sign-up",
             "/api/v1/auth/login",
             "/api/v1/auth/logout",
-            "/api/v1/sse/**"
+            "/api/v1/sse/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/actuator/**"
     );
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
