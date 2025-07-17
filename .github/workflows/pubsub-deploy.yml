@@ -1,9 +1,9 @@
 name: Build and Deploy PubSub Service
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_dispatch:
+#    branches:
+#      - dev
 
 jobs:
   build_and_deploy:
@@ -72,6 +72,7 @@ jobs:
           script: |
             cd /home/${{ secrets.EC2_USERNAME }}/pickcar-pubsub-test
             cat > .env <<EOF
+            SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }}
             EC2_USERNAME=${{ secrets.EC2_USERNAME }}
             
             DB_HOST=${{ secrets.DB_HOST }}
@@ -97,8 +98,8 @@ jobs:
             PINPOINT_APPLICATION_NAME_CONSUMER=${{ secrets.PINPOINT_APPLICATION_NAME_CONSUMER }}
             EOF
                     
-            echo "${{ secrets.PROD_APPLICATION_YML_CONSUMER }}" | base64 -d > /home/${{ secrets.EC2_USERNAME }}/pickcar-pubsub-test/application-prod-consumer.yml
-            echo "${{ secrets.PROD_APPLICATION_YML_PRODUCER }}" | base64 -d > /home/${{ secrets.EC2_USERNAME }}/pickcar-pubsub-test/application-prod-producer.yml
+            echo "${{ secrets.PROD_APPLICATION_YML_CONSUMER }}" | base64 -d > /home/${{ secrets.EC2_USERNAME }}/pickcar-pubsub-test/config/application-prod-consumer.yml
+            echo "${{ secrets.PROD_APPLICATION_YML_PRODUCER }}" | base64 -d > /home/${{ secrets.EC2_USERNAME }}/pickcar-pubsub-test/config/application-prod-producer.yml
             
             docker compose -f docker-compose.pubsub.yml down
             docker compose -f docker-compose.pubsub.yml up -d

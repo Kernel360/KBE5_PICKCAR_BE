@@ -23,6 +23,7 @@ services:
       - "8087:8080"
     volumes:
       - /home/${EC2_USERNAME}/pickcar-domain-test/domain-0.0.1-SNAPSHOT.jar:/app/app.jar
+      - /home/${EC2_USERNAME}/pickcar-domain-test/config:/app/config
       - /home/${EC2_USERNAME}/pickcar-domain-test/logs:/app/logs
       - /pinpoint:/pinpoint
     working_dir: /app

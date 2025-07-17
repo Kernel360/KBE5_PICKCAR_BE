@@ -8,6 +8,7 @@ import com.pickcar.auth.presentation.dto.request.UserInfoRequest;
 import com.pickcar.auth.presentation.dto.response.AuthResponse;
 import com.pickcar.auth.presentation.dto.response.EmployeeListResponse;
 import com.pickcar.auth.presentation.dto.response.UnAllocatedEmployeeResponse;
+import com.pickcar.auth.validator.AuthValidator;
 import com.pickcar.security.jwt.JwtProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final AuthValidator authValidator;
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
@@ -40,10 +42,7 @@ public class AuthService {
 
     @Transactional
     public void create(UserInfoRequest request) {
-
-        if (userRepository.existsByInfoEmail(request.email())) {
-            throw new AuthException(AuthErrorCode.ALREADY_EXIST_EMAIL);
-        }
+        authValidator.userRegisterRequest(request);
 
         User user = User.builder()
                 .info(toUserInfoWithEncodedPassword(request))

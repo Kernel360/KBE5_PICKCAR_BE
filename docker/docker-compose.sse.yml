@@ -58,6 +58,7 @@ services:
     command: -config.file=/etc/promtail/config.yml
     volumes:
       - /home/${EC2_USERNAME}/pickcar-sse-test/promtail-config.yml:/etc/promtail/config.yml
+      - /home/${EC2_USERNAME}/pickcar-sse-test/config:/app/config
       - /home/${EC2_USERNAME}/pickcar-sse-test/logs:/app/logs
       - /home/${EC2_USERNAME}/pickcar-sse-test/promtail:/var/log/promtail
     environment:
