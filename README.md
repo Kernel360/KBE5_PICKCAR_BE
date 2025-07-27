@@ -7,6 +7,9 @@
 차량 할당부터 실시간 운행 관제, 반납 후 운행일지 자동 기록까지 체계적으로 관리할 수 있으며,<br /> 사원에게 차량을 쉽게 배정하고 운행 중인 차량의 위치와 상태를 실시간으로 모니터링하여 차량 관리의 편의성을
 제공합니다.
 
+## 📕 최종 발표 자료 보기
+[Pickcar_최종발표.pdf](https://github.com/user-attachments/files/21454868/Pickcar_.pdf)
+
 ## ✨ 핵심 기능
 
 ### 👥 사용자 관리
@@ -151,17 +154,8 @@
 [![K6](https://img.shields.io/badge/K6-7D64FF?logo=k6&logoColor=white&style=for-the-badge)](#)
 [![nGrinder](https://img.shields.io/badge/nGrinder-4CAF50?logo=naver&logoColor=white&style=for-the-badge)](#)
 
-### 🎨 Frontend & Design
+### 🎨 Frontend 보러가기
 [FE Repository 보러가기](https://github.com/Kernel360/KBE5_PICKCAR_FE) <br/>
-[![Cursor](https://custom-icon-badges.demolab.com/badge/Cursor-000000?logo=cursor-ai-white&style=for-the-badge)](#)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white&style=for-the-badge)](#)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge)](#)
-[![DaisyUI](https://img.shields.io/badge/DaisyUI-5A0EF8?logo=daisyui&logoColor=white&style=for-the-badge)](#)
-[![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?logo=chartdotjs&logoColor=white&style=for-the-badge)](#)
-[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white&style=for-the-badge)](#)
-
-## 📕 최종 발표 자료
-[Pickcar_최종발표.pdf](https://github.com/user-attachments/files/21454868/Pickcar_.pdf)
 
 ## 👥 팀 정보
 
