@@ -13,7 +13,7 @@ public record VehicleReservationStatResponse(
         return new VehicleReservationStatResponse(
                 projection.totalVehicleCount(),
                 projection.reservedVehiclesCount(),
-                projection.totalVehicleCount() - projection.reservedVehiclesCount(),
+                projection.damagedVehiclesCount(),
                 projection.expectedReturnInNext3Days(),
                 projection.delayedCount()
         );

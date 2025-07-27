@@ -202,3 +202,4 @@ logs/.promtail-positions.yml
 **/application-docker.yml
 Dockerfile
 docker/produce/**
+docker/last-produce/**
