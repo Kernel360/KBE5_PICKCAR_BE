@@ -14,11 +14,48 @@
 - **회원가입 및 로그인**: 관리자와 사원으로 권한 분리
 - **역할 기반 접근**: 회원 권한에 따른 다른 기능/화면 제공
 
+<table align="center">
+  <tr>
+    <th><code>온보딩 페이지</code></th>
+    <th><code>회원가입</code></th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/ab3438e0-aeaa-44b8-8e63-4a314e355f93" width="300" alt="온보딩 페이지"></td>
+    <td><img src="https://github.com/user-attachments/assets/4d178199-19a8-437b-a504-b10d59b3dcca" width="180" alt="회원가입"></td>
+  </tr>
+</table>
+
 ### 🚙 차량 관리
 
 - **차량 등록 및 관리**: 차량 등록 및 상태 변경
 - **사원 차량 할당**: 사원에게 차량 할당 기능
 - **할당 정보 조회**: 차량 할당 정보와 연관된 운행 기록 조회
+
+<table align="center">
+  <tr>
+    <th><code>차량 리스트</code></th>
+    <th><code>차량 등록</code></th>
+    <th><code>차량 상태 변경</code></th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/0d26896a-6827-42ec-b36e-6198d579af5a" width="300" alt="차량 리스트"></td>
+    <td><img src="https://github.com/user-attachments/assets/4d178199-19a8-437b-a504-b10d59b3dcca" width="180" alt="차량 등록"></td>
+    <td><img src="https://github.com/user-attachments/assets/efb2a574-6efe-4a74-a007-1d071a25b30d" width="180" alt="차량 상태 변경"></td>
+  </tr>
+</table>
+
+<table align="center">
+  <tr>
+    <th><code>사원 차량 관리</code></th>
+    <th><code>차량 할당</code></th>
+    <th><code>상세 할당 정보</code></th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/1caf705b-a634-43a5-aaa0-1f52d47b01f2" width="300" alt="사원 차량 관리"></td>
+    <td><img src="https://github.com/user-attachments/assets/41e13de2-f236-4447-81a6-55f0f91ecc29" width="180" alt="차량 할당"></td>
+    <td><img src="https://github.com/user-attachments/assets/7e846d0c-042b-45ff-a2d5-606dfc816a38" width="180" alt="상세 할당 정보"></td>
+  </tr>
+</table>
 
 ### 📡 실시간 관제
 
@@ -26,17 +63,38 @@
 - **이동 경로 표현**: 발생 좌표 정보를 기반으로 한 준실시간 이동 경로 시각화
 - **애뮬레이터**: RabbitMQ를 활용한 주기정보 및 이벤트 정보 전송
 
+<table align="center">
+  <tr>
+    <th><code>실시간 관제</code></th>
+    <th><code>차량 애뮬레이터</code></th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/c974ee0d-2d8f-456c-89ea-f4a12bf1174c" width="300" alt="실시간 관제"></td>
+    <td><img src="https://github.com/user-attachments/assets/346224e9-77bc-4b83-863e-c4ab42263017" width="180" alt="차량 애뮬레이터"></td>
+  </tr>
+</table>
+
 ### 📊 운행일지 및 통계
 
 - **자동 운행일지 생성**: ON → OFF 사이 주기정보 기반 운행 내역 자동 기록
 - **상세 운행 정보**:
     - 운행 차량 정보, 운행 시작/종료 시간, 총 이동 거리, 상세 이동 경로
-
-### 📈 대시보드
-
 - **실시간 모니터링**: 차량 예약 및 상태 실시간 조회
 - **통계 데이터**: 매일 새벽 전일 집계 데이터 수집 및 분석
     - 방문지별 통계, 일별 이동 거리 통계, 전일 기준 최다 이동 사원 통계
+
+<table align="center">
+  <tr>
+    <th><code>운행일지 리스트 조회</code></th>
+    <th><code>운행일지 상세보기</code></th>
+    <th><code>통계 대시보드</code></th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/d55a2d82-0026-417d-a286-0b10dcad1de5" width="300" alt="운행일지 리스트 조회"></td>
+    <td><img src="https://github.com/user-attachments/assets/ab93ae4b-f972-4c86-a6b5-7189126721ab" width="180" alt="운행일지 상세보기"></td>
+    <td><img src="https://github.com/user-attachments/assets/05e3c74e-3dab-48c2-9543-497329fd7b57" width="300" alt="통계 대시보드"></td>
+  </tr>
+</table>
 
 ## 🏗 시스템 아키텍처
 ### 주요 구성 요소
