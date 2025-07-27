@@ -97,12 +97,7 @@
 </table>
 
 ## 🏗 시스템 아키텍처
-### 주요 구성 요소
-
-- **웹 애플리케이션**: Spring Boot 기반 백엔드 서비스
-- **메시지 큐**: RabbitMQ를 활용한 준실시간 데이터 처리
-- **실시간 통신**: Redis + SSE를 통한 클라이언트-서버 간 준실시간 데이터 전송 및 추가 확장 고려
-- **애뮬레이터**: 차량 위치 및 상태 정보 전송 ON/OFF 및 반납 처리
+<img width="3093" height="2225" alt="Pickcar_architecture" src="https://github.com/user-attachments/assets/308cee8e-9428-442e-828c-1d291138944c" />
 
 ## 프로젝트 구조
 
@@ -164,6 +159,9 @@
 [![DaisyUI](https://img.shields.io/badge/DaisyUI-5A0EF8?logo=daisyui&logoColor=white&style=for-the-badge)](#)
 [![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?logo=chartdotjs&logoColor=white&style=for-the-badge)](#)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white&style=for-the-badge)](#)
+
+## 📕 최종 발표 자료
+[Pickcar_최종발표.pdf](https://github.com/user-attachments/files/21454868/Pickcar_.pdf)
 
 ## 👥 팀 정보
 
