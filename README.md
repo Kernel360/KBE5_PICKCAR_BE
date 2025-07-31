@@ -143,6 +143,7 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white&style=for-the-badge)](#)
 [![Docker Compose](https://img.shields.io/badge/Docker%20Compose-2496ED?logo=docker&logoColor=white&style=for-the-badge)](#)
 [![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black&style=for-the-badge)](#)
+[![Nginx](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white&style=for-the-badge)](#)
 
 ### 📊 Monitoring & Logging
 [![Promtail](https://img.shields.io/badge/Promtail-2.9.0-F46800?logo=grafana&logoColor=white&labelColor=F46800&style=for-the-badge)](#)
